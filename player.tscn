@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3 uid="uid://dqauwk5l6600p"]
+
+[ext_resource type="Script" path="res://Player.gd" id="1_rc36s"]
+[ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_kowey"]
+[ext_resource type="PackedScene" uid="uid://bteb52yklpiuy" path="res://skill.tscn" id="3_vfrbb"]
+[ext_resource type="Script" path="res://dodge.gd" id="4_5ymh4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
+size = Vector2(10, 17)
+
+[node name="Player" type="CharacterBody2D"]
+position = Vector2(0, -10)
+scale = Vector2(5, 5)
+script = ExtResource("1_rc36s")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(9.53674e-07, 9.53674e-07)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_kowey")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_1xecy")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+
+[node name="Skills" type="Node" parent="."]
+
+[node name="dodge" parent="Skills" instance=ExtResource("3_vfrbb")]
+script = ExtResource("4_5ymh4")
+cooldown = 5
+duration = null
+
+[node name="ShootingPoint" type="Node2D" parent="."]
+position = Vector2(6, -4)
+
+[node name="ShootingTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="end" from="Skills/dodge" to="." method="dodge_end"]
+[connection signal="start" from="Skills/dodge" to="." method="dodge_start"]
+[connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]

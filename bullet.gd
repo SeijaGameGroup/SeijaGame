@@ -1,0 +1,15 @@
+extends Sprite2D
+
+var velocity : Vector2
+@export var speed = 200
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	velocity *= speed
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	position += velocity * delta
+	pass
