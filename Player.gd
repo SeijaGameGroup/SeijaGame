@@ -1,7 +1,5 @@
 extends CharacterBody2D
 
-const JUMP_VELOCITY = -400.0
-
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
@@ -9,12 +7,25 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var damage : float = 6
 @export var tears : float = 0.3
 @export var speed : float = 6
+@export var jump_velocity = -400.0
+
 @export var damage_reduction_rate : float = 0
+@export var speed_multiplier : float = 1
+@export var gravity_multiplier : float = 1
+@export var jump_velocity_multipler : float = 1
 
 var SPEED : int :
 	get:
-		return int(speed * 50)
+		return int(speed * 50 * speed_multiplier)
 		
+var GRAVITY : 
+	get:
+		return gravity * gravity_multiplier
+		
+var JUMP_VELOCITY :
+	get:
+		return jump_velocity * jump_velocity_multipler
+
 var movable : bool = true
 
 @onready var shooting_timer = $ShootingTimer
@@ -26,12 +37,13 @@ func _physics_process(delta):
 		shooting_timer.start(tears)
 	if movable:
 		# Add the gravity.
-		if not is_on_floor():
-			velocity.y += gravity * delta
+		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
+		velocity.y += GRAVITY * delta
 
 		# Handle Jump.
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = JUMP_VELOCITY
+		if Input.is_action_just_pressed("jump"):
+			if (JUMP_VELOCITY < 0 and is_on_floor()) or (JUMP_VELOCITY > 0 and is_on_ceiling()):
+				velocity.y = JUMP_VELOCITY
 
 		# Get the input direction and handle the movement/deceleration.
 		# As good practice, you should replace UI actions with custom gameplay actions.
@@ -48,6 +60,16 @@ func dodge_start():
 
 func dodge_end():
 	movable = true
+	
+func skill2_start():
+	gravity_multiplier = -1
+	jump_velocity_multipler = -1
+	speed_multiplier = 1.5
+
+func skill2_end():
+	gravity_multiplier = 1
+	jump_velocity_multipler = 1
+	speed_multiplier = 1
 
 func shoot():
 	var bullet = preload("res://bullet.tscn").instantiate()
