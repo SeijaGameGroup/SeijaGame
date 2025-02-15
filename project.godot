@@ -58,6 +58,12 @@ skill3={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_3="PlayerHurtBox"
+2d_physics/layer_4="MonsterHurtBox"
+2d_physics/layer_5="PlayerDetectedArea"
+
 [rendering]
 
-textures/vram_compression/import_s3tc_bptc=true
+textures/canvas_textures/default_texture_filter=0

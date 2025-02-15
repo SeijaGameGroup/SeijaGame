@@ -20,16 +20,23 @@ var SPEED : int :
 		
 var GRAVITY : 
 	get:
-		return gravity * gravity_multiplier
+		return gravity * gravity_multiplier * (-1 if upside_down else 1)
 		
 var JUMP_VELOCITY :
 	get:
-		return jump_velocity * jump_velocity_multipler
+		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
 
 var movable : bool = true
 
+var upside_down : bool = false : 
+	set(value):
+		sprite_2d.flip_v = value
+		upside_down = value
+
 @onready var shooting_timer = $ShootingTimer
 @onready var shooting_point = $ShootingPoint
+@onready var sprite_2d = $Sprite2D
+@onready var collision_shape_2d = $CollisionShape2D
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -49,9 +56,12 @@ func _physics_process(delta):
 		# As good practice, you should replace UI actions with custom gameplay actions.
 		var direction = Input.get_axis("move_left", "move_right")
 		if direction:
-			velocity.x = direction * SPEED
+			velocity.x = direction * SPEED			
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
+			
+		if not is_zero_approx(velocity.x):
+			sprite_2d.flip_h = velocity.x < 0
 		
 		move_and_slide()
 
@@ -62,13 +72,11 @@ func dodge_end():
 	movable = true
 	
 func skill2_start():
-	gravity_multiplier = -1
-	jump_velocity_multipler = -1
+	upside_down = true
 	speed_multiplier = 1.5
 
 func skill2_end():
-	gravity_multiplier = 1
-	jump_velocity_multipler = 1
+	upside_down = false
 	speed_multiplier = 1
 
 func shoot():
@@ -76,6 +84,7 @@ func shoot():
 	bullet.position = shooting_point.global_position
 	bullet.velocity = bullet.position.direction_to(get_global_mouse_position())
 	get_tree().current_scene.add_child(bullet)
+	bullet.damage = self.damage
 
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):

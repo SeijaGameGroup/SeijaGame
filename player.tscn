@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=13 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_rc36s"]
 [ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_kowey"]
@@ -7,9 +7,17 @@
 [ext_resource type="Script" path="res://skill1.gd" id="5_57ltk"]
 [ext_resource type="Script" path="res://skill2.gd" id="6_jovnq"]
 [ext_resource type="Script" path="res://skill3.gd" id="7_cuga2"]
+[ext_resource type="Script" path="res://hurtbox.gd" id="8_4yv01"]
+[ext_resource type="Script" path="res://detected_area.gd" id="9_f6fna"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
-size = Vector2(10, 17)
+size = Vector2(6.5, 15.2)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6gk5o"]
+size = Vector2(3.2, 8.4)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_irvdk"]
+radius = 4.8
 
 [node name="Player" type="CharacterBody2D"]
 position = Vector2(0, -10)
@@ -22,7 +30,8 @@ scale = Vector2(0.2, 0.2)
 texture = ExtResource("2_kowey")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 1.5)
+position = Vector2(0.0499996, 2)
+scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_1xecy")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -51,6 +60,24 @@ position = Vector2(6, -4)
 
 [node name="ShootingTimer" type="Timer" parent="."]
 one_shot = true
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("8_4yv01")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(-0.2, -0.4)
+shape = SubResource("RectangleShape2D_6gk5o")
+
+[node name="DetectedArea" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("9_f6fna")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectedArea"]
+position = Vector2(0, 2)
+shape = SubResource("CircleShape2D_irvdk")
 
 [connection signal="end" from="Skills/dodge" to="." method="dodge_end"]
 [connection signal="start" from="Skills/dodge" to="." method="dodge_start"]
