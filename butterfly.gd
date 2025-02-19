@@ -2,6 +2,9 @@ extends CharacterBody2D
 
 @onready var hurtbox = $HurtBox
 @onready var visible_enemies : Array = []
+@onready var animation_player = $AnimationPlayer
+@onready var animation_tree = $AnimationTree
+@onready var state_machine = animation_tree["parameters/playback"]
 
 @export var knockback_acc = 20
 @export var WANDERING_SPEED = 20
@@ -41,8 +44,9 @@ func adjust():
 	if not visible_enemies.is_empty():
 		var enemy = visible_enemies.front() as DetectedArea
 		velocity = global_position.direction_to(enemy.global_position) * CHASING_SPEED
+		state_machine.travel("chasing")
 	else:
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
-
+		state_machine.travel("wandering")
 func die():
 	queue_free()

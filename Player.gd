@@ -30,13 +30,15 @@ var movable : bool = true
 
 var upside_down : bool = false : 
 	set(value):
-		sprite_2d.flip_v = value
+		sprite_2d.scale.y = sprite2d_scale.y * (-1 if value else 1)
 		upside_down = value
 
 @onready var shooting_timer = $ShootingTimer
-@onready var shooting_point = $ShootingPoint
+@onready var shooting_point = $Sprite2D/ShootingPoint
 @onready var sprite_2d = $Sprite2D
 @onready var collision_shape_2d = $CollisionShape2D
+
+@onready var sprite2d_scale = $Sprite2D.scale
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -61,7 +63,7 @@ func _physics_process(delta):
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 			
 		if not is_zero_approx(velocity.x):
-			sprite_2d.flip_h = velocity.x < 0
+			sprite_2d.scale.x = sprite2d_scale.x * (-1 if velocity.x < 0 else 1)
 		
 		move_and_slide()
 

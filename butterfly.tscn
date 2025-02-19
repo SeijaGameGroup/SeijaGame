@@ -1,8 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://bp2klddudgkav"]
+[gd_scene load_steps=22 format=3 uid="uid://bp2klddudgkav"]
 
 [ext_resource type="Script" path="res://butterfly.gd" id="1_nh8t4"]
 [ext_resource type="Script" path="res://detecting_area.gd" id="2_5n5p3"]
-[ext_resource type="Texture2D" uid="uid://cd7r2d34yoi1c" path="res://assets/pictures/butterfly.png" id="3_o6t3i"]
+[ext_resource type="Texture2D" uid="uid://dhmy2yy2klib8" path="res://assets/pictures/butterfly_sprite.png" id="3_wsltf"]
 [ext_resource type="Script" path="res://hurtbox.gd" id="4_3ncwx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vbe1y"]
@@ -13,6 +13,110 @@ size = Vector2(38, 30)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xnl4x"]
 radius = 48.0521
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ilh7v"]
+animation = &"chasing"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hrfhg"]
+animation = &"detecting"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7x6cr"]
+animation = &"wandering"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_oh352"]
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_or53c"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_xk01p"]
+switch_mode = 2
+advance_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5pnw7"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_drv5a"]
+states/chasing/node = SubResource("AnimationNodeAnimation_ilh7v")
+states/chasing/position = Vector2(676, 100)
+states/detecting/node = SubResource("AnimationNodeAnimation_hrfhg")
+states/detecting/position = Vector2(527, 195)
+states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
+states/wandering/position = Vector2(355, 100)
+transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7")]
+graph_offset = Vector2(-310, -2)
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_ugyg2"]
+
+[sub_resource type="Animation" id="Animation_0byte"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_ly8a1"]
+resource_name = "chasing"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_svyxp"]
+resource_name = "detection"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_dohlk"]
+resource_name = "wander"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_a3ugo"]
+_data = {
+"RESET": SubResource("Animation_0byte"),
+"chasing": SubResource("Animation_ly8a1"),
+"detecting": SubResource("Animation_svyxp"),
+"wandering": SubResource("Animation_dohlk")
+}
 
 [node name="butterfly" type="CharacterBody2D"]
 script = ExtResource("1_nh8t4")
@@ -26,7 +130,9 @@ script = ExtResource("2_5n5p3")
 shape = SubResource("CircleShape2D_vbe1y")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("3_o6t3i")
+texture = ExtResource("3_wsltf")
+hframes = 2
+frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(11, 5)
@@ -43,6 +149,17 @@ shape = SubResource("CircleShape2D_xnl4x")
 [node name="DetectingTimer" type="Timer" parent="."]
 wait_time = 2.0
 autostart = true
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_drv5a")
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource("AnimationNodeStateMachinePlayback_ugyg2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_a3ugo")
+}
 
 [connection signal="target_entered" from="DetectingArea" to="." method="enemy_detected"]
 [connection signal="target_lost" from="DetectingArea" to="." method="enemy_lost"]

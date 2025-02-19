@@ -3,8 +3,8 @@ extends Node
 @export var cooldown : int
 @export var duration : int
 
-@onready var cooldown_timer = $CooldownTimer
-@onready var duration_timer = $DurationTimer
+@onready var cooldown_timer = $CooldownTimer as Timer
+@onready var duration_timer = $DurationTimer as Timer
 
 signal start()
 signal end()
