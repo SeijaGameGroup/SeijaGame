@@ -4,7 +4,7 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health : int = 150
-@export var damage : float = 6
+@export var damage : float = 6.0
 @export var tears : float = 0.3
 @export var sub_shoot_cd : float = 10.0
 @export var sub_shoot_num : int = 6
@@ -50,7 +50,7 @@ func _physics_process(delta):
 	
 	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 		shoot_sub()
-		shooting_timer.start(sub_shoot_cd)
+		sub_shooting_timer.start(sub_shoot_cd)
 	
 	if movable:
 		# Add the gravity.
@@ -98,12 +98,15 @@ func shoot():
 
 
 func shoot_sub():
-	var tracked_bullet = preload("res://tracked_bullet.tscn").instantiate()
+	var tracked_bullet_array = {}
 	for i in range(sub_shoot_num):
-		tracked_bullet.position += shooting_point.global_position
-		tracked_bullet.object_tracked = get_tree().current_scene.get_node("butterfly")
-		get_tree().current_scene.add_child(tracked_bullet)
-		tracked_bullet.damage = self.damage
+		tracked_bullet_array[i] = preload("res://tracked_bullet.tscn").instantiate()
+		tracked_bullet_array[i].position += shooting_point.global_position
+		tracked_bullet_array[i].position += Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
+		tracked_bullet_array[i].object_tracked = get_node("/root/World/butterfly")
+		get_tree().current_scene.add_child(tracked_bullet_array[i])
+		tracked_bullet_array[i].damage = self.damage
+
 
 
 func _on_shooting_timer_timeout():
