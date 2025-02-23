@@ -1,3 +1,4 @@
+class_name Bullet
 extends Sprite2D
 
 var velocity : Vector2
@@ -29,3 +30,4 @@ func _on_timer_timeout():
 
 func hit(hurtbox: HurtBox):
 	queue_free()
+

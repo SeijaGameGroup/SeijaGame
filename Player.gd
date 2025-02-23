@@ -6,6 +6,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var health : int = 150
 @export var damage : float = 6
 @export var tears : float = 0.3
+@export var sub_shoot_cd : float = 10.0
+@export var sub_shoot_num : int = 6
 @export var speed : float = 6
 @export var jump_velocity = -400.0
 
@@ -34,6 +36,7 @@ var upside_down : bool = false :
 		upside_down = value
 
 @onready var shooting_timer = $ShootingTimer
+@onready var sub_shooting_timer = $SubShootingTimer
 @onready var shooting_point = $Sprite2D/ShootingPoint
 @onready var sprite_2d = $Sprite2D
 @onready var collision_shape_2d = $CollisionShape2D
@@ -44,6 +47,11 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 		shoot()
 		shooting_timer.start(tears)
+	
+	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
+		shoot_sub()
+		shooting_timer.start(sub_shoot_cd)
+	
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
@@ -88,8 +96,25 @@ func shoot():
 	get_tree().current_scene.add_child(bullet)
 	bullet.damage = self.damage
 
+
+func shoot_sub():
+	var tracked_bullet = preload("res://tracked_bullet.tscn").instantiate()
+	for i in range(sub_shoot_num):
+		tracked_bullet.position += shooting_point.global_position
+		tracked_bullet.object_tracked = get_tree().current_scene.get_node("butterfly")
+		get_tree().current_scene.add_child(tracked_bullet)
+		tracked_bullet.damage = self.damage
+
+
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):
 		shoot()
 		shooting_timer.start(tears)
-	pass # Replace with function body.
+	pass
+
+
+func _on_sub_shooting_timer_timeout():
+	if Input.is_action_pressed("shoot_sub"):
+		shoot_sub()
+		sub_shooting_timer.start(sub_shoot_cd)
+	pass
