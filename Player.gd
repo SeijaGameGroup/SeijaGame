@@ -4,8 +4,10 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health : int = 150
-@export var damage : float = 6
+@export var damage : float = 6.0
 @export var tears : float = 0.3
+@export var sub_shoot_cd : float = 10.0
+@export var sub_shoot_num : int = 6
 @export var speed : float = 6
 @export var jump_velocity = -400.0
 
@@ -30,20 +32,26 @@ var movable : bool = true
 
 var upside_down : bool = false : 
 	set(value):
-		sprite_2d.scale.y = sprite2d_scale.y * (-1 if value else 1)
 		upside_down = value
+		graphics.scale.y = -1 if value else 1
 
 @onready var shooting_timer = $ShootingTimer
-@onready var shooting_point = $Sprite2D/ShootingPoint
-@onready var sprite_2d = $Sprite2D
+@onready var sub_shooting_timer = $SubShootingTimer
+@onready var sprite_2d = $Graphics/Sprite2D
+@onready var shooting_point = $Graphics/ShootingPoint
 @onready var collision_shape_2d = $CollisionShape2D
+@onready var graphics = $Graphics
 
-@onready var sprite2d_scale = $Sprite2D.scale
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 		shoot()
 		shooting_timer.start(tears)
+	
+	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
+		shoot_sub()
+		sub_shooting_timer.start(sub_shoot_cd)
+	
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
@@ -51,7 +59,7 @@ func _physics_process(delta):
 
 		# Handle Jump.
 		if Input.is_action_just_pressed("jump"):
-			if (JUMP_VELOCITY < 0 and is_on_floor()) or (JUMP_VELOCITY > 0 and is_on_ceiling()):
+			if ((not upside_down) and is_on_floor()) or (upside_down and is_on_ceiling()):
 				velocity.y = JUMP_VELOCITY
 
 		# Get the input direction and handle the movement/deceleration.
@@ -63,7 +71,7 @@ func _physics_process(delta):
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 			
 		if not is_zero_approx(velocity.x):
-			sprite_2d.scale.x = sprite2d_scale.x * (-1 if velocity.x < 0 else 1)
+			graphics.scale.x = -1 if velocity.x < 0 else 1
 		
 		move_and_slide()
 
@@ -88,8 +96,28 @@ func shoot():
 	get_tree().current_scene.add_child(bullet)
 	bullet.damage = self.damage
 
+
+func shoot_sub():
+	var tracked_bullet_array = {}
+	for i in range(sub_shoot_num):
+		tracked_bullet_array[i] = preload("res://tracked_bullet.tscn").instantiate()
+		tracked_bullet_array[i].position += shooting_point.global_position
+		tracked_bullet_array[i].position += Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
+		tracked_bullet_array[i].object_tracked = get_node("/root/World/butterfly")
+		get_tree().current_scene.add_child(tracked_bullet_array[i])
+		tracked_bullet_array[i].damage = self.damage
+
+
+
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):
 		shoot()
 		shooting_timer.start(tears)
-	pass # Replace with function body.
+	pass
+
+
+func _on_sub_shooting_timer_timeout():
+	if Input.is_action_pressed("shoot_sub"):
+		shoot_sub()
+		sub_shooting_timer.start(sub_shoot_cd)
+	pass
