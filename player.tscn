@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=13 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_rc36s"]
 [ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_kowey"]
@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://skill2.gd" id="6_jovnq"]
 [ext_resource type="Script" path="res://skill3.gd" id="7_cuga2"]
 [ext_resource type="Script" path="res://hurtbox.gd" id="8_4yv01"]
-[ext_resource type="Script" path="res://subshoot.gd" id="8_80l25"]
 [ext_resource type="Script" path="res://detected_area.gd" id="9_f6fna"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
@@ -21,20 +20,22 @@ size = Vector2(5.2, 8.4)
 radius = 4.8
 
 [node name="Player" type="CharacterBody2D"]
-position = Vector2(0, -10)
 scale = Vector2(5, 5)
 script = ExtResource("1_rc36s")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, 2)
+[node name="Graphics" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("2_kowey")
+offset = Vector2(2.08165e-12, 2.08165e-12)
 
-[node name="ShootingPoint" type="Node2D" parent="Sprite2D"]
-position = Vector2(33, -21)
+[node name="ShootingPoint" type="Node2D" parent="Graphics"]
+position = Vector2(5.8, -3.2)
+scale = Vector2(0.2, 0.2)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 2.2)
+position = Vector2(0, 2.38419e-07)
 shape = SubResource("RectangleShape2D_1xecy")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -57,9 +58,6 @@ duration = 6
 [node name="Skill3" parent="Skills" instance=ExtResource("3_vfrbb")]
 script = ExtResource("7_cuga2")
 
-[node name="SubShoot" parent="Skills" instance=ExtResource("3_vfrbb")]
-script = ExtResource("8_80l25")
-
 [node name="ShootingTimer" type="Timer" parent="."]
 one_shot = true
 
@@ -72,7 +70,6 @@ collision_mask = 0
 script = ExtResource("8_4yv01")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
-position = Vector2(9.53674e-08, 2.2)
 shape = SubResource("RectangleShape2D_6gk5o")
 
 [node name="DetectedArea" type="Area2D" parent="."]
@@ -81,7 +78,7 @@ collision_mask = 0
 script = ExtResource("9_f6fna")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectedArea"]
-position = Vector2(0, 2)
+position = Vector2(0, 7.10543e-15)
 shape = SubResource("CircleShape2D_irvdk")
 
 [connection signal="end" from="Skills/dodge" to="." method="dodge_end"]
