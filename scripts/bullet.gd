@@ -28,6 +28,6 @@ func _on_timer_timeout():
 	queue_free()
 	pass # Replace with function body.
 
-func hit(hurtbox: HurtBox):
+func hit(_hurtbox: HurtBox):
 	queue_free()
 

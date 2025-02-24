@@ -1,14 +1,14 @@
 [gd_scene load_steps=13 format=3 uid="uid://dqauwk5l6600p"]
 
-[ext_resource type="Script" path="res://Player.gd" id="1_rc36s"]
-[ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_kowey"]
-[ext_resource type="PackedScene" uid="uid://bteb52yklpiuy" path="res://skill.tscn" id="3_vfrbb"]
-[ext_resource type="Script" path="res://dodge.gd" id="4_5ymh4"]
-[ext_resource type="Script" path="res://skill1.gd" id="5_57ltk"]
-[ext_resource type="Script" path="res://skill2.gd" id="6_jovnq"]
-[ext_resource type="Script" path="res://skill3.gd" id="7_cuga2"]
-[ext_resource type="Script" path="res://hurtbox.gd" id="8_4yv01"]
-[ext_resource type="Script" path="res://detected_area.gd" id="9_f6fna"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_jmtl0"]
+[ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_yh77n"]
+[ext_resource type="PackedScene" uid="uid://bteb52yklpiuy" path="res://scenes/skill.tscn" id="3_1iiuv"]
+[ext_resource type="Script" path="res://scripts/dodge.gd" id="4_25f81"]
+[ext_resource type="Script" path="res://scripts/skill1.gd" id="5_bsawl"]
+[ext_resource type="Script" path="res://scripts/skill2.gd" id="6_f3au0"]
+[ext_resource type="Script" path="res://scripts/skill3.gd" id="7_ypujm"]
+[ext_resource type="Script" path="res://scripts/hurtbox.gd" id="8_ms0pe"]
+[ext_resource type="Script" path="res://scripts/detected_area.gd" id="9_hjkth"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
 size = Vector2(6.5, 18.4)
@@ -21,13 +21,14 @@ radius = 4.8
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(5, 5)
-script = ExtResource("1_rc36s")
+collision_mask = 32
+script = ExtResource("1_jmtl0")
 
 [node name="Graphics" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
 scale = Vector2(0.2, 0.2)
-texture = ExtResource("2_kowey")
+texture = ExtResource("2_yh77n")
 offset = Vector2(2.08165e-12, 2.08165e-12)
 
 [node name="ShootingPoint" type="Node2D" parent="Graphics"]
@@ -43,20 +44,20 @@ zoom = Vector2(1.5, 1.5)
 
 [node name="Skills" type="Node" parent="."]
 
-[node name="dodge" parent="Skills" instance=ExtResource("3_vfrbb")]
-script = ExtResource("4_5ymh4")
+[node name="dodge" parent="Skills" instance=ExtResource("3_1iiuv")]
+script = ExtResource("4_25f81")
 cooldown = 5
 
-[node name="Skill1" parent="Skills" instance=ExtResource("3_vfrbb")]
-script = ExtResource("5_57ltk")
+[node name="Skill1" parent="Skills" instance=ExtResource("3_1iiuv")]
+script = ExtResource("5_bsawl")
 
-[node name="Skill2" parent="Skills" instance=ExtResource("3_vfrbb")]
-script = ExtResource("6_jovnq")
+[node name="Skill2" parent="Skills" instance=ExtResource("3_1iiuv")]
+script = ExtResource("6_f3au0")
 cooldown = 12
 duration = 6
 
-[node name="Skill3" parent="Skills" instance=ExtResource("3_vfrbb")]
-script = ExtResource("7_cuga2")
+[node name="Skill3" parent="Skills" instance=ExtResource("3_1iiuv")]
+script = ExtResource("7_ypujm")
 
 [node name="ShootingTimer" type="Timer" parent="."]
 one_shot = true
@@ -67,7 +68,7 @@ one_shot = true
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 4
 collision_mask = 0
-script = ExtResource("8_4yv01")
+script = ExtResource("8_ms0pe")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("RectangleShape2D_6gk5o")
@@ -75,7 +76,7 @@ shape = SubResource("RectangleShape2D_6gk5o")
 [node name="DetectedArea" type="Area2D" parent="."]
 collision_layer = 16
 collision_mask = 0
-script = ExtResource("9_f6fna")
+script = ExtResource("9_hjkth")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectedArea"]
 position = Vector2(0, 7.10543e-15)

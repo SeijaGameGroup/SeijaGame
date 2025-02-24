@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://bteb52yklpiuy"]
 
-[ext_resource type="Script" path="res://skill.gd" id="1_8mtm1"]
+[ext_resource type="Script" path="res://scripts/skill.gd" id="1_jtetj"]
 
 [node name="Skill" type="Node"]
-script = ExtResource("1_8mtm1")
+script = ExtResource("1_jtetj")
 
 [node name="CooldownTimer" type="Timer" parent="."]
 one_shot = true

@@ -21,14 +21,14 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 
-func _physics_process(delta):
+func _physics_process(_delta):
 
 	move_and_slide()
 
 func hurt(hitbox: HitBox):
 	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
 	velocity += acc
-	health -= hitbox.damage
+	health -= (hitbox.damage) as int
 
 func enemy_detected(detected_area: DetectedArea):
 	if not visible_enemies.has(detected_area):

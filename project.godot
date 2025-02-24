@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="demo"
-run/main_scene="res://world.tscn"
+run/main_scene="res://scenes/world.tscn"
 config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -76,9 +76,12 @@ shoot_sub={
 
 [layer_names]
 
+2d_physics/layer_1="PlayerCollisionArea"
+2d_physics/layer_2="MonsterCollisionArea"
 2d_physics/layer_3="PlayerHurtBox"
 2d_physics/layer_4="MonsterHurtBox"
 2d_physics/layer_5="PlayerDetectedArea"
+2d_physics/layer_6="EnvironmentCollisionArea"
 
 [rendering]
 
