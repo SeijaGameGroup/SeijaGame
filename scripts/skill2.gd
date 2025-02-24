@@ -1,4 +1,4 @@
-extends "res://skill.gd"
+extends "res://scripts/skill.gd"
 
 
 # Called when the node enters the scene tree for the first time.
@@ -7,7 +7,7 @@ func _ready():
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("skill2"):
 		if available:
 			cooldown_timer.start(cooldown)

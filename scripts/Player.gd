@@ -90,7 +90,7 @@ func skill2_end():
 	speed_multiplier = 1
 
 func shoot():
-	var bullet = preload("res://bullet.tscn").instantiate()
+	var bullet = preload("res://scenes/bullet.tscn").instantiate()
 	bullet.position = shooting_point.global_position
 	bullet.velocity = bullet.position.direction_to(get_global_mouse_position())
 	get_tree().current_scene.add_child(bullet)
@@ -100,7 +100,7 @@ func shoot():
 func shoot_sub():
 	var tracked_bullet_array = {}
 	for i in range(sub_shoot_num):
-		tracked_bullet_array[i] = preload("res://tracked_bullet.tscn").instantiate()
+		tracked_bullet_array[i] = preload("res://scenes/tracked_bullet.tscn").instantiate()
 		tracked_bullet_array[i].position += shooting_point.global_position
 		tracked_bullet_array[i].position += Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
 		tracked_bullet_array[i].object_tracked = get_node("/root/World/butterfly")
