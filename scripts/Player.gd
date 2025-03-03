@@ -16,6 +16,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var gravity_multiplier : float = 1
 @export var jump_velocity_multipler : float = 1
 
+signal operatable_changed(value: bool)
+
 var SPEED : int :
 	get:
 		return int(speed * 50 * speed_multiplier)
@@ -28,7 +30,14 @@ var JUMP_VELOCITY :
 	get:
 		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
 
-var movable : bool = true
+@export var movable : bool = true
+
+@export var invincible : bool = false :
+	set(value):
+		invincible = value
+		hurtbox.monitorable = not value
+		
+@export var operable : bool = true
 
 var upside_down : bool = false : 
 	set(value):
@@ -41,7 +50,10 @@ var upside_down : bool = false :
 @onready var shooting_point = $Graphics/ShootingPoint
 @onready var collision_shape_2d = $CollisionShape2D
 @onready var graphics = $Graphics
-
+@onready var animation_player = $AnimationPlayer
+@onready var animation_tree = $AnimationTree
+@onready var hurtbox = $HurtBox
+@onready var detected_area = $DetectedArea
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -56,22 +68,23 @@ func _physics_process(delta):
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
+		
+		if operable:
+			# Handle Jump.
+			if Input.is_action_just_pressed("jump"):
+				if ((not upside_down) and is_on_floor()) or (upside_down and is_on_ceiling()):
+					velocity.y = JUMP_VELOCITY
 
-		# Handle Jump.
-		if Input.is_action_just_pressed("jump"):
-			if ((not upside_down) and is_on_floor()) or (upside_down and is_on_ceiling()):
-				velocity.y = JUMP_VELOCITY
-
-		# Get the input direction and handle the movement/deceleration.
-		# As good practice, you should replace UI actions with custom gameplay actions.
-		var direction = Input.get_axis("move_left", "move_right")
-		if direction:
-			velocity.x = direction * SPEED			
-		else:
-			velocity.x = move_toward(velocity.x, 0, SPEED)
-			
-		if not is_zero_approx(velocity.x):
-			graphics.scale.x = -1 if velocity.x < 0 else 1
+			# Get the input direction and handle the movement/deceleration.
+			# As good practice, you should replace UI actions with custom gameplay actions.
+			var direction = Input.get_axis("move_left", "move_right")
+			if direction:
+				velocity.x = direction * SPEED			
+			else:
+				velocity.x = move_toward(velocity.x, 0, SPEED)
+				
+			if not is_zero_approx(velocity.x):
+				graphics.scale.x = -1 if velocity.x < 0 else 1
 		
 		move_and_slide()
 
@@ -108,16 +121,17 @@ func shoot_sub():
 		tracked_bullet_array[i].damage = self.damage
 
 
-
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):
 		shoot()
 		shooting_timer.start(tears)
-	pass
 
 
 func _on_sub_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot_sub"):
 		shoot_sub()
 		sub_shooting_timer.start(sub_shoot_cd)
-	pass
+
+
+func _on_hurt_box_hurt(hitbox):
+	animation_player.play("Hurt")

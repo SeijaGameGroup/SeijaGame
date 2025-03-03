@@ -9,9 +9,11 @@ extends Node
 signal start()
 signal end()
 
+var player_operatable : bool = true
+
 var available : bool :
 	get:
-		return cooldown_timer.is_stopped()
+		return cooldown_timer.is_stopped() and player_operatable
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -23,3 +25,6 @@ func _process(_delta):
 	
 func duration_end():
 	end.emit()
+
+func on_player_operatable_changed(value : bool):
+	player_operatable = value
