@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody2D
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -16,19 +17,21 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var gravity_multiplier : float = 1
 @export var jump_velocity_multipler : float = 1
 
-signal operatable_changed(value: bool)
-
 var SPEED : int :
 	get:
 		return int(speed * 50 * speed_multiplier)
 		
-var GRAVITY : 
+var GRAVITY : float : 
 	get:
 		return gravity * gravity_multiplier * (-1 if upside_down else 1)
 		
-var JUMP_VELOCITY :
+var JUMP_VELOCITY : float :
 	get:
 		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
+
+var CAN_JUMP : bool :
+	get:
+		return (not upside_down and is_on_floor()) or (upside_down and is_on_ceiling())
 
 @export var movable : bool = true
 
@@ -37,7 +40,7 @@ var JUMP_VELOCITY :
 		invincible = value
 		hurtbox.set_deferred("monitorable", not value)
 		
-@export var operable : bool = true
+@export var operatable : bool = true
 
 @export var upside_down : bool = false : 
 	set(value):
@@ -46,6 +49,7 @@ var JUMP_VELOCITY :
 
 @onready var shooting_timer = $ShootingTimer
 @onready var sub_shooting_timer = $SubShootingTimer
+@onready var jump_request_timer: Timer = $JumpRequestTimer
 @onready var sprite_2d = $Graphics/Sprite2D
 @onready var shooting_point = $Graphics/ShootingPoint
 @onready var collision_shape_2d = $CollisionShape2D
@@ -69,11 +73,13 @@ func _physics_process(delta):
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
 		
-		if operable:
+		if operatable:
 			# Handle Jump.
-			if Input.is_action_just_pressed("jump"):
-				if ((not upside_down) and is_on_floor()) or (upside_down and is_on_ceiling()):
+			if CAN_JUMP:
+				if Input.is_action_just_pressed("jump") or not jump_request_timer.is_stopped():
 					velocity.y = JUMP_VELOCITY
+			elif Input.is_action_just_pressed("jump"):
+				jump_request_timer.start(0.3)
 
 			# Get the input direction and handle the movement/deceleration.
 			# As good practice, you should replace UI actions with custom gameplay actions.
@@ -87,20 +93,6 @@ func _physics_process(delta):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
 		
 		move_and_slide()
-
-func dodge_start():
-	movable = false
-
-func dodge_end():
-	movable = true
-	
-func skill2_start():
-	upside_down = true
-	speed_multiplier = 1.5
-
-func skill2_end():
-	upside_down = false
-	speed_multiplier = 1
 
 func shoot():
 	var bullet = preload("res://scenes/bullet.tscn").instantiate()

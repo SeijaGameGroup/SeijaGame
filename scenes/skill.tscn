@@ -10,4 +10,7 @@ one_shot = true
 
 [node name="DurationTimer" type="Timer" parent="."]
 
+[node name="RequestTimer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="timeout" from="DurationTimer" to="." method="duration_end"]
