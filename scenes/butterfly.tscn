@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://bp2klddudgkav"]
+[gd_scene load_steps=23 format=3 uid="uid://bp2klddudgkav"]
 
 [ext_resource type="Script" path="res://scripts/butterfly.gd" id="1_wgdg4"]
 [ext_resource type="Script" path="res://scripts/detecting_area.gd" id="3_21p2d"]
@@ -44,8 +44,6 @@ states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
 states/wandering/position = Vector2(355, 100)
 transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7")]
 graph_offset = Vector2(-310, -2)
-
-[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_ugyg2"]
 
 [sub_resource type="Animation" id="Animation_0byte"]
 length = 0.001
@@ -161,8 +159,6 @@ autostart = true
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_drv5a")
 anim_player = NodePath("../AnimationPlayer")
-active = true
-parameters/playback = SubResource("AnimationNodeStateMachinePlayback_ugyg2")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

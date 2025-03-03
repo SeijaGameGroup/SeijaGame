@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=19 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://c1biw0r5u0ni6" path="res://assets/pictures/seija.png" id="2_yh77n"]
@@ -19,50 +19,48 @@ size = Vector2(5.2, 8.4)
 [sub_resource type="CircleShape2D" id="CircleShape2D_irvdk"]
 radius = 4.8
 
-[sub_resource type="Animation" id="Animation_wda33"]
-resource_name = "Idle"
-
-[sub_resource type="Animation" id="Animation_glte2"]
-resource_name = "Run"
-
 [sub_resource type="Animation" id="Animation_w78cg"]
 resource_name = "Hurt"
+step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/Sprite2D:modulate")
+tracks/0/path = NodePath(".:invincible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4, 1),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".:invincible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
 }
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".:operable")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:operable")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics/Sprite2D:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_wda33"]
+resource_name = "Idle"
 
 [sub_resource type="Animation" id="Animation_6k7th"]
 tracks/0/type = "value"
@@ -113,6 +111,21 @@ tracks/3/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Graphics/Sprite2D:self_modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_glte2"]
+resource_name = "Run"
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hmttp"]
 _data = {
@@ -123,8 +136,6 @@ _data = {
 }
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_cebpg"]
-
-[sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_opxbh"]
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(5, 5)
@@ -197,7 +208,6 @@ libraries = {
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_cebpg")
 anim_player = NodePath("../AnimationPlayer")
-parameters/playback = SubResource("AnimationNodeStateMachinePlayback_opxbh")
 
 [connection signal="operatable_changed" from="." to="Skills/Skill1" method="on_player_operatable_changed"]
 [connection signal="operatable_changed" from="." to="Skills/Skill2" method="on_player_operatable_changed"]

@@ -20,4 +20,3 @@ func _on_area_entered(area: Area2D):
 		print("[Hit] %s => %s" % [owner.name, hurtbox.owner.name])
 		hurtbox.hurt.emit(self)
 		hit.emit(hurtbox)
-

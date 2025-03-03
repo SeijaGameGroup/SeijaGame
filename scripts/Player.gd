@@ -5,7 +5,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health : int = 150
 @export var damage : float = 6.0
-@export var tears : float = 0.3
+@export var firedelay : float = 0.3
 @export var sub_shoot_cd : float = 10.0
 @export var sub_shoot_num : int = 6
 @export var speed : float = 6
@@ -35,11 +35,11 @@ var JUMP_VELOCITY :
 @export var invincible : bool = false :
 	set(value):
 		invincible = value
-		hurtbox.monitorable = not value
+		hurtbox.set_deferred("monitorable", not value)
 		
 @export var operable : bool = true
 
-var upside_down : bool = false : 
+@export var upside_down : bool = false : 
 	set(value):
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
@@ -58,7 +58,7 @@ var upside_down : bool = false :
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 		shoot()
-		shooting_timer.start(tears)
+		shooting_timer.start(firedelay)
 	
 	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 		shoot_sub()
@@ -124,7 +124,7 @@ func shoot_sub():
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):
 		shoot()
-		shooting_timer.start(tears)
+		shooting_timer.start(firedelay)
 
 
 func _on_sub_shooting_timer_timeout():
@@ -133,5 +133,5 @@ func _on_sub_shooting_timer_timeout():
 		sub_shooting_timer.start(sub_shoot_cd)
 
 
-func _on_hurt_box_hurt(hitbox):
+func _on_hurt_box_hurt(_hitbox):
 	animation_player.play("Hurt")
