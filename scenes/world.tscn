@@ -149,6 +149,7 @@ tile_set = SubResource("TileSet_ax17x")
 
 [node name="Player" parent="." instance=ExtResource("2_i1woc")]
 position = Vector2(-258, -48)
+operatable = true
 
 [node name="butterfly" parent="." instance=ExtResource("3_0paq3")]
 position = Vector2(379, -83)

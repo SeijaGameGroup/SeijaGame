@@ -47,10 +47,10 @@ var CAN_JUMP : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer = $ShootingTimer
-@onready var sub_shooting_timer = $SubShootingTimer
-@onready var jump_request_timer: Timer = $JumpRequestTimer
-@onready var sprite_2d = $Graphics/Sprite2D
+@onready var shooting_timer 	: Timer 	= $ShootingTimer
+@onready var sub_shooting_timer : Timer 	= $SubShootingTimer
+@onready var jump_request_timer : Timer 	= $JumpRequestTimer
+@onready var sprite_2d 			: Sprite2D 	= $Graphics/Sprite2D
 @onready var shooting_point = $Graphics/ShootingPoint
 @onready var collision_shape_2d = $CollisionShape2D
 @onready var graphics = $Graphics
@@ -58,6 +58,7 @@ var CAN_JUMP : bool :
 @onready var animation_tree = $AnimationTree
 @onready var hurtbox = $HurtBox
 @onready var detected_area = $DetectedArea
+@onready var state_machine : AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -74,7 +75,7 @@ func _physics_process(delta):
 		velocity.y += GRAVITY * delta
 		
 		if operatable:
-			# Handle Jump.
+			# Handle Jump.addd
 			if CAN_JUMP:
 				if Input.is_action_just_pressed("jump") or not jump_request_timer.is_stopped():
 					velocity.y = JUMP_VELOCITY
@@ -126,4 +127,4 @@ func _on_sub_shooting_timer_timeout():
 
 
 func _on_hurt_box_hurt(_hitbox):
-	animation_player.play("Hurt")
+	state_machine.travel("Hurt")
