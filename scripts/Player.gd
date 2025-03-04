@@ -20,11 +20,11 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var SPEED : int :
 	get:
 		return int(speed * 50 * speed_multiplier)
-		
-var GRAVITY : float : 
+
+var GRAVITY : float :
 	get:
 		return gravity * gravity_multiplier * (-1 if upside_down else 1)
-		
+
 var JUMP_VELOCITY : float :
 	get:
 		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
@@ -39,10 +39,10 @@ var CAN_JUMP : bool :
 	set(value):
 		invincible = value
 		hurtbox.set_deferred("monitorable", not value)
-		
+
 @export var operatable : bool = true
 
-@export var upside_down : bool = false : 
+@export var upside_down : bool = false :
 	set(value):
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
@@ -56,43 +56,46 @@ var CAN_JUMP : bool :
 @onready var graphics = $Graphics
 @onready var animation_player = $AnimationPlayer
 @onready var animation_tree = $AnimationTree
+@onready var animation_tree_extra: AnimationTree = $AnimationTreeExtra
 @onready var hurtbox = $HurtBox
 @onready var detected_area = $DetectedArea
-@onready var state_machine : AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
+@onready var state_machine : AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
+@onready var state_machine_extra : AnimationNodeStateMachinePlayback = animation_tree_extra.get("parameters/playback")
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 		shoot()
 		shooting_timer.start(firedelay)
-	
+
 	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 		shoot_sub()
 		sub_shooting_timer.start(sub_shoot_cd)
-	
+
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
-		
+
 		if operatable:
-			# Handle Jump.addd
+			# Handle Jump
 			if CAN_JUMP:
 				if Input.is_action_just_pressed("jump") or not jump_request_timer.is_stopped():
 					velocity.y = JUMP_VELOCITY
 			elif Input.is_action_just_pressed("jump"):
 				jump_request_timer.start(0.3)
-
 			# Get the input direction and handle the movement/deceleration.
 			# As good practice, you should replace UI actions with custom gameplay actions.
 			var direction = Input.get_axis("move_left", "move_right")
 			if direction:
-				velocity.x = direction * SPEED			
+				velocity.x = direction * SPEED
 			else:
-				velocity.x = move_toward(velocity.x, 0, SPEED)
-				
+				velocity.x = move_toward(velocity.x, 0, SPEED*delta)
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
-		
+
+		else:
+			velocity.x = move_toward(velocity.x, 0, SPEED*delta)
+
 		move_and_slide()
 
 func shoot():
@@ -128,3 +131,4 @@ func _on_sub_shooting_timer_timeout():
 
 func _on_hurt_box_hurt(_hitbox):
 	state_machine.travel("Hurt")
+	state_machine_extra.travel("HurtEffect")

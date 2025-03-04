@@ -17,8 +17,8 @@ func _process(_delta):
 			await duration_timer.timeout
 			player.upside_down = false
 			player.speed_multiplier = 1
-			
-		else: 
+
+		else:
 			if not duration_timer.is_stopped():
 				duration_timer.stop()
 				player.upside_down = false
