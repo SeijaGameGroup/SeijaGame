@@ -9,8 +9,10 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var firedelay : float = 0.3
 @export var sub_shoot_cd : float = 10.0
 @export var sub_shoot_num : int = 6
-@export var speed : float = 6
+@export var speed : float = 6.0
 @export var jump_velocity = -400.0
+@export var friction := 2000
+#@export var acc := 1500
 
 @export var damage_reduction_rate : float = 0
 @export var speed_multiplier : float = 1
@@ -33,6 +35,10 @@ var CAN_JUMP : bool :
 	get:
 		return (not upside_down and is_on_floor()) or (upside_down and is_on_ceiling())
 
+var IN_AIR : bool :
+	get:
+		return not (is_on_floor() or is_on_ceiling())
+
 @export var movable : bool = true
 
 @export var invincible : bool = false :
@@ -47,20 +53,19 @@ var CAN_JUMP : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer 	: Timer 	= $ShootingTimer
-@onready var sub_shooting_timer : Timer 	= $SubShootingTimer
-@onready var jump_request_timer : Timer 	= $JumpRequestTimer
-@onready var sprite_2d 			: Sprite2D 	= $Graphics/Sprite2D
-@onready var shooting_point = $Graphics/ShootingPoint
-@onready var collision_shape_2d = $CollisionShape2D
-@onready var graphics = $Graphics
-@onready var animation_player = $AnimationPlayer
-@onready var animation_tree = $AnimationTree
-@onready var animation_tree_extra: AnimationTree = $AnimationTreeExtra
-@onready var hurtbox = $HurtBox
-@onready var detected_area = $DetectedArea
-@onready var state_machine : AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
-@onready var state_machine_extra : AnimationNodeStateMachinePlayback = animation_tree_extra.get("parameters/playback")
+@onready var shooting_timer 		: Timer 							= $ShootingTimer
+@onready var sub_shooting_timer 	: Timer 							= $SubShootingTimer
+@onready var jump_request_timer 	: Timer 							= $JumpRequestTimer
+@onready var sprite_2d 				: Sprite2D 							= $Graphics/Sprite2D
+@onready var shooting_point 		: Node2D							= $Graphics/ShootingPoint
+@onready var collision_shape_2d 	: CollisionShape2D					= $CollisionShape2D
+@onready var graphics 				: Node2D							= $Graphics
+@onready var animation_player 		: AnimationPlayer 					= $AnimationPlayer
+@onready var animation_tree 		: AnimationTree						= $AnimationTree
+@onready var hurtbox 				: HurtBox							= $HurtBox
+@onready var detected_area			: DetectedArea 						= $DetectedArea
+@onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
+@onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -79,22 +84,24 @@ func _physics_process(delta):
 		if operatable:
 			# Handle Jump
 			if CAN_JUMP:
-				if Input.is_action_just_pressed("jump") or not jump_request_timer.is_stopped():
+				if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
 					velocity.y = JUMP_VELOCITY
-			elif Input.is_action_just_pressed("jump"):
-				jump_request_timer.start(0.3)
+					state_machine_normal.travel("Jump")
+			elif Input.is_action_pressed("jump"):
+				jump_request_timer.start(0.1)
 			# Get the input direction and handle the movement/deceleration.
 			# As good practice, you should replace UI actions with custom gameplay actions.
 			var direction = Input.get_axis("move_left", "move_right")
 			if direction:
-				velocity.x = direction * SPEED
+				velocity.x = SPEED * direction
 			else:
-				velocity.x = move_toward(velocity.x, 0, SPEED*delta)
+				velocity.x = move_toward(velocity.x, 0, friction * delta)
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
+				
 
 		else:
-			velocity.x = move_toward(velocity.x, 0, SPEED*delta)
+			velocity.x = move_toward(velocity.x, 0, friction * delta)
 
 		move_and_slide()
 
@@ -131,4 +138,3 @@ func _on_sub_shooting_timer_timeout():
 
 func _on_hurt_box_hurt(_hitbox):
 	state_machine.travel("Hurt")
-	state_machine_extra.travel("HurtEffect")
