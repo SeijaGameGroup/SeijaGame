@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://bw2sfiywjc6gi"]
 
 [ext_resource type="Texture2D" uid="uid://cs2scrnquxfvp" path="res://assets/pictures/bullet1.png" id="1_2o0wb"]
-[ext_resource type="Script" path="res://scripts/bullet.gd" id="2_jpt3r"]
-[ext_resource type="Script" path="res://scripts/hitbox.gd" id="3_j6uh8"]
+[ext_resource type="Script" uid="uid://d05mlupo38sbt" path="res://scripts/bullet.gd" id="2_jpt3r"]
+[ext_resource type="Script" uid="uid://cfsmsiujxat5m" path="res://scripts/hitbox.gd" id="3_j6uh8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rawoo"]
 

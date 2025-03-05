@@ -30,4 +30,3 @@ func _on_timer_timeout():
 
 func hit(_hurtbox: HurtBox):
 	queue_free()
-

@@ -7,8 +7,9 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if Input.is_action_just_pressed("dodge") and available:
-		cooldown_timer.start(cooldown)
-		start.emit()
-		duration_timer.start(duration)
-	
+	if available:
+		if Input.is_action_just_pressed("dodge") or not request_timer.is_stopped():
+			cooldown_timer.start(cooldown)
+			player.state_machine.travel("Still")
+	elif Input.is_action_just_pressed("dodge"):
+		request_timer.start(request_time)
