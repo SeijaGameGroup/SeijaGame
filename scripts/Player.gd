@@ -4,19 +4,20 @@ extends CharacterBody2D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var health : int = 150
-@export var damage : float = 6.0
-@export var firedelay : float = 0.3
-@export var sub_shoot_cd : float = 10.0
-@export var sub_shoot_num : int = 6
-@export var speed : float = 6.0
-@export var jump_velocity = -400.0
-@export var friction := 2000
+@export var health 			: int = 150
+@export var damage 			: float = 6.0
+@export var firedelay 		: float = 0.3
+@export var sub_shoot_cd 	: float = 10.0
+@export var sub_shoot_num 	: int = 6
+@export var speed 			: float = 6.0
+@export var jump_velocity 	:= -700.0
+@export var ground_friction := 2000
+@export var air_friction 	:= 300
 #@export var acc := 1500
 
-@export var damage_reduction_rate : float = 0
-@export var speed_multiplier : float = 1
-@export var gravity_multiplier : float = 1
+@export var damage_reduction_rate 	: float = 0
+@export var speed_multiplier 		: float = 1
+@export var gravity_multiplier 		: float = 1
 @export var jump_velocity_multipler : float = 1
 
 var SPEED : int :
@@ -67,6 +68,8 @@ var IN_AIR : bool :
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
+var interacting_with : Array[Interactable]
+
 func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 		shoot()
@@ -82,26 +85,32 @@ func _physics_process(delta):
 		velocity.y += GRAVITY * delta
 
 		if operatable:
-			# Handle Jump
-			if CAN_JUMP:
-				if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
-					velocity.y = JUMP_VELOCITY
-					state_machine_normal.travel("Jump")
-			elif Input.is_action_pressed("jump"):
-				jump_request_timer.start(0.1)
-			# Get the input direction and handle the movement/deceleration.
-			# As good practice, you should replace UI actions with custom gameplay actions.
 			var direction = Input.get_axis("move_left", "move_right")
-			if direction:
-				velocity.x = SPEED * direction
+			if IN_AIR:
+				if direction:
+					velocity.x = SPEED * direction
+				else:
+					velocity.x = move_toward(velocity.x, 0, air_friction * delta)
+
 			else:
-				velocity.x = move_toward(velocity.x, 0, friction * delta)
+				# Handle Jump
+				if CAN_JUMP:
+					if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
+						velocity.y = JUMP_VELOCITY
+						state_machine_normal.travel("Jump")
+				elif Input.is_action_pressed("jump"):
+					jump_request_timer.start(0.1)
+					
+				if direction:
+					velocity.x = SPEED * direction
+				else:
+					velocity.x = move_toward(velocity.x, 0, ground_friction * delta)
+			# Handle graphics
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
 				
-
 		else:
-			velocity.x = move_toward(velocity.x, 0, friction * delta)
+			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
 
 		move_and_slide()
 

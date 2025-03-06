@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=58 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" uid="uid://dduk4utfcs0ke" path="res://scripts/Player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
@@ -19,61 +19,25 @@ size = Vector2(5.2, 8.4)
 [sub_resource type="CircleShape2D" id="CircleShape2D_irvdk"]
 radius = 3.4
 
-[sub_resource type="Animation" id="Animation_a8ls1"]
-resource_name = "Default"
-step = 0.05
-
 [sub_resource type="Animation" id="Animation_d2wvv"]
 resource_name = "Falling"
-step = 0.05
-
-[sub_resource type="Animation" id="Animation_jej6c"]
-resource_name = "Flying"
-step = 0.05
-
-[sub_resource type="Animation" id="Animation_qfm1y"]
-resource_name = "Hurt"
-step = 0.05
-
-[sub_resource type="Animation" id="Animation_w78cg"]
-resource_name = "HurtEffect"
 step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath(".:invincible")
+tracks/0/path = NodePath("Graphics/Sprite2D:frame_coords")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true, false]
+"values": [Vector2i(0, 3)]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".:operatable")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [false, true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Graphics/Sprite2D:self_modulate")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1)]
-}
+
+[sub_resource type="Animation" id="Animation_jej6c"]
+resource_name = "Flying"
+step = 0.05
 
 [sub_resource type="Animation" id="Animation_wda33"]
 resource_name = "Idle"
@@ -113,7 +77,7 @@ tracks/0/keys = {
 [sub_resource type="Animation" id="Animation_3v2ag"]
 resource_name = "Land"
 length = 0.8
-step = 0.05
+step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -253,25 +217,58 @@ tracks/0/keys = {
 "values": [false, true]
 }
 
-[sub_resource type="Animation" id="Animation_f1ej7"]
-resource_name = "WallSliding"
+[sub_resource type="Animation" id="Animation_w78cg"]
+resource_name = "HurtEffect"
 step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:invincible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:operatable")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Graphics/Sprite2D:self_modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1), Color(1, 1, 1, 0.25098), Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hmttp"]
 _data = {
-&"Default": SubResource("Animation_a8ls1"),
 &"Falling": SubResource("Animation_d2wvv"),
 &"Flying": SubResource("Animation_jej6c"),
-&"Hurt": SubResource("Animation_qfm1y"),
-&"HurtEffect": SubResource("Animation_w78cg"),
+&"Hurt": SubResource("Animation_w78cg"),
 &"Idle": SubResource("Animation_wda33"),
 &"Jump": SubResource("Animation_ur7pv"),
 &"Land": SubResource("Animation_3v2ag"),
 &"RESET": SubResource("Animation_6k7th"),
 &"Rising": SubResource("Animation_y4r1p"),
 &"Running": SubResource("Animation_glte2"),
-&"Still": SubResource("Animation_oprun"),
-&"WallSliding": SubResource("Animation_f1ej7")
+&"Still": SubResource("Animation_oprun")
 }
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_y4r1p"]
@@ -437,9 +434,6 @@ scale = Vector2(0.2, 0.2)
 position = Vector2(0, 0.9)
 shape = SubResource("RectangleShape2D_1xecy")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.5, 1.5)
-
 [node name="Skills" type="Node" parent="."]
 
 [node name="dodge" parent="Skills" node_paths=PackedStringArray("player") instance=ExtResource("3_1iiuv")]
@@ -497,8 +491,6 @@ libraries = {
 tree_root = SubResource("AnimationNodeStateMachine_cebpg")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
-
-[node name="AnimationPlayer2" type="AnimationPlayer" parent="."]
 
 [connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]
 [connection signal="timeout" from="SubShootingTimer" to="." method="_on_sub_shooting_timer_timeout"]

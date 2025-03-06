@@ -4,6 +4,7 @@ extends CharacterBody2D
 @onready var visible_enemies : Array = []
 @onready var animation_player = $AnimationPlayer
 @onready var animation_tree = $AnimationTree
+@onready var graphics: Node2D = $Graphics
 @onready var state_machine = animation_tree["parameters/playback"]
 
 @export var knockback_acc = 20
@@ -22,7 +23,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 
 func _physics_process(_delta):
-
+	if not is_zero_approx(velocity.x):
+		graphics.scale.x = -1 if velocity.x > 0 else 1
 	move_and_slide()
 
 func hurt(hitbox: HitBox):
@@ -40,7 +42,7 @@ func enemy_lost(detected_area: DetectedArea):
 		visible_enemies.erase(detected_area)
 
 func adjust():
-	print("adjusing...")
+	# print("adjusing...")
 	if not visible_enemies.is_empty():
 		var enemy = visible_enemies.front() as DetectedArea
 		velocity = global_position.direction_to(enemy.global_position) * CHASING_SPEED
@@ -48,5 +50,6 @@ func adjust():
 	else:
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
 		state_machine.travel("wandering")
+		
 func die():
 	queue_free()
