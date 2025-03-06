@@ -82,6 +82,7 @@ shoot_sub={
 2d_physics/layer_4="MonsterHurtBox"
 2d_physics/layer_5="PlayerDetectedArea"
 2d_physics/layer_6="EnvironmentCollisionArea"
+2d_physics/layer_7="BulletCollisionArea"
 
 [rendering]
 

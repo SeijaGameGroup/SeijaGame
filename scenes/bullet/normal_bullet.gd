@@ -4,26 +4,35 @@ extends BaseBullet
 
 @onready var timer: Timer = $Timer
 @onready var hitbox: HitBox = $HitBox
+@onready var environment_hit_box: EnvironmentHitBox = $EnvironmentHitBox
 
 
 func _ready():
 	add_to_group("Bullets")
 	timer.start(life)
 	timer.timeout.connect(_on_timer_timeout)
-	hitbox.area_entered.connect(_on_hit)
+	hitbox.hit.connect(_on_hit)
+	environment_hit_box.hit.connect(_on_environment_hit)
+	hitbox.damage = damage
+	if shooter is Player:
+		hitbox.set_collision_mask_value(3,false)
+		hitbox.set_collision_mask_value(4,true)
+	if shooter in get_tree().get_nodes_in_group("Monsters"):
+		hitbox.set_collision_mask_value(3,true)
+		hitbox.set_collision_mask_value(4,false)
 
 
 func _process(delta):
 	position += velocity * delta
 
 
-func set_bullet(shooter, position:Vector2, direction:Vector2, speed:float, damage:float, life:float):
-	self.shooter = shooter
-	self.position = position
-	self.direction = direction
-	self.speed = speed
-	self.damage = damage
-	self.life = life
+func set_bullet(Shooter, Position:Vector2, Direction:Vector2, Speed:float, Damage:float, Life:float):
+	self.shooter = Shooter
+	self.position = Position
+	self.direction = Direction
+	self.speed = Speed
+	self.damage = Damage
+	self.life = Life
 	velocity = direction * speed
 
 
@@ -32,4 +41,8 @@ func _on_timer_timeout():
 
 
 func _on_hit(_hurtbox: HurtBox):
+	queue_free()
+
+
+func _on_environment_hit():
 	queue_free()

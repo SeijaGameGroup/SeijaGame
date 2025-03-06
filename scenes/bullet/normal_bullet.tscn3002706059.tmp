@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bw2sfiywjc6gi"]
+[gd_scene load_steps=5 format=3 uid="uid://bw2sfiywjc6gi"]
 
 [ext_resource type="Texture2D" uid="uid://cs2scrnquxfvp" path="res://assets/pictures/bullet1.png" id="1_o0eqw"]
 [ext_resource type="Script" uid="uid://d05mlupo38sbt" path="res://scenes/bullet/normal_bullet.gd" id="2_t08in"]
 [ext_resource type="Script" uid="uid://cfsmsiujxat5m" path="res://scripts/hitbox.gd" id="3_ovih5"]
-[ext_resource type="Script" uid="uid://dklgr7yc0h5b6" path="res://scenes/bullet/environment_hit_box.gd" id="4_t08in"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rawoo"]
 
@@ -17,16 +16,8 @@ one_shot = true
 
 [node name="HitBox" type="Area2D" parent="."]
 collision_layer = 64
-collision_mask = 44
+collision_mask = 76
 script = ExtResource("3_ovih5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
-shape = SubResource("CircleShape2D_rawoo")
-
-[node name="EnvironmentHitBox" type="Area2D" parent="."]
-collision_layer = 64
-collision_mask = 44
-script = ExtResource("4_t08in")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnvironmentHitBox"]
 shape = SubResource("CircleShape2D_rawoo")

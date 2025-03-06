@@ -135,7 +135,7 @@ texture = ExtResource("1_06q47")
 
 [sub_resource type="TileSet" id="TileSet_ax17x"]
 physics_layer_0/collision_layer = 32
-physics_layer_0/collision_mask = 3
+physics_layer_0/collision_mask = 67
 sources/0 = SubResource("TileSetAtlasSource_63f0d")
 
 [node name="World" type="Node2D"]
@@ -150,5 +150,5 @@ tile_set = SubResource("TileSet_ax17x")
 [node name="Player" parent="." instance=ExtResource("2_i1woc")]
 position = Vector2(-255, -46)
 
-[node name="butterfly" parent="." groups=["Enermies"] instance=ExtResource("3_0paq3")]
+[node name="butterfly" parent="." groups=["Monsters"] instance=ExtResource("3_0paq3")]
 position = Vector2(379, -83)

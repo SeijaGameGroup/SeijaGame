@@ -43,7 +43,7 @@ states/detecting/position = Vector2(527, 195)
 states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
 states/wandering/position = Vector2(355, 100)
 transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7")]
-graph_offset = Vector2(-260, 10)
+graph_offset = Vector2(-146, 12)
 
 [sub_resource type="Animation" id="Animation_0byte"]
 length = 0.001

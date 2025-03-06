@@ -62,6 +62,7 @@ var IN_AIR : bool :
 @onready var collision_shape_2d 	: CollisionShape2D					= $CollisionShape2D
 @onready var graphics 				: Node2D							= $Graphics
 @onready var animation_player 		: AnimationPlayer 					= $AnimationPlayer
+@onready var animation_player_extra	: AnimationPlayer 					= $AnimationPlayerExtra
 @onready var animation_tree 		: AnimationTree						= $AnimationTree
 @onready var hurtbox 				: HurtBox							= $HurtBox
 @onready var detected_area			: DetectedArea 						= $DetectedArea
@@ -108,7 +109,7 @@ func _physics_process(delta):
 
 func shoot() -> void:
 	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
-	normal_bullet.set_bullet(self, shooting_point.global_position, normal_bullet.position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
+	normal_bullet.set_bullet(self, shooting_point.global_position, shooting_point.global_position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
 	get_tree().current_scene.add_child(normal_bullet)
 
 
@@ -116,17 +117,15 @@ func shoot_sub() -> void:
 	var offset: Vector2
 	var tracked_enermy = enermy_tracking()
 	for i:int in range(sub_shoot_num):
-		var tracked_bullet
 		offset = Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
-		tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
+		var tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
 		tracked_bullet.set_bullet(self, tracked_enermy, shooting_point.global_position + offset, 100, shoot_damage, 10)
 		get_tree().current_scene.add_child(tracked_bullet)
 
 
 func enermy_tracking():
-	var enermies = get_tree().get_nodes_in_group("Enermies")
 	var tracked_enermy
-	tracked_enermy = get_tree().get_first_node_in_group("Enermies")
+	tracked_enermy = get_tree().get_first_node_in_group("Monsters")
 	#print("Tracking: ", tracked_enermy.name)
 	return tracked_enermy
 
@@ -145,3 +144,4 @@ func _on_sub_shooting_timer_timeout():
 
 func _on_hurt_box_hurt(_hitbox):
 	state_machine.travel("Hurt")
+	animation_player_extra.play("HurtEffect")

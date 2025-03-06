@@ -11,7 +11,8 @@ func _ready():
 	add_to_group("Bullets")
 	timer.start(life)
 	timer.timeout.connect(_on_timer_timeout)
-	hitbox.area_entered.connect(_on_hit)
+	hitbox.hit.connect(_on_hit)
+	hitbox.damage = damage
 
 
 func _process(delta):
@@ -20,16 +21,15 @@ func _process(delta):
 		target_lost.emit()
 	else:
 		velocity = self.global_position.direction_to(target.global_position) * speed
-		print(self.global_position, target.global_position, target.name)
 
 
-func set_bullet(shooter, target, position:Vector2, speed:float, damage:float, life:float):
-	self.shooter = shooter
-	self.target = target
-	self.position = position
-	self.speed = speed
-	self.damage = damage
-	self.life = life
+func set_bullet(Shooter, Target, Position:Vector2, Speed:float, Damage:float, Life:float):
+	self.shooter = Shooter
+	self.target = Target
+	self.position = Position
+	self.speed = Speed
+	self.damage = Damage
+	self.life = Life
 
 
 func _on_timer_timeout():
