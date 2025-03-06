@@ -2,7 +2,7 @@ class_name EnvironmentHitBox
 extends Area2D
 
 
-signal hit
+signal hit(body:Node2D)
 
 
 func _ready():

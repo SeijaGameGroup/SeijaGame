@@ -44,5 +44,5 @@ func _on_hit(_hurtbox: HurtBox):
 	queue_free()
 
 
-func _on_environment_hit():
+func _on_environment_hit(_body: Node2D):
 	queue_free()

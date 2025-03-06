@@ -3,6 +3,7 @@ extends BaseBullet
 
 @onready var timer: Timer = $Timer
 @onready var hitbox: HitBox = $HitBox
+@onready var environment_hit_box: EnvironmentHitBox = $EnvironmentHitBox
 
 signal target_lost
 
@@ -12,6 +13,7 @@ func _ready():
 	timer.start(life)
 	timer.timeout.connect(_on_timer_timeout)
 	hitbox.hit.connect(_on_hit)
+	environment_hit_box.hit.connect(_on_environment_hit)
 	hitbox.damage = damage
 
 
@@ -37,4 +39,8 @@ func _on_timer_timeout():
 
 
 func _on_hit(_hurtbox: HurtBox):
+	queue_free()
+
+
+func _on_environment_hit(_body: Node2D):
 	queue_free()
