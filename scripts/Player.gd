@@ -6,6 +6,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health : int = 150
 @export var damage : float = 6.0
+@export var shoot_damage : float = 6.0
 @export var firedelay : float = 0.3
 @export var sub_shoot_cd : float = 10.0
 @export var sub_shoot_num : int = 6
@@ -98,30 +99,36 @@ func _physics_process(delta):
 				velocity.x = move_toward(velocity.x, 0, friction * delta)
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
-				
+
 
 		else:
 			velocity.x = move_toward(velocity.x, 0, friction * delta)
 
 		move_and_slide()
 
-func shoot():
-	var bullet = preload("res://scenes/bullet.tscn").instantiate()
-	bullet.position = shooting_point.global_position
-	bullet.velocity = bullet.position.direction_to(get_global_mouse_position())
-	get_tree().current_scene.add_child(bullet)
-	bullet.damage = self.damage
+func shoot() -> void:
+	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
+	normal_bullet.set_bullet(self, shooting_point.global_position, normal_bullet.position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
+	get_tree().current_scene.add_child(normal_bullet)
 
 
-func shoot_sub():
-	var tracked_bullet_array = {}
-	for i in range(sub_shoot_num):
-		tracked_bullet_array[i] = preload("res://scenes/tracked_bullet.tscn").instantiate()
-		tracked_bullet_array[i].position += shooting_point.global_position
-		tracked_bullet_array[i].position += Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
-		tracked_bullet_array[i].object_tracked = get_node("/root/World/butterfly")
-		get_tree().current_scene.add_child(tracked_bullet_array[i])
-		tracked_bullet_array[i].damage = self.damage
+func shoot_sub() -> void:
+	var offset: Vector2
+	var tracked_enermy = enermy_tracking()
+	for i:int in range(sub_shoot_num):
+		var tracked_bullet
+		offset = Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
+		tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
+		tracked_bullet.set_bullet(self, tracked_enermy, shooting_point.global_position + offset, 100, shoot_damage, 10)
+		get_tree().current_scene.add_child(tracked_bullet)
+
+
+func enermy_tracking():
+	var enermies = get_tree().get_nodes_in_group("Enermies")
+	var tracked_enermy
+	tracked_enermy = get_tree().get_first_node_in_group("Enermies")
+	#print("Tracking: ", tracked_enermy.name)
+	return tracked_enermy
 
 
 func _on_shooting_timer_timeout():

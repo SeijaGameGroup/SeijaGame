@@ -112,7 +112,7 @@ tracks/0/keys = {
 
 [sub_resource type="Animation" id="Animation_3v2ag"]
 resource_name = "Land"
-length = 0.8
+length = 0.6
 step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -121,10 +121,10 @@ tracks/0/path = NodePath("Graphics/Sprite2D:frame_coords")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 2), Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(6, 2), Vector2i(7, 2)]
+"values": [Vector2i(3, 2), Vector2i(4, 2), Vector2i(5, 2), Vector2i(6, 2), Vector2i(7, 2)]
 }
 
 [sub_resource type="Animation" id="Animation_6k7th"]
@@ -366,22 +366,22 @@ advance_expression = "IN_AIR"
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_hhpqf"]
 states/End/position = Vector2(619, -32)
 states/Falling/node = SubResource("AnimationNodeAnimation_a8ls1")
-states/Falling/position = Vector2(484, 279)
+states/Falling/position = Vector2(494, 279)
 states/Idle/node = SubResource("AnimationNodeAnimation_qfm1y")
-states/Idle/position = Vector2(484, -32)
+states/Idle/position = Vector2(494, -32)
 states/Jump/node = SubResource("AnimationNodeAnimation_fulsm")
-states/Jump/position = Vector2(619, 120)
+states/Jump/position = Vector2(654, 100)
 states/Land/node = SubResource("AnimationNodeAnimation_4r5pv")
-states/Land/position = Vector2(619, 279)
+states/Land/position = Vector2(654, 279)
 states/RESET/node = SubResource("AnimationNodeAnimation_60mlk")
 states/RESET/position = Vector2(100, 100)
 states/Rising/node = SubResource("AnimationNodeAnimation_i4ail")
-states/Rising/position = Vector2(266, 120)
+states/Rising/position = Vector2(294, 100)
 states/Running/node = SubResource("AnimationNodeAnimation_a38lo")
-states/Running/position = Vector2(266, -32)
+states/Running/position = Vector2(294, -32)
 states/Start/position = Vector2(-82, 100)
 transitions = ["Start", "RESET", SubResource("AnimationNodeStateMachineTransition_4ni07"), "RESET", "Idle", SubResource("AnimationNodeStateMachineTransition_l71n6"), "RESET", "Running", SubResource("AnimationNodeStateMachineTransition_ke2ow"), "RESET", "Rising", SubResource("AnimationNodeStateMachineTransition_ujl30"), "RESET", "Falling", SubResource("AnimationNodeStateMachineTransition_31cv2"), "Idle", "Running", SubResource("AnimationNodeStateMachineTransition_pf23h"), "Running", "Idle", SubResource("AnimationNodeStateMachineTransition_dt7fs"), "Idle", "Jump", SubResource("AnimationNodeStateMachineTransition_wqfne"), "Running", "Jump", SubResource("AnimationNodeStateMachineTransition_wnwbv"), "Jump", "Rising", SubResource("AnimationNodeStateMachineTransition_gl8cc"), "Rising", "Falling", SubResource("AnimationNodeStateMachineTransition_487ah"), "Land", "Idle", SubResource("AnimationNodeStateMachineTransition_cs1tg"), "Land", "Running", SubResource("AnimationNodeStateMachineTransition_2dvfe"), "Land", "Jump", SubResource("AnimationNodeStateMachineTransition_giy8y"), "Falling", "Land", SubResource("AnimationNodeStateMachineTransition_ur7pv"), "Falling", "Rising", SubResource("AnimationNodeStateMachineTransition_oprun"), "Running", "Falling", SubResource("AnimationNodeStateMachineTransition_a8ls1"), "Idle", "Falling", SubResource("AnimationNodeStateMachineTransition_qfm1y")]
-graph_offset = Vector2(-351, -96)
+graph_offset = Vector2(-180, -138)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ur7pv"]
 animation = &"Still"
@@ -411,7 +411,7 @@ states/Start/position = Vector2(-23, 157)
 states/Still/node = SubResource("AnimationNodeAnimation_ur7pv")
 states/Still/position = Vector2(290, -5)
 transitions = ["Normal", "Still", SubResource("AnimationNodeStateMachineTransition_y4r1p"), "Still", "Normal", SubResource("AnimationNodeStateMachineTransition_d2wvv"), "Start", "Normal", SubResource("AnimationNodeStateMachineTransition_3v2ag"), "Normal", "Hurt", SubResource("AnimationNodeStateMachineTransition_jej6c"), "Hurt", "Normal", SubResource("AnimationNodeStateMachineTransition_f1ej7")]
-graph_offset = Vector2(-389, -98)
+graph_offset = Vector2(-244, -29)
 
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(5, 5)
