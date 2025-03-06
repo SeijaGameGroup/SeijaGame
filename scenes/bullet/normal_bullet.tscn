@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://bw2sfiywjc6gi"]
+
+[ext_resource type="Texture2D" uid="uid://cs2scrnquxfvp" path="res://assets/pictures/bullet1.png" id="1_o0eqw"]
+[ext_resource type="Script" uid="uid://d05mlupo38sbt" path="res://scenes/bullet/normal_bullet.gd" id="2_t08in"]
+[ext_resource type="Script" uid="uid://cfsmsiujxat5m" path="res://scripts/hitbox.gd" id="3_ovih5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rawoo"]
+
+[node name="NormalBullet" type="Sprite2D"]
+texture = ExtResource("1_o0eqw")
+offset = Vector2(4, -15)
+script = ExtResource("2_t08in")
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("3_ovih5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("CircleShape2D_rawoo")

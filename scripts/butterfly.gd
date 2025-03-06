@@ -21,6 +21,10 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 
+func _ready() -> void:
+	add_to_group("Enermies")
+
+
 func _physics_process(_delta):
 
 	move_and_slide()
@@ -34,7 +38,7 @@ func enemy_detected(detected_area: DetectedArea):
 	if not visible_enemies.has(detected_area):
 		visible_enemies.append(detected_area)
 		adjust()
-		
+
 func enemy_lost(detected_area: DetectedArea):
 	if visible_enemies.has(detected_area):
 		visible_enemies.erase(detected_area)
@@ -48,5 +52,6 @@ func adjust():
 	else:
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
 		state_machine.travel("wandering")
+
 func die():
 	queue_free()
