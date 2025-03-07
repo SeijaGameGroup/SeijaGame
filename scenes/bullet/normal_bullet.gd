@@ -1,4 +1,4 @@
-# constant v and no target
+# constant v and no tracking
 class_name NormalBullet
 extends BaseBullet
 
@@ -7,12 +7,10 @@ extends BaseBullet
 @onready var environment_hit_box: EnvironmentHitBox = $EnvironmentHitBox
 
 
+
 func _ready():
 	add_to_group("Bullets")
 	timer.start(life)
-	timer.timeout.connect(_on_timer_timeout)
-	hitbox.hit.connect(_on_hit)
-	environment_hit_box.hit.connect(_on_environment_hit)
 	hitbox.damage = damage
 	if shooter is Player:
 		hitbox.set_collision_mask_value(3,false)
@@ -24,7 +22,7 @@ func _ready():
 
 func _process(delta):
 	position += velocity * delta
-
+	rotation = direction.angle()
 
 func set_bullet(Shooter, Position:Vector2, Direction:Vector2, Speed:float, Damage:float, Life:float):
 	self.shooter = Shooter

@@ -35,4 +35,5 @@ script = ExtResource("4_p3d0t")
 shape = SubResource("CircleShape2D_v44q1")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
-[connection signal="hit" from="HitBox" to="." method="hit"]
+[connection signal="hit" from="HitBox" to="." method="_on_hit"]
+[connection signal="hit" from="EnvironmentHitBox" to="." method="_on_environment_hit"]

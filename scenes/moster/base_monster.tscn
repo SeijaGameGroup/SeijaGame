@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://kxq4ge4vi2ag"]
+
+[ext_resource type="Script" uid="uid://c0agtpwgdg80a" path="res://scenes/moster/base_monster.gd" id="1_shd0i"]
+
+[node name="BaseMonster" type="CharacterBody2D"]
+script = ExtResource("1_shd0i")

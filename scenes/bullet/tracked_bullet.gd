@@ -11,18 +11,25 @@ signal target_lost
 func _ready():
 	add_to_group("Bullets")
 	timer.start(life)
-	timer.timeout.connect(_on_timer_timeout)
-	hitbox.hit.connect(_on_hit)
-	environment_hit_box.hit.connect(_on_environment_hit)
 	hitbox.damage = damage
+	if shooter is Player:
+		hitbox.set_collision_mask_value(3,false)
+		hitbox.set_collision_mask_value(4,true)
+	if shooter in get_tree().get_nodes_in_group("Monsters"):
+		hitbox.set_collision_mask_value(3,true)
+		hitbox.set_collision_mask_value(4,false)
+
 
 
 func _process(delta):
+	velocity = direction * speed
 	position += velocity * delta
+	rotation = direction.angle()
+
 	if target == null:
 		target_lost.emit()
 	else:
-		velocity = self.global_position.direction_to(target.global_position) * speed
+		direction = self.global_position.direction_to(target.global_position)
 
 
 func set_bullet(Shooter, Target, Position:Vector2, Speed:float, Damage:float, Life:float):

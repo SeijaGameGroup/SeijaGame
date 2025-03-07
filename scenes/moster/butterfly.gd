@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends BaseMonster
 
 @onready var hurtbox = $HurtBox
 @onready var visible_enemies : Array = []

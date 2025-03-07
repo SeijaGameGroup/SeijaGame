@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=4 uid="uid://clt7k802fps6l"]
 
 [ext_resource type="Texture2D" uid="uid://bwefnnp8p0pja" path="res://icon.svg" id="1_06q47"]
-[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player.tscn" id="2_i1woc"]
-[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/butterfly.tscn" id="3_0paq3"]
+[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player/player.tscn" id="2_i1woc"]
+[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/moster/butterfly.tscn" id="3_0paq3"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_63f0d"]
 texture = ExtResource("1_06q47")
@@ -152,3 +152,6 @@ position = Vector2(-255, -46)
 
 [node name="butterfly" parent="." groups=["Monsters"] instance=ExtResource("3_0paq3")]
 position = Vector2(379, -83)
+
+[node name="butterfly2" parent="." groups=["Monsters"] instance=ExtResource("3_0paq3")]
+position = Vector2(-576, -147)
