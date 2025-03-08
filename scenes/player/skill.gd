@@ -7,7 +7,7 @@ extends Node
 @export var player : Player
 
 @onready var cooldown_timer : Timer = $CooldownTimer
-@onready var duration_timer : Timer = $DurationTimer 
+@onready var duration_timer : Timer = $DurationTimer
 @onready var request_timer	: Timer = $RequestTimer
 
 var available : bool :

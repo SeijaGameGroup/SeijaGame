@@ -62,26 +62,43 @@ var IN_AIR : bool :
 @onready var collision_shape_2d 	: CollisionShape2D					= $CollisionShape2D
 @onready var graphics 				: Node2D							= $Graphics
 @onready var animation_player 		: AnimationPlayer 					= $AnimationPlayer
+@onready var animation_player_extra	: AnimationPlayer 					= $AnimationPlayerExtra
 @onready var animation_tree 		: AnimationTree						= $AnimationTree
 @onready var hurtbox 				: HurtBox							= $HurtBox
 @onready var detected_area			: DetectedArea 						= $DetectedArea
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
-func _physics_process(delta):
-	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-		shoot()
-		shooting_timer.start(firedelay)
+var enemy_tracked:BaseMonster
+var is_locking: bool
 
+
+
+# Bullet types for shooting
+enum Bullets
+{
+	NormalBullet,
+	TrackedBullet,
+}
+
+
+func _physics_process(delta):
+	if Input.is_action_just_pressed("enemy_lock"):
+		is_locking = true
+		enemy_tracking()
+	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
+		shoot(Bullets.NormalBullet)
+		shooting_timer.start(firedelay)
 	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 		shoot_sub()
 		sub_shooting_timer.start(sub_shoot_cd)
+	if is_locking and enemy_tracked == null:
+		enemy_tracking()
 
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
-
 		if operatable:
 			# Handle Jump
 			if CAN_JUMP:
@@ -99,41 +116,49 @@ func _physics_process(delta):
 				velocity.x = move_toward(velocity.x, 0, friction * delta)
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
-
-
 		else:
 			velocity.x = move_toward(velocity.x, 0, friction * delta)
 
 		move_and_slide()
 
-func shoot() -> void:
-	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
-	normal_bullet.set_bullet(self, shooting_point.global_position, normal_bullet.position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
-	get_tree().current_scene.add_child(normal_bullet)
+
+func shoot(bullet:Bullets):
+	match bullet:
+		Bullets.NormalBullet:
+			shoot_normal_bullet()
+		Bullets.TrackedBullet:
+			pass
 
 
 func shoot_sub() -> void:
+	enemy_tracking()
+	if enemy_tracked == null:
+		return
 	var offset: Vector2
-	var tracked_enermy = enermy_tracking()
 	for i:int in range(sub_shoot_num):
-		var tracked_bullet
 		offset = Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
-		tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
-		tracked_bullet.set_bullet(self, tracked_enermy, shooting_point.global_position + offset, 100, shoot_damage, 10)
+		var tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
+		tracked_bullet.set_bullet(self, enemy_tracked, shooting_point.global_position + offset, 100, shoot_damage, 10)
 		get_tree().current_scene.add_child(tracked_bullet)
 
 
-func enermy_tracking():
-	var enermies = get_tree().get_nodes_in_group("Enermies")
-	var tracked_enermy
-	tracked_enermy = get_tree().get_first_node_in_group("Enermies")
-	#print("Tracking: ", tracked_enermy.name)
-	return tracked_enermy
+func enemy_tracking() :
+	var enermies_tracked: Array
+	for enemy in get_tree().get_nodes_in_group("Monsters"):
+		if enemy is BaseMonster:
+			enermies_tracked.append(enemy)
+	# return the nearest enemy node
+	if enermies_tracked.is_empty():
+		enemy_tracked = null
+	else:
+		enermies_tracked.sort_custom(func(a,b):return (self.global_position.\
+		distance_squared_to(a.global_position) < self.global_position.distance_squared_to(b.global_position)))
+		enemy_tracked = enermies_tracked[0]
 
 
 func _on_shooting_timer_timeout():
 	if Input.is_action_pressed("shoot"):
-		shoot()
+		shoot(Bullets.NormalBullet)
 		shooting_timer.start(firedelay)
 
 
@@ -145,3 +170,15 @@ func _on_sub_shooting_timer_timeout():
 
 func _on_hurt_box_hurt(_hitbox):
 	state_machine.travel("Hurt")
+	animation_player_extra.play("HurtEffect")
+
+
+func shoot_normal_bullet():
+	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
+	if is_locking and not (enemy_tracked == null):
+		normal_bullet.set_bullet(self, shooting_point.global_position,\
+		shooting_point.global_position.direction_to(enemy_tracked.global_position), 800, shoot_damage, 10)
+	else:
+		normal_bullet.set_bullet(self, shooting_point.global_position,\
+		shooting_point.global_position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
+	get_tree().current_scene.add_child(normal_bullet)

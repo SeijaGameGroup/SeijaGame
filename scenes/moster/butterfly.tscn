@@ -1,6 +1,6 @@
 [gd_scene load_steps=23 format=3 uid="uid://bp2klddudgkav"]
 
-[ext_resource type="Script" uid="uid://c3v3e5lt7b4l3" path="res://scripts/butterfly.gd" id="1_wgdg4"]
+[ext_resource type="Script" uid="uid://c3v3e5lt7b4l3" path="res://scenes/moster/butterfly.gd" id="1_wgdg4"]
 [ext_resource type="Script" uid="uid://bhv07ig7mc223" path="res://scripts/detecting_area.gd" id="3_21p2d"]
 [ext_resource type="Texture2D" uid="uid://dhmy2yy2klib8" path="res://assets/pictures/butterfly_sprite.png" id="3_wsltf"]
 [ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="4_0cgc5"]
@@ -43,7 +43,7 @@ states/detecting/position = Vector2(527, 195)
 states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
 states/wandering/position = Vector2(355, 100)
 transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7")]
-graph_offset = Vector2(-260, 10)
+graph_offset = Vector2(-146, 12)
 
 [sub_resource type="Animation" id="Animation_0byte"]
 length = 0.001
