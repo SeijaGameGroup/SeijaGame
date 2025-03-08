@@ -1,23 +1,31 @@
 class_name Skill
 extends Node
 
-@export var cooldown : int
-@export var duration : int
-@export var request_time := 0.3
+@export var cooldown 		: int
+@export var duration 		: int
+@export var request_time 	:= 0.1
 @export var player : Player
 
-@onready var cooldown_timer : Timer = $CooldownTimer
-@onready var duration_timer : Timer = $DurationTimer
-@onready var request_timer	: Timer = $RequestTimer
+var cooldown_timer : Timer
+var duration_timer : Timer
+var request_timer  : Timer
 
 var available : bool :
 	get:
 		return cooldown_timer.is_stopped() and player.operatable
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+func _init() -> void:
+	cooldown_timer = Timer.new()
+	cooldown_timer.one_shot = true
+	add_child(cooldown_timer)
+	
+	duration_timer = Timer.new()
+	duration_timer.one_shot = true
+	add_child(duration_timer)
+	
+	request_timer = Timer.new()
+	request_timer.one_shot = true
+	add_child(request_timer)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _process(_delta) -> void:
 	pass

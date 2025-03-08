@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dkff0o0q4plm"]
+
+[ext_resource type="Script" uid="uid://dtv2nt2h36f3m" path="res://scripts/status_panel.gd" id="1_nq8qi"]
+
+[node name="StatusPanel" type="HBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_nq8qi")

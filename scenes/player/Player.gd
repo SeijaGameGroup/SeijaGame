@@ -4,25 +4,26 @@ extends CharacterBody2D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var health : int = 150
-@export var damage : float = 6.0
-@export var shoot_damage : float = 6.0
-@export var firedelay : float = 0.3
-@export var sub_shoot_cd : float = 10.0
-@export var sub_shoot_num : int = 6
-@export var speed : float = 6.0
-@export var jump_velocity = -400.0
-@export var friction := 2000
+@export var health 			:= 150.0
+@export var damage 			:= 6.0
+@export var shoot_damage	:= 6.0
+@export var firedelay 		:= 0.3
+@export var sub_shoot_cd 	:= 10.0
+@export var sub_shoot_num 	:= 6
+@export var speed 			:= 6.0
+@export var jump_velocity 	:= -700.0
+@export var ground_friction := 2000.0
+@export var air_friction 	:= 300.0
 #@export var acc := 1500
 
-@export var damage_reduction_rate : float = 0
-@export var speed_multiplier : float = 1
-@export var gravity_multiplier : float = 1
-@export var jump_velocity_multipler : float = 1
+@export var damage_reduction_rate 	:= 0.0
+@export var speed_multiplier 		:= 1.0
+@export var gravity_multiplier 		:= 1.0
+@export var jump_velocity_multipler := 1.0
 
-var SPEED : int :
+var SPEED : float :
 	get:
-		return int(speed * 50 * speed_multiplier)
+		return speed * 50 * speed_multiplier
 
 var GRAVITY : float :
 	get:
@@ -54,25 +55,23 @@ var IN_AIR : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer 		: Timer 							= $ShootingTimer
-@onready var sub_shooting_timer 	: Timer 							= $SubShootingTimer
-@onready var jump_request_timer 	: Timer 							= $JumpRequestTimer
-@onready var sprite_2d 				: Sprite2D 							= $Graphics/Sprite2D
-@onready var shooting_point 		: Node2D							= $Graphics/ShootingPoint
-@onready var collision_shape_2d 	: CollisionShape2D					= $CollisionShape2D
-@onready var graphics 				: Node2D							= $Graphics
-@onready var animation_player 		: AnimationPlayer 					= $AnimationPlayer
-@onready var animation_player_extra	: AnimationPlayer 					= $AnimationPlayerExtra
-@onready var animation_tree 		: AnimationTree						= $AnimationTree
-@onready var hurtbox 				: HurtBox							= $HurtBox
-@onready var detected_area			: DetectedArea 						= $DetectedArea
+@onready var shooting_timer 		:= $ShootingTimer
+@onready var sub_shooting_timer 	:= $SubShootingTimer
+@onready var jump_request_timer 	:= $JumpRequestTimer
+@onready var sprite_2d 				:= $Graphics/Sprite2D
+@onready var shooting_point 		:= $Graphics/ShootingPoint
+@onready var collision_shape_2d 	:= $CollisionShape2D
+@onready var graphics 				:= $Graphics
+@onready var animation_player 		:= $AnimationPlayer
+@onready var animation_tree 		:= $AnimationTree
+@onready var hurtbox 				:= $HurtBox
+@onready var detected_area			:= $DetectedArea
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
-var enemy_tracked:BaseMonster
-var is_locking: bool
-
-
+@export var interacting_with 		: Array[Interactable]
+@export var enemy_tracked			: BaseMonster
+@export var is_locking				: bool
 
 # Bullet types for shooting
 enum Bullets
@@ -81,43 +80,57 @@ enum Bullets
 	TrackedBullet,
 }
 
+func _physics_process(delta) -> void:
+	if operatable:
+		# Handle Shoot
+		if Input.is_action_just_pressed("enemy_lock"):
+			is_locking = true
+			enemy_tracking()
+		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
+			shoot(Bullets.NormalBullet)
+			shooting_timer.start(firedelay)
+		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
+			shoot_sub()
+			sub_shooting_timer.start(sub_shoot_cd)
+		if is_locking and enemy_tracked == null:
+			enemy_tracking()
 
-func _physics_process(delta):
-	if Input.is_action_just_pressed("enemy_lock"):
-		is_locking = true
-		enemy_tracking()
-	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-		shoot(Bullets.NormalBullet)
-		shooting_timer.start(firedelay)
-	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
-		shoot_sub()
-		sub_shooting_timer.start(sub_shoot_cd)
-	if is_locking and enemy_tracked == null:
-		enemy_tracking()
+		# Handle Interact
+		if Input.is_action_just_pressed("Interact") and not interacting_with.is_empty():
+			interacting_with.back().interact(self)
 
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
+		
 		if operatable:
-			# Handle Jump
-			if CAN_JUMP:
-				if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
-					velocity.y = JUMP_VELOCITY
-					state_machine_normal.travel("Jump")
-			elif Input.is_action_pressed("jump"):
-				jump_request_timer.start(0.1)
-			# Get the input direction and handle the movement/deceleration.
-			# As good practice, you should replace UI actions with custom gameplay actions.
 			var direction = Input.get_axis("move_left", "move_right")
-			if direction:
-				velocity.x = SPEED * direction
+			if IN_AIR:
+				if direction:
+					velocity.x = SPEED * direction
+				else:
+					velocity.x = move_toward(velocity.x, 0, air_friction * delta)
+
 			else:
-				velocity.x = move_toward(velocity.x, 0, friction * delta)
+				# Handle Jump
+				if CAN_JUMP:
+					if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
+						velocity.y = JUMP_VELOCITY
+						state_machine_normal.travel("Jump")
+				elif Input.is_action_pressed("jump"):
+					jump_request_timer.start(0.1)
+					
+				if direction:
+					velocity.x = SPEED * direction
+				else:
+					velocity.x = move_toward(velocity.x, 0, ground_friction * delta)
+			# Handle graphics
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
+				
 		else:
-			velocity.x = move_toward(velocity.x, 0, friction * delta)
+			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
 
 		move_and_slide()
 
@@ -156,21 +169,21 @@ func enemy_tracking() :
 		enemy_tracked = enermies_tracked[0]
 
 
-func _on_shooting_timer_timeout():
+func _on_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot"):
 		shoot(Bullets.NormalBullet)
 		shooting_timer.start(firedelay)
 
 
-func _on_sub_shooting_timer_timeout():
+func _on_sub_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot_sub"):
 		shoot_sub()
 		sub_shooting_timer.start(sub_shoot_cd)
 
 
-func _on_hurt_box_hurt(_hitbox):
+func _on_hurt_box_hurt(_hitbox) -> void:
 	state_machine.travel("Hurt")
-	animation_player_extra.play("HurtEffect")
+	# animation_player_extra.play("HurtEffect")
 
 
 func shoot_normal_bullet():
