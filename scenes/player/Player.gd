@@ -6,6 +6,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health 			:= 150.0
 @export var damage 			:= 6.0
+@export var shoot_damage	:= 6.0
 @export var firedelay 		:= 0.3
 @export var sub_shoot_cd 	:= 10.0
 @export var sub_shoot_num 	:= 6
@@ -182,7 +183,7 @@ func _on_sub_shooting_timer_timeout() -> void:
 
 func _on_hurt_box_hurt(_hitbox) -> void:
 	state_machine.travel("Hurt")
-	animation_player_extra.play("HurtEffect")
+	# animation_player_extra.play("HurtEffect")
 
 
 func shoot_normal_bullet():

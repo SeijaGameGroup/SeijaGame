@@ -25,14 +25,10 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 func _physics_process(_delta):
 	if not is_zero_approx(velocity.x):
 		graphics.scale.x = -1 if velocity.x > 0 else 1
+	move_and_slide()
 
 func _ready() -> void:
 	add_to_group("Monsters")
-
-
-func _physics_process(_delta):
-	move_and_slide()
-
 
 func hurt(hitbox: HitBox):
 	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
@@ -61,3 +57,5 @@ func adjust():
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
 		state_machine.travel("wandering")
 		
+func die() -> void:
+	queue_free()
