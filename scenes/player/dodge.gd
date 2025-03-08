@@ -1,4 +1,4 @@
-extends "res://scripts/skill.gd"
+extends Skill
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

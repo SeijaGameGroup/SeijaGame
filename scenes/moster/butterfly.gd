@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends BaseMonster
 
 @onready var hurtbox 			:= $HurtBox
 @onready var animation_player 	:= $AnimationPlayer
@@ -25,21 +25,31 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 func _physics_process(_delta):
 	if not is_zero_approx(velocity.x):
 		graphics.scale.x = -1 if velocity.x > 0 else 1
+
+func _ready() -> void:
+	add_to_group("Monsters")
+
+
+func _physics_process(_delta):
 	move_and_slide()
+
 
 func hurt(hitbox: HitBox):
 	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
 	velocity += acc
 	health -= (hitbox.damage) as int
 
+
 func enemy_detected(detected_area: DetectedArea):
 	if not visible_enemies.has(detected_area):
 		visible_enemies.append(detected_area)
 		adjust()
-		
+
+
 func enemy_lost(detected_area: DetectedArea):
 	if visible_enemies.has(detected_area):
 		visible_enemies.erase(detected_area)
+
 
 func adjust():
 	# print("adjusing...")
@@ -51,5 +61,3 @@ func adjust():
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
 		state_machine.travel("wandering")
 		
-func die():
-	queue_free()

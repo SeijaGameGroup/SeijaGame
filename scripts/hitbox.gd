@@ -2,8 +2,10 @@ class_name HitBox
 extends Area2D
 
 @export var damage : float
+var damage: float
 
-signal hit(hurtbox)
+signal hit(hurtbox:HurtBox)
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
