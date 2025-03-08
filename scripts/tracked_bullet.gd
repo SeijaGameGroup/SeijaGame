@@ -20,5 +20,3 @@ func _process(delta):
 func speed_func():
 	speed = 80
 	return speed
-
-

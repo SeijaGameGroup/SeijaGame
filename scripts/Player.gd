@@ -4,25 +4,25 @@ extends CharacterBody2D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var health 			: int = 150
-@export var damage 			: float = 6.0
-@export var firedelay 		: float = 0.3
-@export var sub_shoot_cd 	: float = 10.0
-@export var sub_shoot_num 	: int = 6
-@export var speed 			: float = 6.0
+@export var health 			:= 150.0
+@export var damage 			:= 6.0
+@export var firedelay 		:= 0.3
+@export var sub_shoot_cd 	:= 10.0
+@export var sub_shoot_num 	:= 6
+@export var speed 			:= 6.0
 @export var jump_velocity 	:= -700.0
-@export var ground_friction := 2000
-@export var air_friction 	:= 300
+@export var ground_friction := 2000.0
+@export var air_friction 	:= 300.0
 #@export var acc := 1500
 
-@export var damage_reduction_rate 	: float = 0
-@export var speed_multiplier 		: float = 1
-@export var gravity_multiplier 		: float = 1
-@export var jump_velocity_multipler : float = 1
+@export var damage_reduction_rate 	:= 0.0
+@export var speed_multiplier 		:= 1.0
+@export var gravity_multiplier 		:= 1.0
+@export var jump_velocity_multipler := 1.0
 
-var SPEED : int :
+var SPEED : float :
 	get:
-		return int(speed * 50 * speed_multiplier)
+		return speed * 50 * speed_multiplier
 
 var GRAVITY : float :
 	get:
@@ -54,30 +54,35 @@ var IN_AIR : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer 		: Timer 							= $ShootingTimer
-@onready var sub_shooting_timer 	: Timer 							= $SubShootingTimer
-@onready var jump_request_timer 	: Timer 							= $JumpRequestTimer
-@onready var sprite_2d 				: Sprite2D 							= $Graphics/Sprite2D
-@onready var shooting_point 		: Node2D							= $Graphics/ShootingPoint
-@onready var collision_shape_2d 	: CollisionShape2D					= $CollisionShape2D
-@onready var graphics 				: Node2D							= $Graphics
-@onready var animation_player 		: AnimationPlayer 					= $AnimationPlayer
-@onready var animation_tree 		: AnimationTree						= $AnimationTree
-@onready var hurtbox 				: HurtBox							= $HurtBox
-@onready var detected_area			: DetectedArea 						= $DetectedArea
+@onready var shooting_timer 		:= $ShootingTimer
+@onready var sub_shooting_timer 	:= $SubShootingTimer
+@onready var jump_request_timer 	:= $JumpRequestTimer
+@onready var sprite_2d 				:= $Graphics/Sprite2D
+@onready var shooting_point 		:= $Graphics/ShootingPoint
+@onready var collision_shape_2d 	:= $CollisionShape2D
+@onready var graphics 				:= $Graphics
+@onready var animation_player 		:= $AnimationPlayer
+@onready var animation_tree 		:= $AnimationTree
+@onready var hurtbox 				:= $HurtBox
+@onready var detected_area			:= $DetectedArea
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
-var interacting_with : Array[Interactable]
+@export var interacting_with 		: Array[Interactable]
 
-func _physics_process(delta):
-	if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-		shoot()
-		shooting_timer.start(firedelay)
-
-	if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
-		shoot_sub()
-		sub_shooting_timer.start(sub_shoot_cd)
+func _physics_process(delta) -> void:
+	if operatable:
+		# Handle Shoot
+		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
+			shoot()
+			shooting_timer.start(firedelay)
+		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
+			shoot_sub()
+			sub_shooting_timer.start(sub_shoot_cd)
+			
+		# Handle Interact
+		if Input.is_action_just_pressed("Interact") and not interacting_with.is_empty():
+			interacting_with.back().interact(self)
 
 	if movable:
 		# Add the gravity.
@@ -114,7 +119,7 @@ func _physics_process(delta):
 
 		move_and_slide()
 
-func shoot():
+func shoot() -> void:
 	var bullet = preload("res://scenes/bullet.tscn").instantiate()
 	bullet.position = shooting_point.global_position
 	bullet.velocity = bullet.position.direction_to(get_global_mouse_position())
@@ -122,7 +127,7 @@ func shoot():
 	bullet.damage = self.damage
 
 
-func shoot_sub():
+func shoot_sub() -> void:
 	var tracked_bullet_array = {}
 	for i in range(sub_shoot_num):
 		tracked_bullet_array[i] = preload("res://scenes/tracked_bullet.tscn").instantiate()
@@ -133,17 +138,17 @@ func shoot_sub():
 		tracked_bullet_array[i].damage = self.damage
 
 
-func _on_shooting_timer_timeout():
+func _on_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot"):
 		shoot()
 		shooting_timer.start(firedelay)
 
 
-func _on_sub_shooting_timer_timeout():
+func _on_sub_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot_sub"):
 		shoot_sub()
 		sub_shooting_timer.start(sub_shoot_cd)
 
 
-func _on_hurt_box_hurt(_hitbox):
+func _on_hurt_box_hurt(_hitbox) -> void:
 	state_machine.travel("Hurt")

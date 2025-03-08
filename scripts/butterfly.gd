@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
-@onready var hurtbox = $HurtBox
-@onready var visible_enemies : Array = []
-@onready var animation_player = $AnimationPlayer
-@onready var animation_tree = $AnimationTree
-@onready var graphics: Node2D = $Graphics
-@onready var state_machine = animation_tree["parameters/playback"]
+@onready var hurtbox 			:= $HurtBox
+@onready var animation_player 	:= $AnimationPlayer
+@onready var animation_tree 	:= $AnimationTree
+@onready var graphics			:= $Graphics
+@onready var visible_enemies 	: Array = []
+@onready var state_machine 		: AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
 
 @export var knockback_acc = 20
 @export var WANDERING_SPEED = 20

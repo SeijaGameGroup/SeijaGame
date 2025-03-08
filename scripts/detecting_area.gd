@@ -17,10 +17,12 @@ func _process(_delta):
 
 func _on_area_entered(area: Area2D):
 	var detected_area = area as DetectedArea
-	if detected_area:
-		target_entered.emit(detected_area)
+	if detected_area == null:
+		return
+	target_entered.emit(detected_area)
 
 func _on_area_lost(area: Area2D):
 	var detected_area = area as DetectedArea
-	if detected_area:
-		target_lost.emit(detected_area)
+	if detected_area == null:
+		return
+	target_lost.emit(detected_area)
