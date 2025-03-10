@@ -56,6 +56,6 @@ func adjust():
 	else:
 		velocity = Vector2.from_angle(randf_range(0, 2*PI)) * WANDERING_SPEED
 		state_machine.travel("wandering")
-		
+
 func die() -> void:
 	queue_free()

@@ -19,7 +19,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var damage_reduction_rate 	:= 0.0
 @export var speed_multiplier 		:= 1.0
 @export var gravity_multiplier 		:= 1.0
-@export var jump_velocity_multipler := 1.0
+@export var jump_velocity_multiplier := 1.0
 
 var SPEED : float :
 	get:
@@ -31,7 +31,7 @@ var GRAVITY : float :
 
 var JUMP_VELOCITY : float :
 	get:
-		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
+		return jump_velocity * jump_velocity_multiplier * (-1 if upside_down else 1)
 
 var CAN_JUMP : bool :
 	get:
@@ -74,10 +74,18 @@ var IN_AIR : bool :
 @export var is_locking				: bool
 
 # Bullet types for shooting
-enum Bullets
+enum BulletType
 {
 	NormalBullet,
-	TrackedBullet,
+	TrackingBullet,
+}
+
+enum DistributionType
+{
+	None,
+	Serial,
+	Angular,
+	Vertical,
 }
 
 func _physics_process(delta) -> void:
@@ -87,7 +95,7 @@ func _physics_process(delta) -> void:
 			is_locking = true
 			enemy_tracking()
 		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-			shoot(Bullets.NormalBullet)
+			shoot(BulletType.NormalBullet)
 			shooting_timer.start(firedelay)
 		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 			shoot_sub()
@@ -98,12 +106,15 @@ func _physics_process(delta) -> void:
 		# Handle Interact
 		if Input.is_action_just_pressed("Interact") and not interacting_with.is_empty():
 			interacting_with.back().interact(self)
+		# Test
+		if Input.is_action_just_pressed("TestButton"):
+			get_tree().call_group("Bullets", &"duplicate_bullet")
 
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
 		velocity.y += GRAVITY * delta
-		
+
 		if operatable:
 			var direction = Input.get_axis("move_left", "move_right")
 			if IN_AIR:
@@ -120,7 +131,7 @@ func _physics_process(delta) -> void:
 						state_machine_normal.travel("Jump")
 				elif Input.is_action_pressed("jump"):
 					jump_request_timer.start(0.1)
-					
+
 				if direction:
 					velocity.x = SPEED * direction
 				else:
@@ -128,18 +139,52 @@ func _physics_process(delta) -> void:
 			# Handle graphics
 			if not is_zero_approx(velocity.x):
 				graphics.scale.x = -1 if velocity.x < 0 else 1
-				
+
 		else:
 			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
 
 		move_and_slide()
 
 
-func shoot(bullet:Bullets):
+func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.None, num:int = 1, par1:float = -1, par2:float = -1):
 	match bullet:
-		Bullets.NormalBullet:
-			shoot_normal_bullet()
-		Bullets.TrackedBullet:
+		BulletType.NormalBullet:
+			match distribution:
+				DistributionType.None:
+					shoot_normal_bullet()
+				DistributionType.Serial:
+					shoot_normal_bullet()
+					if num > 1:
+						var fire_delay:float = firedelay if par1 == -1 else par1
+						for i:int in range(0, num-1):
+							await get_tree().create_timer(fire_delay).timeout
+							shoot_normal_bullet()
+				DistributionType.Angular:
+					pass
+				DistributionType.Vertical:
+					if num == 1:
+						shoot_normal_bullet()
+					elif num > 1:
+						var v_distance:float = 50 if par1 == -1 else par1
+						var v_offset = Vector2(v_distance,0)
+						var fire_rotation:float
+						if par2 == -1:
+							if enemy_tracked == null:
+								var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
+								fire_rotation = direction_to_mouse.orthogonal().angle()
+							else:
+								var direction_to_enemy = shooting_point.global_position.direction_to(enemy_tracked.global_position)
+								fire_rotation = direction_to_enemy.orthogonal().angle()
+						else:
+							fire_rotation = par2
+						v_offset = v_offset.rotated(fire_rotation)
+						var bullet_offset = v_offset
+						for i:int in range(0,num):
+							shoot_normal_bullet(bullet_offset,0)
+							bullet_offset -= v_offset/(num-1)
+
+
+		BulletType.TrackingBullet:
 			pass
 
 
@@ -150,9 +195,11 @@ func shoot_sub() -> void:
 	var offset: Vector2
 	for i:int in range(sub_shoot_num):
 		offset = Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
-		var tracked_bullet = preload("res://scenes/bullet/tracked_bullet.tscn").instantiate()
-		tracked_bullet.set_bullet(self, enemy_tracked, shooting_point.global_position + offset, 100, shoot_damage, 10)
-		get_tree().current_scene.add_child(tracked_bullet)
+		var tracking_bullet = preload("res://scenes/bullet/tracking_bullet.tscn").instantiate()
+		tracking_bullet.set_bullet(shooting_point.global_position + offset,\
+		Vector2.ZERO, 200, 10, enemy_tracked, self, shoot_damage)
+		get_tree().current_scene.add_child(tracking_bullet)
+
 
 
 func enemy_tracking() :
@@ -171,7 +218,7 @@ func enemy_tracking() :
 
 func _on_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot"):
-		shoot(Bullets.NormalBullet)
+		shoot(BulletType.NormalBullet)
 		shooting_timer.start(firedelay)
 
 
@@ -186,12 +233,14 @@ func _on_hurt_box_hurt(_hitbox) -> void:
 	# animation_player_extra.play("HurtEffect")
 
 
-func shoot_normal_bullet():
+func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, direction_offset:float = 0):
 	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
 	if is_locking and not (enemy_tracked == null):
-		normal_bullet.set_bullet(self, shooting_point.global_position,\
-		shooting_point.global_position.direction_to(enemy_tracked.global_position), 800, shoot_damage, 10)
+		var direction_to_enemy:Vector2 = shooting_point.global_position.direction_to(enemy_tracked.global_position)
+		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
+		direction_to_enemy.rotated(direction_offset), 800, 10, enemy_tracked, self, shoot_damage)
 	else:
-		normal_bullet.set_bullet(self, shooting_point.global_position,\
-		shooting_point.global_position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
+		var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
+		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
+		direction_to_mouse.rotated(direction_offset), 800, 10, enemy_tracked, self, shoot_damage)
 	get_tree().current_scene.add_child(normal_bullet)
