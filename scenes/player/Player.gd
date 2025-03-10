@@ -12,14 +12,14 @@ signal health_changed(health: float)
 		health = value
 		health_changed.emit(value)	
 @export var damage 			:= 6.0
-@export var shoot_damage		:= 6.0
+@export var shoot_damage	:= 6.0
 @export var firedelay 		:= 0.3
-@export var range			:= 10.0
+@export var shooting_range	:= 10.0
 @export var sub_shoot_cd 	:= 10.0
 @export var sub_shoot_num 	:= 6
 @export var speed 			:= 6.0
 @export var jump_velocity 	:= -700.0
-@export var ground_friction 	:= 2000.0
+@export var ground_friction := 2000.0
 @export var air_friction 	:= 300.0
 #@export var acc := 1500
 

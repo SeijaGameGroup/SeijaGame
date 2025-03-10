@@ -1433,7 +1433,7 @@ tile_map_data = PackedByteArray("AAC1ADAAAQABAAIAAAC1AC8AAQADAAMAAAC1AC4AAQADAAI
 tile_set = SubResource("TileSet_jray3")
 
 [node name="Player" parent="." instance=ExtResource("3_jray3")]
-position = Vector2(198, 498)
+position = Vector2(129, 424)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 zoom = Vector2(2, 2)
@@ -1454,7 +1454,7 @@ position = Vector2(1600, -260)
 [node name="Teleporter" type="Area2D" parent="."]
 position = Vector2(2452.2, 396.039)
 script = ExtResource("6_vkmld")
-path = "uid://clt7k802fps6l"
+target_path = "uid://b7335uhkmb221"
 metadata/_custom_type_script = "uid://cf2os0iwnvytu"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Teleporter"]
