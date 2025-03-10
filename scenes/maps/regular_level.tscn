@@ -2,9 +2,9 @@
 
 [ext_resource type="Texture2D" uid="uid://crcu60v7mpvo3" path="res://assets/pictures/Tiles.png" id="1_dw5pd"]
 [ext_resource type="Texture2D" uid="uid://dp37u14ujaj8s" path="res://assets/pictures/Tree-Assets.png" id="2_hrksg"]
-[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player.tscn" id="3_jray3"]
+[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player/player.tscn" id="3_jray3"]
 [ext_resource type="Texture2D" uid="uid://xt3vbf5vj0j0" path="res://assets/pictures/Buildings.png" id="3_vrf76"]
-[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/butterfly.tscn" id="4_48p3r"]
+[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/moster/butterfly.tscn" id="4_48p3r"]
 [ext_resource type="Script" uid="uid://cf2os0iwnvytu" path="res://scripts/teleporter.gd" id="6_vkmld"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hrksg"]
