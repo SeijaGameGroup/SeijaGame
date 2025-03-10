@@ -4,7 +4,13 @@ extends CharacterBody2D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@export var health 			:= 150.0
+signal health_changed(health: float)
+
+@export var max_health 		:= 150.0
+@export var health			:= max_health :
+	set(value):
+		health = value
+		health_changed.emit(value)	
 @export var damage 			:= 6.0
 @export var shoot_damage	:= 6.0
 @export var firedelay 		:= 0.3
@@ -66,6 +72,7 @@ var IN_AIR : bool :
 @onready var animation_tree 		:= $AnimationTree
 @onready var hurtbox 				:= $HurtBox
 @onready var detected_area			:= $DetectedArea
+@onready var interaction_icon		:= $InteractionIcon
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
@@ -81,6 +88,10 @@ enum Bullets
 }
 
 func _physics_process(delta) -> void:
+	
+	# Handle Interactable
+	interaction_icon.visible = not interacting_with.is_empty()
+	
 	if operatable:
 		# Handle Shoot
 		if Input.is_action_just_pressed("enemy_lock"):
@@ -181,9 +192,11 @@ func _on_sub_shooting_timer_timeout() -> void:
 		sub_shooting_timer.start(sub_shoot_cd)
 
 
-func _on_hurt_box_hurt(_hitbox) -> void:
+func _on_hurt_box_hurt(hitbox: HitBox) -> void:
 	state_machine.travel("Hurt")
 	# animation_player_extra.play("HurtEffect")
+	
+	health -= hitbox.damage
 
 
 func shoot_normal_bullet():

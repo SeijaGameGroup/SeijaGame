@@ -2,12 +2,12 @@
 
 [ext_resource type="Texture2D" uid="uid://crcu60v7mpvo3" path="res://assets/pictures/Tiles.png" id="1_dw5pd"]
 [ext_resource type="Texture2D" uid="uid://dp37u14ujaj8s" path="res://assets/pictures/Tree-Assets.png" id="2_hrksg"]
-[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player.tscn" id="3_jray3"]
+[ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player/player.tscn" id="3_jray3"]
 [ext_resource type="Texture2D" uid="uid://xt3vbf5vj0j0" path="res://assets/pictures/Buildings.png" id="3_vrf76"]
-[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/butterfly.tscn" id="4_48p3r"]
+[ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/moster/butterfly.tscn" id="4_48p3r"]
 [ext_resource type="Script" uid="uid://cf2os0iwnvytu" path="res://scripts/teleporter.gd" id="6_vkmld"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hrksg"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hyjl5"]
 texture = ExtResource("1_dw5pd")
 6:0/0 = 0
 7:0/0 = 0
@@ -570,7 +570,7 @@ texture = ExtResource("1_dw5pd")
 0:0/0/terrain = 0
 0:0/0/terrains_peering_bit/bottom_right_corner = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jray3"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4who2"]
 texture = ExtResource("2_hrksg")
 5:0/0 = 0
 5:0/0/terrain_set = 0
@@ -1015,7 +1015,7 @@ texture = ExtResource("2_hrksg")
 4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 4:0/0/terrains_peering_bit/bottom_left_corner = 1
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vkmld"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_muvuw"]
 texture = ExtResource("3_vrf76")
 0:0/0 = 0
 1:0/0 = 0
@@ -1415,9 +1415,9 @@ terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
 terrain_set_0/terrain_1/name = "Terrain 1"
 terrain_set_0/terrain_1/color = Color(0.5, 0.4375, 0.25, 1)
-sources/0 = SubResource("TileSetAtlasSource_hrksg")
-sources/1 = SubResource("TileSetAtlasSource_jray3")
-sources/2 = SubResource("TileSetAtlasSource_vkmld")
+sources/0 = SubResource("TileSetAtlasSource_hyjl5")
+sources/1 = SubResource("TileSetAtlasSource_4who2")
+sources/2 = SubResource("TileSetAtlasSource_muvuw")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_15h1g"]
 size = Vector2(64, 68)
