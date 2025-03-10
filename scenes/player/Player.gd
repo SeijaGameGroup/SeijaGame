@@ -6,32 +6,45 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var health 			:= 150.0
 @export var damage 			:= 6.0
-@export var shoot_damage	:= 6.0
+@export var shoot_damage		:= 6.0
 @export var firedelay 		:= 0.3
+@export var range			:= 10.0
 @export var sub_shoot_cd 	:= 10.0
 @export var sub_shoot_num 	:= 6
 @export var speed 			:= 6.0
 @export var jump_velocity 	:= -700.0
-@export var ground_friction := 2000.0
+@export var ground_friction 	:= 2000.0
 @export var air_friction 	:= 300.0
 #@export var acc := 1500
 
 @export var damage_reduction_rate 	:= 0.0
 @export var speed_multiplier 		:= 1.0
 @export var gravity_multiplier 		:= 1.0
-@export var jump_velocity_multipler := 1.0
+@export var jump_velocity_multipler 	:= 1.0
+@export var range_multipler			:= 1.0
+
+@export var damage_item	:= 0.0
+
+@export var range_multipler_item				:= 1.0
+@export var dodge_time_multipler_item		:= 1.0
+@export var cooldown_multipler_item			:= 1.0
+@export var damage_multipler_item			:= 1.0
+@export var damage_reduction_rate_item		:= 0.0
+@export var speed_multiplier_item			:= 1.0
+@export var gravity_multiplier_item 			:= 1.0
+@export var jump_velocity_multipler_item 	:= 1.0
 
 var SPEED : float :
 	get:
-		return speed * 50 * speed_multiplier
+		return speed * 50 * speed_multiplier * speed_multiplier_item
 
 var GRAVITY : float :
 	get:
-		return gravity * gravity_multiplier * (-1 if upside_down else 1)
+		return gravity * gravity_multiplier * gravity_multiplier_item * (-1 if upside_down else 1)
 
 var JUMP_VELOCITY : float :
 	get:
-		return jump_velocity * jump_velocity_multipler * (-1 if upside_down else 1)
+		return jump_velocity * jump_velocity_multipler * jump_velocity_multipler_item * (-1 if upside_down else 1)
 
 var CAN_JUMP : bool :
 	get:
@@ -55,21 +68,22 @@ var IN_AIR : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer 		:= $ShootingTimer
-@onready var sub_shooting_timer 	:= $SubShootingTimer
-@onready var jump_request_timer 	:= $JumpRequestTimer
+@onready var shooting_timer 			:= $ShootingTimer
+@onready var sub_shooting_timer 		:= $SubShootingTimer
+@onready var jump_request_timer 		:= $JumpRequestTimer
 @onready var sprite_2d 				:= $Graphics/Sprite2D
-@onready var shooting_point 		:= $Graphics/ShootingPoint
-@onready var collision_shape_2d 	:= $CollisionShape2D
+@onready var shooting_point 			:= $Graphics/ShootingPoint
+@onready var collision_shape_2d 		:= $CollisionShape2D
 @onready var graphics 				:= $Graphics
 @onready var animation_player 		:= $AnimationPlayer
-@onready var animation_tree 		:= $AnimationTree
+@onready var animation_tree 			:= $AnimationTree
 @onready var hurtbox 				:= $HurtBox
 @onready var detected_area			:= $DetectedArea
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
 @export var interacting_with 		: Array[Interactable]
+@export var passive_items			: Array[Item]
 @export var enemy_tracked			: BaseMonster
 @export var is_locking				: bool
 
@@ -195,3 +209,14 @@ func shoot_normal_bullet():
 		normal_bullet.set_bullet(self, shooting_point.global_position,\
 		shooting_point.global_position.direction_to(get_global_mouse_position()), 800, shoot_damage, 10)
 	get_tree().current_scene.add_child(normal_bullet)
+
+#func reset_item_effects():
+	#damage_item				= 0.0
+#
+	#dodge_time_multipler	= 1.0
+	#cooldown_multipler		= 1.0
+	#damage_multipler_item	= 1.0
+	#damage_reduction_rate 	= 0.0
+	#speed_multiplier 		= 1.0
+	#gravity_multiplier 		= 1.0
+	#jump_velocity_multipler	= 1.0

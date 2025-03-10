@@ -1,6 +1,6 @@
 [gd_scene load_steps=58 format=3 uid="uid://dqauwk5l6600p"]
 
-[ext_resource type="Script" uid="uid://dduk4utfcs0ke" path="res://scenes/player/Player.gd" id="1_jmtl0"]
+[ext_resource type="Script" uid="uid://dduk4utfcs0ke" path="res://scenes/player/player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
 [ext_resource type="Script" uid="uid://bjo3en6vjihqs" path="res://scenes/player/dodge.gd" id="4_25f81"]
 [ext_resource type="Script" uid="uid://13srbjh567rb" path="res://scenes/player/skill1.gd" id="5_bsawl"]
