@@ -25,6 +25,6 @@ func _physics_process(delta: float) -> void:
 			global_position += velocity * delta
 		State.ATTRACTED:
 			global_position = global_position.move_toward(Game.player_stats.player_global_position, speed * delta)
-	if global_position.distance_to(Game.player_stats.player_global_position) < 10:
+	if global_position.distance_to(Game.player_stats.player_global_position) < 30:
 		Game.player_stats.p_points += 1
 		queue_free()

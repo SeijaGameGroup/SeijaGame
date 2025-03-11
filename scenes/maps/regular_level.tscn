@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=4 uid="uid://dbs41hxmx2nt6"]
+[gd_scene load_steps=12 format=4 uid="uid://dbs41hxmx2nt6"]
 
 [ext_resource type="Texture2D" uid="uid://crcu60v7mpvo3" path="res://assets/pictures/Tiles.png" id="1_dw5pd"]
 [ext_resource type="Texture2D" uid="uid://dp37u14ujaj8s" path="res://assets/pictures/Tree-Assets.png" id="2_hrksg"]
@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" uid="uid://xt3vbf5vj0j0" path="res://assets/pictures/Buildings.png" id="3_vrf76"]
 [ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/moster/butterfly.tscn" id="4_48p3r"]
 [ext_resource type="Script" uid="uid://cf2os0iwnvytu" path="res://scripts/teleporter.gd" id="6_vkmld"]
-[ext_resource type="PackedScene" uid="uid://d4ed7n5307len" path="res://scenes/utilities/p_point.tscn" id="7_4who2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hyjl5"]
 texture = ExtResource("1_dw5pd")
@@ -1461,18 +1460,3 @@ metadata/_custom_type_script = "uid://cf2os0iwnvytu"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Teleporter"]
 position = Vector2(-0.195313, -0.0390625)
 shape = SubResource("RectangleShape2D_15h1g")
-
-[node name="P_Point" parent="." instance=ExtResource("7_4who2")]
-position = Vector2(220, 309)
-
-[node name="P_Point4" parent="." instance=ExtResource("7_4who2")]
-position = Vector2(219, 310)
-
-[node name="P_Point5" parent="." instance=ExtResource("7_4who2")]
-position = Vector2(220, 308)
-
-[node name="P_Point3" parent="." instance=ExtResource("7_4who2")]
-position = Vector2(220, 309)
-
-[node name="P_Point2" parent="." instance=ExtResource("7_4who2")]
-position = Vector2(219, 309)
