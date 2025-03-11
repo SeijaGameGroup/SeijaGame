@@ -1421,7 +1421,7 @@ sources/2 = SubResource("TileSetAtlasSource_1lofy")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w0gi"]
 size = Vector2(60.075, 61.5409)
 
-[node name="HealingRoom" type="Node2D"]
+[node name="HealingRoom2" type="Node2D"]
 metadata/_edit_vertical_guides_ = [202.0, 1465.0]
 metadata/_edit_horizontal_guides_ = [252.0, 803.0]
 
@@ -1437,7 +1437,7 @@ position = Vector2(474, 565)
 [node name="Camera2D" type="Camera2D" parent="Player"]
 zoom = Vector2(2, 2)
 limit_left = 200
-limit_top = 250
+limit_top = 260
 limit_right = 1500
 limit_bottom = 800
 

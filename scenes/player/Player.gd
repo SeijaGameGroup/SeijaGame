@@ -4,13 +4,6 @@ extends CharacterBody2D
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-signal health_changed(health: float)
-
-@export var max_health 		:= 150.0
-@export var health			:= max_health :
-	set(value):
-		health = value
-		health_changed.emit(value)	
 @export var damage 			:= 6.0
 @export var shoot_damage	:= 6.0
 @export var firedelay 		:= 0.3
@@ -26,31 +19,20 @@ signal health_changed(health: float)
 @export var damage_reduction_rate 	:= 0.0
 @export var speed_multiplier 		:= 1.0
 @export var gravity_multiplier 		:= 1.0
-@export var jump_velocity_multipler 	:= 1.0
+@export var jump_velocity_multipler := 1.0
 @export var range_multipler			:= 1.0
-
-@export var damage_item	:= 0.0
-
-@export var range_multipler_item				:= 1.0
-@export var dodge_time_multipler_item		:= 1.0
-@export var cooldown_multipler_item			:= 1.0
-@export var damage_multipler_item			:= 1.0
-@export var damage_reduction_rate_item		:= 0.0
-@export var speed_multiplier_item			:= 1.0
-@export var gravity_multiplier_item 			:= 1.0
-@export var jump_velocity_multipler_item 	:= 1.0
 
 var SPEED : float :
 	get:
-		return speed * 50 * speed_multiplier * speed_multiplier_item
+		return speed * 50 * speed_multiplier * playerstats.speed_multiplier_item
 
 var GRAVITY : float :
 	get:
-		return gravity * gravity_multiplier * gravity_multiplier_item * (-1 if upside_down else 1)
+		return gravity * gravity_multiplier * playerstats.gravity_multiplier_item * (-1 if upside_down else 1)
 
 var JUMP_VELOCITY : float :
 	get:
-		return jump_velocity * jump_velocity_multipler * jump_velocity_multipler_item * (-1 if upside_down else 1)
+		return jump_velocity * jump_velocity_multipler * playerstats.jump_velocity_multipler_item * (-1 if upside_down else 1)
 
 var CAN_JUMP : bool :
 	get:
@@ -74,15 +56,16 @@ var IN_AIR : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
-@onready var shooting_timer 			:= $ShootingTimer
-@onready var sub_shooting_timer 		:= $SubShootingTimer
-@onready var jump_request_timer 		:= $JumpRequestTimer
+@onready var playerstats			: PlayerStats = Game.player_stats
+@onready var shooting_timer 		:= $ShootingTimer
+@onready var sub_shooting_timer 	:= $SubShootingTimer
+@onready var jump_request_timer 	:= $JumpRequestTimer
 @onready var sprite_2d 				:= $Graphics/Sprite2D
-@onready var shooting_point 			:= $Graphics/ShootingPoint
-@onready var collision_shape_2d 		:= $CollisionShape2D
+@onready var shooting_point 		:= $Graphics/ShootingPoint
+@onready var collision_shape_2d 	:= $CollisionShape2D
 @onready var graphics 				:= $Graphics
 @onready var animation_player 		:= $AnimationPlayer
-@onready var animation_tree 			:= $AnimationTree
+@onready var animation_tree 		:= $AnimationTree
 @onready var hurtbox 				:= $HurtBox
 @onready var detected_area			:= $DetectedArea
 @onready var interaction_icon		:= $InteractionIcon
@@ -90,9 +73,7 @@ var IN_AIR : bool :
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 
 @export var interacting_with 		: Array[Interactable]
-@export var passive_items			: Array[Item]
 @export var enemy_tracked			: BaseMonster
-@export var is_locking				: bool
 
 # Bullet types for shooting
 enum Bullets
@@ -109,7 +90,7 @@ func _physics_process(delta) -> void:
 	if operatable:
 		# Handle Shoot
 		if Input.is_action_just_pressed("enemy_lock"):
-			is_locking = true
+			playerstats.is_locking = true
 			enemy_tracking()
 		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
 			shoot(Bullets.NormalBullet)
@@ -117,7 +98,7 @@ func _physics_process(delta) -> void:
 		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 			shoot_sub()
 			sub_shooting_timer.start(sub_shoot_cd)
-		if is_locking and enemy_tracked == null:
+		if playerstats.is_locking and enemy_tracked == null:
 			enemy_tracking()
 
 		# Handle Interact
@@ -210,12 +191,12 @@ func _on_hurt_box_hurt(hitbox: HitBox) -> void:
 	state_machine.travel("Hurt")
 	# animation_player_extra.play("HurtEffect")
 	
-	health -= hitbox.damage
+	playerstats.health -= hitbox.damage
 
 
 func shoot_normal_bullet():
 	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
-	if is_locking and not (enemy_tracked == null):
+	if playerstats.is_locking and not (enemy_tracked == null):
 		normal_bullet.set_bullet(self, shooting_point.global_position,\
 		shooting_point.global_position.direction_to(enemy_tracked.global_position), 800, shoot_damage, 10)
 	else:
@@ -225,11 +206,11 @@ func shoot_normal_bullet():
 
 #func reset_item_effects():
 	#damage_item				= 0.0
-#
-	#dodge_time_multipler	= 1.0
-	#cooldown_multipler		= 1.0
-	#damage_multipler_item	= 1.0
-	#damage_reduction_rate 	= 0.0
-	#speed_multiplier 		= 1.0
+
+	#dodge_time_multipler		= 1.0
+	#cooldown_multipler			= 1.0
+	#damage_multipler_item		= 1.0
+	#damage_reduction_rate 		= 0.0
+	#speed_multiplier 			= 1.0
 	#gravity_multiplier 		= 1.0
 	#jump_velocity_multipler	= 1.0

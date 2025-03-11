@@ -1,5 +1,6 @@
 extends BaseMonster
 
+@onready var stats 				:= $Stats
 @onready var hitbox				:= $HitBox
 @onready var hurtbox 			:= $HurtBox
 @onready var animation_player 	:= $AnimationPlayer
@@ -15,13 +16,6 @@ extends BaseMonster
 	set(value):
 		damage = value
 		hitbox.damage = value
-@export var max_health		:= 60.0
-@export var health 			:= max_health :
-	set(value):
-		if (value <= 0):
-			die()
-		else:
-			health = value
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -34,11 +28,14 @@ func _physics_process(_delta):
 
 func _ready() -> void:
 	add_to_group("Monsters")
+	stats.max_health = 60.0
+	stats.health = 60.0
+	stats.die.connect(die)
 
 func hurt(hitbox: HitBox):
 	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
 	velocity += acc
-	health -= hitbox.damage
+	stats.health -= hitbox.damage
 
 
 func enemy_detected(detected_area: DetectedArea):

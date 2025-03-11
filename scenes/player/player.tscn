@@ -538,8 +538,7 @@ anim_player = NodePath("../AnimationPlayer")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="StatusPanel" parent="CanvasLayer" node_paths=PackedStringArray("player") instance=ExtResource("9_ur7pv")]
-player = NodePath("../..")
+[node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("9_ur7pv")]
 
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
 position = Vector2(0.2, -11.6)
