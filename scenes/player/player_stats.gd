@@ -13,8 +13,12 @@ extends Stats
 @export var gravity_multiplier_item 		:= 1.0
 @export var jump_velocity_multipler_item 	:= 1.0
 
+@export var p_points		:= 0
 @export var passive_items	: Array[Item]
 @export var is_locking		: bool
+
+var player_global_position : Vector2
+
 
 func _init() -> void:
 	max_health = 150.0

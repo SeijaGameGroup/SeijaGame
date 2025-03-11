@@ -92,6 +92,7 @@ enemy_lock={
 2d_physics/layer_5="PlayerDetectedArea"
 2d_physics/layer_6="EnvironmentCollisionArea"
 2d_physics/layer_7="BulletCollisionArea"
+2d_physics/layer_8="GravityAffectedItems"
 
 [rendering]
 

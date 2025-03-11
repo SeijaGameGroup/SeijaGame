@@ -139,7 +139,7 @@ func _physics_process(delta) -> void:
 			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
 
 		move_and_slide()
-
+		Game.player_stats.player_global_position = global_position
 
 func shoot(bullet:Bullets):
 	match bullet:
