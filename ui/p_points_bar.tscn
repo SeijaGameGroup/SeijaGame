@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1e42hsk88xhu"]
+
+[ext_resource type="Script" uid="uid://3lhdmlcyo1ms" path="res://ui/p_points_bar.gd" id="1_5fua0"]
+[ext_resource type="Texture2D" uid="uid://dd8tciffbrjoc" path="res://assets/pictures/p_point.png" id="1_lrvm1"]
+
+[node name="P_PointsBar" type="HBoxContainer"]
+script = ExtResource("1_5fua0")
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_lrvm1")
+expand_mode = 2
+
+[node name="Number" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "0"

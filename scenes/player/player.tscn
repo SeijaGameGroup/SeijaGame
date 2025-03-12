@@ -1,4 +1,4 @@
-[gd_scene load_steps=66 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=67 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" uid="uid://doy788hc8gr5h" path="res://scenes/player/player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
@@ -8,10 +8,11 @@
 [ext_resource type="Script" uid="uid://clefr0k3indke" path="res://scenes/player/skill3.gd" id="7_ypujm"]
 [ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="8_ms0pe"]
 [ext_resource type="Script" uid="uid://cmpnd44nwscvv" path="res://scripts/detected_area.gd" id="9_hjkth"]
-[ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_panel.tscn" id="9_ur7pv"]
+[ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_bar.tscn" id="9_ur7pv"]
 [ext_resource type="Texture2D" uid="uid://dalpyb1g5dwa7" path="res://assets/pictures/arrow.png" id="10_gx1jg"]
 [ext_resource type="PackedScene" uid="uid://bta45gmfb3gnr" path="res://scripts/visible_detection.tscn" id="10_h17s1"]
 [ext_resource type="Texture2D" uid="uid://berftylujv48v" path="res://assets/pictures/gdb-keyboard-2.png" id="10_je7p5"]
+[ext_resource type="PackedScene" uid="uid://d1e42hsk88xhu" path="res://ui/p_points_bar.tscn" id="10_ugbui"]
 [ext_resource type="Texture2D" uid="uid://cvesyhit6sjta" path="res://assets/pictures/crosshair.png" id="11_ugbui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
@@ -555,7 +556,14 @@ anim_player = NodePath("../AnimationPlayer")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="StatusPanel" parent="CanvasLayer" instance=ExtResource("9_ur7pv")]
+[node name="StatusBar" parent="CanvasLayer" instance=ExtResource("9_ur7pv")]
+scale = Vector2(3, 3)
+
+[node name="P_PointsBar" parent="CanvasLayer" instance=ExtResource("10_ugbui")]
+offset_left = 1.0
+offset_top = 180.0
+offset_right = 45.0
+offset_bottom = 208.0
 
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
 position = Vector2(0.2, -11.6)
