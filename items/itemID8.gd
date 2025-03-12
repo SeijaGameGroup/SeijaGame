@@ -1,10 +1,10 @@
 extends Item
 
-func _ready() -> void:
+func _init() -> void:
 	ID = 8
 	Type = ItemType.Passive
 	Name = "伞"
 	
 func effect(player: Player) -> void:
 	super(player)
-	player.gravity_multiplier = 0.5
+	Game.player_stats.gravity_multiplier_item = 0.5

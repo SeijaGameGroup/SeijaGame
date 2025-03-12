@@ -1,10 +1,10 @@
 extends Item
 
-func _ready() -> void:
+func _init() -> void:
 	ID = 4
 	Type = ItemType.Passive
 	Name = "御币"
 	
 func effect(player: Player) -> void:
 	super(player)
-	player.range_multipler_item += 0.1
+	Game.player_stats.range_multipler_item += 0.1
