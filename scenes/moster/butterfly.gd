@@ -6,6 +6,7 @@ extends BaseMonster
 @onready var graphics			:= $Graphics
 @onready var visible_enemies 	: Array = []
 @onready var state_machine 		: AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
+@onready var visible_detection	: VisibleDetection = $VisibleDetection
 
 @export var knockback_acc = 20
 @export var WANDERING_SPEED = 20
@@ -37,20 +38,21 @@ func hurt(hitbox: HitBox):
 
 
 func enemy_detected(detected_area: DetectedArea):
-	if not visible_enemies.has(detected_area):
-		visible_enemies.append(detected_area)
-		adjust()
+	if not visible_enemies.has(detected_area.owner):
+		if visible_detection.visible_detect(detected_area.owner, 30):
+			visible_enemies.append(detected_area.owner)
+			adjust()
 
 
 func enemy_lost(detected_area: DetectedArea):
-	if visible_enemies.has(detected_area):
-		visible_enemies.erase(detected_area)
+	if visible_enemies.has(detected_area.owner):
+		visible_enemies.erase(detected_area.owner)
 
 
 func adjust():
 	# print("adjusing...")
 	if not visible_enemies.is_empty():
-		var enemy = visible_enemies.front() as DetectedArea
+		var enemy = visible_enemies.front()
 		velocity = global_position.direction_to(enemy.global_position) * CHASING_SPEED
 		state_machine.travel("chasing")
 	else:

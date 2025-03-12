@@ -1,4 +1,4 @@
-[gd_scene load_steps=58 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=59 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" uid="uid://dduk4utfcs0ke" path="res://scenes/player/Player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="8_ms0pe"]
 [ext_resource type="Script" uid="uid://cmpnd44nwscvv" path="res://scripts/detected_area.gd" id="9_hjkth"]
 [ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_panel.tscn" id="9_ur7pv"]
+[ext_resource type="PackedScene" uid="uid://bta45gmfb3gnr" path="res://scripts/visible_detection.tscn" id="10_h17s1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
 size = Vector2(6.5, 16.6)
@@ -414,6 +415,8 @@ graph_offset = Vector2(-244, -29)
 scale = Vector2(5, 5)
 collision_mask = 32
 script = ExtResource("1_jmtl0")
+bullet_distribution = 1
+bullet_num = 5
 
 [node name="Graphics" type="Node2D" parent="."]
 
@@ -500,6 +503,9 @@ advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 
 [node name="StatusPanel" parent="." instance=ExtResource("9_ur7pv")]
+
+[node name="VisibleDetection" parent="." instance=ExtResource("10_h17s1")]
+position = Vector2(2.98023e-08, -3.2)
 
 [connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]
 [connection signal="timeout" from="SubShootingTimer" to="." method="_on_sub_shooting_timer_timeout"]

@@ -1446,7 +1446,7 @@ limit_bottom = 900
 position = Vector2(661, -241)
 
 [node name="butterfly2" parent="." instance=ExtResource("4_48p3r")]
-position = Vector2(863, 561)
+position = Vector2(857, 389)
 
 [node name="butterfly3" parent="." instance=ExtResource("4_48p3r")]
 position = Vector2(1600, -260)

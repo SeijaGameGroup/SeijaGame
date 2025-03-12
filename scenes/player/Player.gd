@@ -68,10 +68,15 @@ var IN_AIR : bool :
 @onready var detected_area			:= $DetectedArea
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
+@onready var visible_detection		: VisibleDetection = $VisibleDetection
 
 @export var interacting_with 		: Array[Interactable]
 @export var enemy_tracked			: BaseMonster
 @export var is_locking				: bool
+
+@export var bullet_type				: BulletType = BulletType.NormalBullet
+@export var bullet_distribution		: DistributionType = DistributionType.None
+@export var bullet_num				: int = 1
 
 # Bullet types for shooting
 enum BulletType
@@ -89,19 +94,21 @@ enum DistributionType
 }
 
 func _physics_process(delta) -> void:
+	enemy_tracking()
+	if Input.is_action_just_pressed("enemy_lock"):
+		is_locking = not is_locking
+
 	if operatable:
 		# Handle Shoot
-		if Input.is_action_just_pressed("enemy_lock"):
-			is_locking = true
-			enemy_tracking()
 		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-			shoot(BulletType.NormalBullet)
-			shooting_timer.start(firedelay)
+			shoot(BulletType.NormalBullet, bullet_distribution, bullet_num)
+			if bullet_distribution == DistributionType.Serial:
+				shooting_timer.start(firedelay * bullet_num)
+			else:
+				shooting_timer.start(firedelay)
 		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
 			shoot_sub()
 			sub_shooting_timer.start(sub_shoot_cd)
-		if is_locking and enemy_tracked == null:
-			enemy_tracking()
 
 		# Handle Interact
 		if Input.is_action_just_pressed("Interact") and not interacting_with.is_empty():
@@ -160,7 +167,20 @@ func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.N
 							await get_tree().create_timer(fire_delay).timeout
 							shoot_normal_bullet()
 				DistributionType.Angular:
-					pass
+					if num == 1:
+						shoot_normal_bullet()
+					elif num > 1:
+						var angle_to_enemy: float
+						if enemy_tracked == null:
+							angle_to_enemy = PI/48
+						else:
+							angle_to_enemy = asin(enemy_tracked.visible_radius / (global_position.distance_to(enemy_tracked.global_position)))
+						var fire_angle:float = clamp(2*angle_to_enemy,0,PI*2/3) if par1==-1 else par1
+						var angle_offset = fire_angle
+						for i:int in range(0,num):
+							shoot_normal_bullet(Vector2.ZERO,angle_offset)
+							angle_offset -= fire_angle/(num-1)
+
 				DistributionType.Vertical:
 					if num == 1:
 						shoot_normal_bullet()
@@ -189,7 +209,6 @@ func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.N
 
 
 func shoot_sub() -> void:
-	enemy_tracking()
 	if enemy_tracked == null:
 		return
 	var offset: Vector2
@@ -202,8 +221,8 @@ func shoot_sub() -> void:
 
 
 
-func enemy_tracking() :
-	var enermies_tracked: Array
+func enemy_tracking() -> void:
+	var enermies_tracked: Array[BaseMonster]
 	for enemy in get_tree().get_nodes_in_group("Monsters"):
 		if enemy is BaseMonster:
 			enermies_tracked.append(enemy)
@@ -213,12 +232,16 @@ func enemy_tracking() :
 	else:
 		enermies_tracked.sort_custom(func(a,b):return (self.global_position.\
 		distance_squared_to(a.global_position) < self.global_position.distance_squared_to(b.global_position)))
-		enemy_tracked = enermies_tracked[0]
+		for i:int in range(0,enermies_tracked.size()):
+			if visible_detection.visible_detect(enermies_tracked[i], enermies_tracked[i].visible_radius):
+				enemy_tracked = enermies_tracked[i]
+				break
+		enemy_tracked == null
 
 
 func _on_shooting_timer_timeout() -> void:
 	if Input.is_action_pressed("shoot"):
-		shoot(BulletType.NormalBullet)
+		shoot(BulletType.NormalBullet, bullet_distribution, bullet_num)
 		shooting_timer.start(firedelay)
 
 
@@ -233,14 +256,14 @@ func _on_hurt_box_hurt(_hitbox) -> void:
 	# animation_player_extra.play("HurtEffect")
 
 
-func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, direction_offset:float = 0):
+func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:float = 0):
 	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
 	if is_locking and not (enemy_tracked == null):
 		var direction_to_enemy:Vector2 = shooting_point.global_position.direction_to(enemy_tracked.global_position)
 		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
-		direction_to_enemy.rotated(direction_offset), 800, 10, enemy_tracked, self, shoot_damage)
+		direction_to_enemy.rotated(angle_offset), 800, 10, enemy_tracked, self, shoot_damage)
 	else:
 		var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
 		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
-		direction_to_mouse.rotated(direction_offset), 800, 10, enemy_tracked, self, shoot_damage)
+		direction_to_mouse.rotated(angle_offset), 800, 10, null, self, shoot_damage)
 	get_tree().current_scene.add_child(normal_bullet)
