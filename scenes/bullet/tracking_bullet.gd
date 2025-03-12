@@ -1,4 +1,4 @@
-class_name TrackedBullet
+class_name TrackingBullet
 extends BaseBullet
 
 @onready var timer: Timer = $Timer
@@ -31,14 +31,6 @@ func _process(delta):
 	else:
 		direction = self.global_position.direction_to(target.global_position)
 
-
-func set_bullet(Shooter, Target, Position:Vector2, Speed:float, Damage:float, Life:float):
-	self.shooter = Shooter
-	self.target = Target
-	self.position = Position
-	self.speed = Speed
-	self.damage = Damage
-	self.life = Life
 
 
 func _on_timer_timeout():

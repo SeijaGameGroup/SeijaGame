@@ -1,6 +1,6 @@
-[gd_scene load_steps=64 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=66 format=3 uid="uid://dqauwk5l6600p"]
 
-[ext_resource type="Script" uid="uid://dduk4utfcs0ke" path="res://scenes/player/player.gd" id="1_jmtl0"]
+[ext_resource type="Script" uid="uid://doy788hc8gr5h" path="res://scenes/player/player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
 [ext_resource type="Script" uid="uid://bjo3en6vjihqs" path="res://scenes/player/dodge.gd" id="4_25f81"]
 [ext_resource type="Script" uid="uid://13srbjh567rb" path="res://scenes/player/skill1.gd" id="5_bsawl"]
@@ -9,7 +9,10 @@
 [ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="8_ms0pe"]
 [ext_resource type="Script" uid="uid://cmpnd44nwscvv" path="res://scripts/detected_area.gd" id="9_hjkth"]
 [ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_panel.tscn" id="9_ur7pv"]
-[ext_resource type="Texture2D" uid="uid://berftylujv48v" path="res://assets/pictures/gdb-keyboard-2.png" id="10_h17s1"]
+[ext_resource type="Texture2D" uid="uid://dalpyb1g5dwa7" path="res://assets/pictures/arrow.png" id="10_gx1jg"]
+[ext_resource type="PackedScene" uid="uid://bta45gmfb3gnr" path="res://scripts/visible_detection.tscn" id="10_h17s1"]
+[ext_resource type="Texture2D" uid="uid://berftylujv48v" path="res://assets/pictures/gdb-keyboard-2.png" id="10_je7p5"]
+[ext_resource type="Texture2D" uid="uid://cvesyhit6sjta" path="res://assets/pictures/crosshair.png" id="11_ugbui"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
 size = Vector2(6.5, 16.6)
@@ -411,28 +414,17 @@ states/Still/position = Vector2(290, -5)
 transitions = ["Normal", "Still", SubResource("AnimationNodeStateMachineTransition_y4r1p"), "Still", "Normal", SubResource("AnimationNodeStateMachineTransition_d2wvv"), "Start", "Normal", SubResource("AnimationNodeStateMachineTransition_3v2ag"), "Normal", "Hurt", SubResource("AnimationNodeStateMachineTransition_jej6c"), "Hurt", "Normal", SubResource("AnimationNodeStateMachineTransition_f1ej7")]
 graph_offset = Vector2(-244, -42)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_je7p5"]
-atlas = ExtResource("10_h17s1")
-region = Rect2(112, 64, 16, 16)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_fm80t"]
-atlas = ExtResource("10_h17s1")
-region = Rect2(112, 176, 16, 16)
+atlas = ExtResource("10_je7p5")
+region = Rect2(112, 400, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gx1jg"]
-atlas = ExtResource("10_h17s1")
+atlas = ExtResource("10_je7p5")
 region = Rect2(112, 288, 16, 16)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ugbui"]
-atlas = ExtResource("10_h17s1")
-region = Rect2(112, 400, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_fcs02"]
 animations = [{
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_je7p5")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fm80t")
 }, {
@@ -440,10 +432,32 @@ animations = [{
 "texture": SubResource("AtlasTexture_gx1jg")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ugbui")
+"texture": SubResource("AtlasTexture_fm80t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gx1jg")
 }],
 "loop": true,
 "name": &"keyboard",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_myrg7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_gx1jg")
+}],
+"loop": true,
+"name": &"arrow",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_ugbui")
+}],
+"loop": true,
+"name": &"locking",
 "speed": 5.0
 }]
 
@@ -452,6 +466,8 @@ z_index = 1
 scale = Vector2(3, 3)
 collision_mask = 32
 script = ExtResource("1_jmtl0")
+bullet_distribution = 2
+bullet_num = 3
 
 [node name="Graphics" type="Node2D" parent="."]
 
@@ -547,7 +563,15 @@ scale = Vector2(0.3, 0.3)
 sprite_frames = SubResource("SpriteFrames_fcs02")
 animation = &"keyboard"
 autoplay = "keyboard"
-frame_progress = 0.650646
+
+[node name="VisibleDetection" parent="." instance=ExtResource("10_h17s1")]
+position = Vector2(2.98023e-08, -3.2)
+
+[node name="EnemyLockSprite" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.333333, 0.333333)
+sprite_frames = SubResource("SpriteFrames_myrg7")
+animation = &"locking"
+autoplay = "locking"
 
 [connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]
 [connection signal="timeout" from="SubShootingTimer" to="." method="_on_sub_shooting_timer_timeout"]

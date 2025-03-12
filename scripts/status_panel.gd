@@ -17,4 +17,3 @@ func _ready() -> void:
 func redrawHealthBar():
 	var percentage = player_stats.health / player_stats.max_health
 	health_bar.value = percentage
-	

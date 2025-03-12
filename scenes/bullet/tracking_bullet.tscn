@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://oiamf560qx6t"]
 
 [ext_resource type="Texture2D" uid="uid://cs2scrnquxfvp" path="res://assets/pictures/bullet1.png" id="1_jdmof"]
-[ext_resource type="Script" uid="uid://benm38ebghp3u" path="res://scenes/bullet/tracked_bullet.gd" id="2_eg6f6"]
+[ext_resource type="Script" uid="uid://benm38ebghp3u" path="res://scenes/bullet/tracking_bullet.gd" id="2_eg6f6"]
 [ext_resource type="Script" uid="uid://cfsmsiujxat5m" path="res://scripts/hitbox.gd" id="3_1gwvv"]
 [ext_resource type="Script" uid="uid://dklgr7yc0h5b6" path="res://scenes/bullet/environment_hit_box.gd" id="4_p3d0t"]
 
@@ -9,7 +9,7 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_v44q1"]
 
-[node name="Tracked_Bullet" type="Sprite2D"]
+[node name="Tracking_Bullet" type="Sprite2D"]
 position = Vector2(3, -14)
 texture = ExtResource("1_jdmof")
 script = ExtResource("2_eg6f6")
