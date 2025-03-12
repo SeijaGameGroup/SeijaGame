@@ -69,9 +69,10 @@ var IN_AIR : bool :
 @onready var hurtbox 				:= $HurtBox
 @onready var detected_area			:= $DetectedArea
 @onready var interaction_icon		:= $InteractionIcon
+@onready var enemy_lock_sprite		:= $EnemyLockSprite
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
-@onready var visible_detection		: VisibleDetection = $VisibleDetection
+@onready var visible_detection		: VisibleDetection 					= $VisibleDetection
 
 @export var interacting_with 		: Array[Interactable]
 @export var enemy_tracked			: BaseMonster
@@ -95,14 +96,34 @@ enum DistributionType
 	Vertical,
 }
 
+
 func _physics_process(delta) -> void:
+	# Track Enemy
 	enemy_tracking()
 	if Input.is_action_just_pressed("enemy_lock"):
-		playerstats.is_locking = not is_locking
+		playerstats.is_locking = not playerstats.is_locking
+	if playerstats.is_locking and enemy_tracked != null:
+		enemy_lock_sprite.visible = true
+		var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
+		if camera:
+			if is_in_camera(enemy_tracked, camera):
+				enemy_lock_sprite.global_position = enemy_tracked.global_position
+				enemy_lock_sprite.rotation = 0
+				enemy_lock_sprite.play("locking")
+			else:
+				var direction_to_enemy = self.global_position.direction_to(enemy_tracked.global_position)
+				enemy_lock_sprite.global_position = global_position + 200 * direction_to_enemy
+				enemy_lock_sprite.rotation = direction_to_enemy.angle()
+				enemy_lock_sprite.play("arrow")
+
+		else:
+			enemy_lock_sprite.visible = false
+	else:
+		enemy_lock_sprite.visible = false
 
 	# Handle Interactable
 	interaction_icon.visible = not interacting_with.is_empty()
-	
+
 	if operatable:
 		# Handle Shoot
 		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
@@ -231,7 +252,7 @@ func enemy_tracking() -> void:
 	for enemy in get_tree().get_nodes_in_group("Monsters"):
 		if enemy is BaseMonster:
 			enermies_tracked.append(enemy)
-	# return the nearest enemy node
+	# return the nearest visible enemy node
 	if enermies_tracked.is_empty():
 		enemy_tracked = null
 	else:
@@ -259,7 +280,7 @@ func _on_sub_shooting_timer_timeout() -> void:
 func _on_hurt_box_hurt(hitbox: HitBox) -> void:
 	state_machine.travel("Hurt")
 	# animation_player_extra.play("HurtEffect")
-	
+
 	playerstats.health -= hitbox.damage
 
 
@@ -285,3 +306,9 @@ func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:fl
 	#speed_multiplier 			= 1.0
 	#gravity_multiplier 		= 1.0
 	#jump_velocity_multipler	= 1.0
+
+func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
+	var viewport_size = get_viewport_rect().size
+	var camera_half_size = viewport_size * 0.5 / camera.zoom
+	var camera_rect = Rect2(camera.global_position - camera_half_size, viewport_size/camera.zoom)
+	return camera_rect.has_point(node.global_position)
