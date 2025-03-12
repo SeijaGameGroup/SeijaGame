@@ -18,11 +18,11 @@ func _init() -> void:
 	cooldown_timer = Timer.new()
 	cooldown_timer.one_shot = true
 	add_child(cooldown_timer)
-	
+
 	duration_timer = Timer.new()
 	duration_timer.one_shot = true
 	add_child(duration_timer)
-	
+
 	request_timer = Timer.new()
 	request_timer.one_shot = true
 	add_child(request_timer)

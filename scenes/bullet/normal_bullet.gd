@@ -21,17 +21,9 @@ func _ready():
 
 
 func _process(delta):
+	velocity = direction * speed
 	position += velocity * delta
 	rotation = direction.angle()
-
-func set_bullet(Shooter, Position:Vector2, Direction:Vector2, Speed:float, Damage:float, Life:float):
-	self.shooter = Shooter
-	self.position = Position
-	self.direction = Direction
-	self.speed = Speed
-	self.damage = Damage
-	self.life = Life
-	velocity = direction * speed
 
 
 func _on_timer_timeout():
