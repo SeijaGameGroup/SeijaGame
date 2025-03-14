@@ -5,4 +5,4 @@ extends Interactable
 
 func interact(player: Player) -> void:
 	super(player)
-	get_tree().change_scene_to_file(target_path)
+	Game.change_scene(target_path)

@@ -8,9 +8,8 @@ var itemID : int
 
 func _init(itemID: int = 0) -> void:
 	self.itemID = itemID
-	var img = Image.load_from_file(ITEM_ICON_PATH + "itemID%d.png" % itemID)
+	var img = load(ITEM_ICON_PATH + "itemID%d.png" % itemID)
 	if img == null:
-		has_resource = false
+		print("no resource")
 		return
-	texture = ImageTexture.new()
-	texture = texture.create_from_image(img)
+	self.texture = img
