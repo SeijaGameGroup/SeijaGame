@@ -8,7 +8,7 @@ extends BaseMonster
 @onready var graphics			:= $Graphics
 @onready var visible_enemies 	: Array = []
 @onready var state_machine 		: AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
-@onready var visible_detection	: VisibleDetection = $VisibleDetection
+@onready var visible_detection	:= $VisibleDetection
 
 @export var knockback_acc 	:= 20
 @export var WANDERING_SPEED := 20
@@ -22,16 +22,18 @@ extends BaseMonster
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 
+func _ready() -> void:
+	super()
+	stats.max_health = 60.0
+	stats.health = 60.0
+	stats.die.connect(die)
+
+
 func _physics_process(_delta):
 	if not is_zero_approx(velocity.x):
 		graphics.scale.x = -1 if velocity.x > 0 else 1
 	move_and_slide()
 
-func _ready() -> void:
-	add_to_group("Monsters")
-	stats.max_health = 60.0
-	stats.health = 60.0
-	stats.die.connect(die)
 
 func hurt(hitbox: HitBox):
 	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc

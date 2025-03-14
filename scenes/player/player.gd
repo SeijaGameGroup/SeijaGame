@@ -56,6 +56,8 @@ var IN_AIR : bool :
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
 
+@export var facing_direction : float = 1
+
 @onready var playerstats			: PlayerStats = Game.player_stats
 @onready var shooting_timer 		:= $ShootingTimer
 @onready var sub_shooting_timer 	:= $SubShootingTimer
@@ -73,10 +75,13 @@ var IN_AIR : bool :
 @onready var map_items_bar			:= $"CanvasLayer/Map&ItemsBar"
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
-@onready var visible_detection		: VisibleDetection 					= $VisibleDetection
+@onready var visible_detection		:= $VisibleDetection
 
 @export var interacting_with 		: Array[Interactable]
+@export var viewsize				: Vector2
 @export var enemy_tracked			: BaseMonster
+@export var enemies_in_sight		: Array[BaseMonster]
+@export var enemies_in_camera		: Array[BaseMonster]
 
 @export var bullet_type				: BulletType = BulletType.NormalBullet
 @export var bullet_distribution		: DistributionType = DistributionType.None
@@ -106,20 +111,21 @@ func _physics_process(delta) -> void:
 	enemy_tracking()
 	if Input.is_action_just_pressed("enemy_lock"):
 		playerstats.is_locking = not playerstats.is_locking
+
 	if playerstats.is_locking and enemy_tracked != null:
-		enemy_lock_sprite.visible = true
 		var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
 		if camera:
 			if is_in_camera(enemy_tracked, camera):
+				enemy_lock_sprite.visible = true
 				enemy_lock_sprite.global_position = enemy_tracked.global_position
 				enemy_lock_sprite.rotation = 0
 				enemy_lock_sprite.play("locking")
 			else:
+				enemy_lock_sprite.visible = true
 				var direction_to_enemy = self.global_position.direction_to(enemy_tracked.global_position)
 				enemy_lock_sprite.global_position = global_position + 200 * direction_to_enemy
 				enemy_lock_sprite.rotation = direction_to_enemy.angle()
 				enemy_lock_sprite.play("arrow")
-
 		else:
 			enemy_lock_sprite.visible = false
 	else:
@@ -156,6 +162,7 @@ func _physics_process(delta) -> void:
 			var direction = Input.get_axis("move_left", "move_right")
 			if IN_AIR:
 				if direction:
+					facing_direction = direction
 					velocity.x = SPEED * direction
 				else:
 					velocity.x = move_toward(velocity.x, 0, air_friction * delta)
@@ -170,6 +177,7 @@ func _physics_process(delta) -> void:
 					jump_request_timer.start(0.1)
 
 				if direction:
+					facing_direction = direction
 					velocity.x = SPEED * direction
 				else:
 					velocity.x = move_toward(velocity.x, 0, ground_friction * delta)
@@ -206,7 +214,7 @@ func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.N
 						else:
 							angle_to_enemy = asin(enemy_tracked.visible_radius / (global_position.distance_to(enemy_tracked.global_position)))
 						var fire_angle:float = clamp(2*angle_to_enemy,0,PI*2/3) if par1==-1 else par1
-						var angle_offset = fire_angle
+						var angle_offset = fire_angle/2
 						for i:int in range(0,num):
 							shoot_normal_bullet(Vector2.ZERO,angle_offset)
 							angle_offset -= fire_angle/(num-1)
@@ -220,15 +228,15 @@ func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.N
 						var fire_rotation:float
 						if par2 == -1:
 							if enemy_tracked == null:
-								var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
-								fire_rotation = direction_to_mouse.orthogonal().angle()
+								#var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
+								fire_rotation = PI/2
 							else:
 								var direction_to_enemy = shooting_point.global_position.direction_to(enemy_tracked.global_position)
 								fire_rotation = direction_to_enemy.orthogonal().angle()
 						else:
 							fire_rotation = par2
 						v_offset = v_offset.rotated(fire_rotation)
-						var bullet_offset = v_offset
+						var bullet_offset = v_offset/2
 						for i:int in range(0,num):
 							shoot_normal_bullet(bullet_offset,0)
 							bullet_offset -= v_offset/(num-1)
@@ -250,23 +258,47 @@ func shoot_sub() -> void:
 		get_tree().current_scene.add_child(tracking_bullet)
 
 
-
 func enemy_tracking() -> void:
-	var enermies_tracked: Array[BaseMonster]
 	for enemy in get_tree().get_nodes_in_group("Monsters"):
-		if enemy is BaseMonster:
-			enermies_tracked.append(enemy)
+		if enemy:
+			if is_in_sight(enemy) and not enemies_in_sight.has(enemy):
+				enemies_in_sight.append(enemy)
+			elif not is_in_sight(enemy) and enemies_in_sight.has(enemy):
+				enemies_in_sight.erase(enemy)
+		else:
+			enemies_in_sight.erase(null)
+
+	var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
+	for enemy in enemies_in_sight:
+		if enemy:
+			if is_in_camera(enemy,camera) and not enemies_in_camera.has(enemy):
+				enemies_in_camera.append(enemy)
+			elif not is_in_camera(enemy,camera) and enemies_in_camera.has(enemy):
+				enemies_in_camera.erase(enemy)
+		else:
+			enemies_in_camera.erase(null)
+
 	# return the nearest visible enemy node
-	if enermies_tracked.is_empty():
+	if enemies_in_sight.is_empty():
 		enemy_tracked = null
+		return
 	else:
-		enermies_tracked.sort_custom(func(a,b):return (self.global_position.\
-		distance_squared_to(a.global_position) < self.global_position.distance_squared_to(b.global_position)))
-		for i:int in range(0,enermies_tracked.size()):
-			if visible_detection.visible_detect(enermies_tracked[i], enermies_tracked[i].visible_radius):
-				enemy_tracked = enermies_tracked[i]
-				break
+		if not enemies_in_camera.is_empty():
+			enemies_in_camera.sort_custom(sort_by_distance_to_player)
+			for enemy in enemies_in_camera:
+				if enemy:
+					if visible_detection.visible_detect(enemy, enemy.visible_radius):
+						enemy_tracked = enemy
+						return
+		else:
+			enemies_in_sight.sort_custom(sort_by_distance_to_player)
+			for enemy in enemies_in_sight:
+				if enemy:
+					if visible_detection.visible_detect(enemy, enemy.visible_radius):
+						enemy_tracked = enemy
+						return
 		enemy_tracked == null
+
 
 
 func _on_shooting_timer_timeout() -> void:
@@ -295,9 +327,9 @@ func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:fl
 		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
 		direction_to_enemy.rotated(angle_offset), 800, 10, enemy_tracked, self, shoot_damage)
 	else:
-		var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
+		#var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
 		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
-		direction_to_mouse.rotated(angle_offset), 800, 10, null, self, shoot_damage)
+		Vector2(facing_direction,0).rotated(angle_offset), 800, 10, null, self, shoot_damage)
 	get_tree().current_scene.add_child(normal_bullet)
 
 #func reset_item_effects():
@@ -311,11 +343,32 @@ func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:fl
 	#gravity_multiplier 		= 1.0
 	#jump_velocity_multipler	= 1.0
 
+
 func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
 	var viewport_size = get_viewport_rect().size
-	var camera_half_size = viewport_size * 0.5 / camera.zoom
-	var camera_rect = Rect2(camera.global_position - camera_half_size, viewport_size/camera.zoom)
+	var camera_rect = Rect2(camera.global_position - viewport_size*0.5 / camera.zoom, viewport_size / camera.zoom)
+	if node is BaseMonster:
+		var monster_hurtbox = node.get_node("HurtBox") as HurtBox
+		if HurtBox:
+			var monster_hurtbox_area = monster_hurtbox.get_child(0) as CollisionShape2D
+			var monster_hurtbox_rect = Rect2(
+				monster_hurtbox_area.shape.get_rect().position + monster_hurtbox.position + node.global_position,
+				monster_hurtbox_area.shape.get_rect().size
+				)
+			if monster_hurtbox_area:
+				return camera_rect.has_point(node.global_position)\
+				or camera_rect.intersects(monster_hurtbox_rect)
 	return camera_rect.has_point(node.global_position)
 
 func add_item(itemID: int):
 	map_items_bar.add_item(itemID)
+
+func is_in_sight(node: Node2D) -> bool:
+	var sight_rect = Rect2(self.global_position - viewsize * 0.5, viewsize)
+	return sight_rect.has_point(node.global_position)
+
+
+func sort_by_distance_to_player(a,b) -> bool:
+	if not a or not a is Node2D: return false
+	if not b or not b is Node2D: return true
+	return (self.global_position.distance_squared_to(a.global_position) < self.global_position.distance_squared_to(b.global_position))
