@@ -1449,7 +1449,10 @@ position = Vector2(661, -241)
 position = Vector2(857, 389)
 
 [node name="butterfly3" parent="." instance=ExtResource("4_48p3r")]
-position = Vector2(1600, -260)
+position = Vector2(1376, -79)
+
+[node name="butterfly4" parent="." instance=ExtResource("4_48p3r")]
+position = Vector2(1886, 216)
 
 [node name="Teleporter" type="Area2D" parent="."]
 position = Vector2(2452.2, 396.039)

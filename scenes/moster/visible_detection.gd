@@ -1,12 +1,20 @@
-class_name VisibleDetection
 extends Node2D
+
+@export_flags_2d_physics var visible_collision_mask : int
+#@onready var player: Player = $".."
 
 @onready var detection_ray_up: RayCast2D = $DetectionRayUp
 @onready var detection_ray_mid: RayCast2D = $DetectionRayMid
 @onready var detection_ray_down: RayCast2D = $DetectionRayDown
+@onready var detection_rays = [detection_ray_mid, detection_ray_up, detection_ray_down]
 
 
-func visible_detect(target:Node2D, visible_radius:float) -> bool:
+func _ready() -> void:
+	for ray:RayCast2D in detection_rays:
+		ray.collision_mask = visible_collision_mask
+
+
+func visible_detect(target, visible_radius:float) -> bool:
 	var t_distance:Vector2 = target.global_position - self.global_position
 	if visible_radius >= t_distance.length():
 		return true
@@ -15,17 +23,11 @@ func visible_detect(target:Node2D, visible_radius:float) -> bool:
 	detection_ray_up.target_position = t_distance.rotated(t_angle)
 	detection_ray_down.target_position = t_distance.rotated(-t_angle)
 
-	detection_ray_mid.force_raycast_update()
-	detection_ray_up.force_raycast_update()
-	detection_ray_down.force_raycast_update()
+	for ray:RayCast2D in detection_rays:
+		ray.force_raycast_update()
+		var collider = ray.get_collider()
+		if collider:
+			if ray.get_collider() == target or ray.get_collider().owner == target:
+				return true
 
-	#var collider_mid = detection_ray_mid.get_collider()
-	#var collider_up = detection_ray_up.get_collider()
-	#var collider_down = detection_ray_down.get_collider()
-	if detection_ray_mid.get_collider() == target:
-		return true
-	if detection_ray_up.get_collider() == target:
-		return true
-	if detection_ray_down.get_collider() == target:
-		return true
 	return false
