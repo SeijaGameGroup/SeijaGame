@@ -1,4 +1,4 @@
-[gd_scene load_steps=67 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=69 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" uid="uid://doy788hc8gr5h" path="res://scenes/player/player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
@@ -13,7 +13,9 @@
 [ext_resource type="PackedScene" uid="uid://bta45gmfb3gnr" path="res://scripts/visible_detection.tscn" id="10_h17s1"]
 [ext_resource type="Texture2D" uid="uid://berftylujv48v" path="res://assets/pictures/gdb-keyboard-2.png" id="10_je7p5"]
 [ext_resource type="PackedScene" uid="uid://d1e42hsk88xhu" path="res://ui/p_points_bar.tscn" id="10_ugbui"]
+[ext_resource type="PackedScene" uid="uid://csxx6ylytbhlh" path="res://ui/config_bar.tscn" id="11_fcs02"]
 [ext_resource type="Texture2D" uid="uid://cvesyhit6sjta" path="res://assets/pictures/crosshair.png" id="11_ugbui"]
+[ext_resource type="PackedScene" uid="uid://d2hldw1swdjsc" path="res://ui/map&items_bar.tscn" id="12_myrg7"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
 size = Vector2(6.5, 16.6)
@@ -469,6 +471,7 @@ collision_mask = 32
 script = ExtResource("1_jmtl0")
 bullet_distribution = 2
 bullet_num = 3
+metadata/_edit_vertical_guides_ = [22.0, 28.0]
 
 [node name="Graphics" type="Node2D" parent="."]
 
@@ -557,13 +560,38 @@ anim_player = NodePath("../AnimationPlayer")
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="StatusBar" parent="CanvasLayer" instance=ExtResource("9_ur7pv")]
+offset_left = 22.0
+offset_top = 31.0
+offset_right = 113.0
+offset_bottom = 60.0
 scale = Vector2(3, 3)
 
 [node name="P_PointsBar" parent="CanvasLayer" instance=ExtResource("10_ugbui")]
-offset_left = 1.0
-offset_top = 180.0
-offset_right = 45.0
-offset_bottom = 208.0
+offset_left = 28.0
+offset_top = 183.0
+offset_right = 101.0
+offset_bottom = 232.0
+
+[node name="ConfigBar" parent="CanvasLayer" instance=ExtResource("11_fcs02")]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 29.0
+offset_top = -132.0
+offset_right = 801.0
+offset_bottom = 27.0
+grow_vertical = 0
+scale = Vector2(0.7, 0.7)
+
+[node name="Map&ItemsBar" parent="CanvasLayer" instance=ExtResource("12_myrg7")]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -92.0
+offset_top = 64.0
+offset_right = -66.0
+offset_bottom = 90.0
+grow_horizontal = 0
 
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
 position = Vector2(0.2, -11.6)

@@ -70,6 +70,7 @@ var IN_AIR : bool :
 @onready var detected_area			:= $DetectedArea
 @onready var interaction_icon		:= $InteractionIcon
 @onready var enemy_lock_sprite		:= $EnemyLockSprite
+@onready var map_items_bar			:= $"CanvasLayer/Map&ItemsBar"
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 @onready var visible_detection		: VisibleDetection 					= $VisibleDetection
@@ -96,6 +97,9 @@ enum DistributionType
 	Vertical,
 }
 
+func _ready() -> void:
+	for item in Game.player_stats.passive_items:
+		add_item(item.ID)
 
 func _physics_process(delta) -> void:
 	# Track Enemy
@@ -312,3 +316,6 @@ func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
 	var camera_half_size = viewport_size * 0.5 / camera.zoom
 	var camera_rect = Rect2(camera.global_position - camera_half_size, viewport_size/camera.zoom)
 	return camera_rect.has_point(node.global_position)
+
+func add_item(itemID: int):
+	map_items_bar.add_item(itemID)

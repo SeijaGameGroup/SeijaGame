@@ -8,5 +8,5 @@ script = ExtResource("1_uwrxv")
 
 [node name="PlayerStats" type="Node" parent="."]
 script = ExtResource("2_yqjtg")
-p_points = 15
+p_points = 150
 metadata/_custom_type_script = "uid://cljc20g42jra0"

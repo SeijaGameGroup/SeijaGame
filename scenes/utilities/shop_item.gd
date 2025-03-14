@@ -10,18 +10,24 @@ enum ItemType {
 	ITEM
 }
 
+@export var random_item : bool = true
+
 @export var price 	: int
 @export var type 	: ItemType
 @export var healing 	: float
 @export var itemID	: int
-
+	
 func _ready() -> void:
+	if random_item and type == ItemType.ITEM:
+		itemID = randi_range(1, 5)
 	rich_text_label.text = "%d¢" % price
 
 func interact(player: Player) -> void:
 	if Game.player_stats.p_points >= price:
 		Game.player_stats.p_points -= price
 		effect(player)
+		if random_item and type == ItemType.ITEM:
+			itemID = randi_range(1, 5)
 		
 func effect(player: Player) -> void:
 	match type:
@@ -32,6 +38,7 @@ func effect(player: Player) -> void:
 			var script_path = ScriptPath + "itemID%d.gd" % itemID
 			var script = load(script_path)
 			item.set_script(script)
+			player.add_item(itemID)
 			match item.Type:
 				Item.ItemType.Passive:
 					Game.player_stats.passive_items.append(item)

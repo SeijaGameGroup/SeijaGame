@@ -1441,6 +1441,9 @@ limit_left = -400
 limit_top = -800
 limit_right = 2800
 limit_bottom = 900
+position_smoothing_speed = 10.0
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
 
 [node name="butterfly" parent="." instance=ExtResource("4_48p3r")]
 position = Vector2(661, -241)
