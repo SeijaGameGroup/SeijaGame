@@ -10,9 +10,9 @@
 [ext_resource type="Script" uid="uid://cmpnd44nwscvv" path="res://scripts/detected_area.gd" id="9_hjkth"]
 [ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_panel.tscn" id="9_ur7pv"]
 [ext_resource type="Texture2D" uid="uid://dalpyb1g5dwa7" path="res://assets/pictures/arrow.png" id="10_gx1jg"]
-[ext_resource type="PackedScene" uid="uid://bta45gmfb3gnr" path="res://scripts/visible_detection.tscn" id="10_h17s1"]
 [ext_resource type="Texture2D" uid="uid://berftylujv48v" path="res://assets/pictures/gdb-keyboard-2.png" id="10_je7p5"]
 [ext_resource type="Texture2D" uid="uid://cvesyhit6sjta" path="res://assets/pictures/crosshair.png" id="11_ugbui"]
+[ext_resource type="Script" uid="uid://bn2bu5d5tw6vk" path="res://scenes/player/visible_detection.gd" id="13_gx1jg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1xecy"]
 size = Vector2(6.5, 16.6)
@@ -465,6 +465,7 @@ animations = [{
 scale = Vector2(3, 3)
 collision_mask = 32
 script = ExtResource("1_jmtl0")
+viewsize = Vector2(1440, 810)
 bullet_distribution = 2
 bullet_num = 3
 
@@ -563,14 +564,27 @@ sprite_frames = SubResource("SpriteFrames_fcs02")
 animation = &"keyboard"
 autoplay = "keyboard"
 
-[node name="VisibleDetection" parent="." instance=ExtResource("10_h17s1")]
-position = Vector2(2.98023e-08, -3.2)
-
 [node name="EnemyLockSprite" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.333333, 0.333333)
 sprite_frames = SubResource("SpriteFrames_myrg7")
 animation = &"locking"
 autoplay = "locking"
+
+[node name="VisibleDetection" type="Node2D" parent="."]
+script = ExtResource("13_gx1jg")
+visible_collision_mask = 40
+
+[node name="DetectionRayUp" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, -10)
+collide_with_areas = true
+
+[node name="DetectionRayMid" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, 0)
+collide_with_areas = true
+
+[node name="DetectionRayDown" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, 10)
+collide_with_areas = true
 
 [connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]
 [connection signal="timeout" from="SubShootingTimer" to="." method="_on_sub_shooting_timer_timeout"]
