@@ -72,6 +72,7 @@ var IN_AIR : bool :
 @onready var detected_area			:= $DetectedArea
 @onready var interaction_icon		:= $InteractionIcon
 @onready var enemy_lock_sprite		:= $EnemyLockSprite
+@onready var map_items_bar			:= $"CanvasLayer/Map&ItemsBar"
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 @onready var visible_detection		:= $VisibleDetection
@@ -101,6 +102,9 @@ enum DistributionType
 	Vertical,
 }
 
+func _ready() -> void:
+	for item in Game.player_stats.passive_items:
+		add_item(item.ID)
 
 func _physics_process(delta) -> void:
 	# Track Enemy
@@ -185,7 +189,7 @@ func _physics_process(delta) -> void:
 			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
 
 		move_and_slide()
-
+		Game.player_stats.player_global_position = global_position
 
 func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.None, num:int = 1, par1:float = -1, par2:float = -1):
 	match bullet:
@@ -356,6 +360,8 @@ func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
 				or camera_rect.intersects(monster_hurtbox_rect)
 	return camera_rect.has_point(node.global_position)
 
+func add_item(itemID: int):
+	map_items_bar.add_item(itemID)
 
 func is_in_sight(node: Node2D) -> bool:
 	var sight_rect = Rect2(self.global_position - viewsize * 0.5, viewsize)

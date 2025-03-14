@@ -1,6 +1,6 @@
 extends Item
 
-func _ready() -> void:
+func _init() -> void:
 	ID = 6
 	Type = ItemType.Passive
 	Name = "编号06"

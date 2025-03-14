@@ -124,7 +124,7 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8va8a"]
 size = Vector2(38, 30)
 
-[node name="butterfly" type="CharacterBody2D"]
+[node name="Butterfly" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 32
 script = ExtResource("1_wgdg4")

@@ -1,10 +1,10 @@
 extends Item
 
-func _ready() -> void:
+func _init() -> void:
 	ID = 3
 	Type = ItemType.Passive
 	Name = "伊吹瓢"
 	
 func effect(player: Player) -> void:
 	super(player)
-	player.cooldown_multipler -= 0.1
+	Game.player_stats.cooldown_multipler_item -= 0.1

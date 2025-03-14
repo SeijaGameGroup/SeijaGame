@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://d2hldw1swdjsc"]
+
+[ext_resource type="Texture2D" uid="uid://dotfrums17cy0" path="res://assets/pictures/Base-01.png" id="1_pnq2u"]
+[ext_resource type="Script" uid="uid://dxgu5x1iekpyx" path="res://ui/map&items_bar.gd" id="1_s5jqi"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s5jqi"]
+atlas = ExtResource("1_pnq2u")
+region = Rect2(323, 203, 26, 26)
+
+[node name="Map&ItemsBar" type="VBoxContainer"]
+script = ExtResource("1_s5jqi")
+
+[node name="MapBase" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(300, 300)
+layout_mode = 2
+size_flags_horizontal = 8
+texture = SubResource("AtlasTexture_s5jqi")
+
+[node name="Seperator" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="."]
+custom_minimum_size = Vector2(400, 800)
+layout_mode = 2
+columns = 4

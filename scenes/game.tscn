@@ -3,9 +3,19 @@
 [ext_resource type="Script" uid="uid://oqwfrpboybno" path="res://scenes/game.gd" id="1_uwrxv"]
 [ext_resource type="Script" uid="uid://cljc20g42jra0" path="res://scenes/player/player_stats.gd" id="2_yqjtg"]
 
-[node name="Game" type="Node"]
+[node name="Game" type="CanvasLayer"]
+layer = 99
 script = ExtResource("1_uwrxv")
 
 [node name="PlayerStats" type="Node" parent="."]
 script = ExtResource("2_yqjtg")
+p_points = 150
 metadata/_custom_type_script = "uid://cljc20g42jra0"
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0)

@@ -1,0 +1,55 @@
+[gd_scene load_steps=5 format=3 uid="uid://rcl1omwlkbqk"]
+
+[ext_resource type="Script" uid="uid://cmuxhk61f2ahp" path="res://ui/start_screen.gd" id="1_igmpp"]
+[ext_resource type="Texture2D" uid="uid://wkqk4j4bsnlo" path="res://assets/pictures/startscreen.png" id="1_s6cxg"]
+[ext_resource type="Texture2D" uid="uid://tcxxjrm1g2gq" path="res://assets/pictures/title.png" id="2_50anp"]
+[ext_resource type="Texture2D" uid="uid://cr4f30xk504av" path="res://assets/pictures/start.png" id="3_nledq"]
+
+[node name="StartScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_igmpp")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_s6cxg")
+stretch_mode = 3
+
+[node name="Title" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 124.0
+offset_right = 300.0
+offset_bottom = 424.0
+grow_horizontal = 2
+texture = ExtResource("2_50anp")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -214.0
+offset_top = -332.0
+offset_right = 394.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+scale = Vector2(0.7, 0.7)
+icon = ExtResource("3_nledq")
+
+[connection signal="button_down" from="Button" to="." method="start_game"]

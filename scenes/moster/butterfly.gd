@@ -64,4 +64,9 @@ func adjust():
 		state_machine.travel("wandering")
 
 func die() -> void:
+	var n_points = randi_range(5, 8)
+	for i in range(n_points):
+		var p_point = preload("res://scenes/utilities/p_point.tscn").instantiate()
+		p_point.global_position = global_position
+		get_tree().current_scene.add_child(p_point)
 	queue_free()

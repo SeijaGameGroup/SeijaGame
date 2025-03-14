@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://di0h1t8f1vp85"]
+
+[ext_resource type="Script" uid="uid://b0qffo365qey2" path="res://ui/item_icon.gd" id="1_84ti5"]
+
+[node name="ItemIcon" type="TextureRect"]
+custom_minimum_size = Vector2(100, 0)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("1_84ti5")
+
+[node name="ID" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

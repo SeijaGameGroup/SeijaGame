@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://bj2r3341xfcv1"]
+
+[ext_resource type="Script" uid="uid://busfi2wv7hgb5" path="res://scenes/utilities/shop_item.gd" id="1_bt0ps"]
+[ext_resource type="Texture2D" uid="uid://crcu60v7mpvo3" path="res://assets/pictures/Tiles.png" id="1_o2ewt"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bt0ps"]
+atlas = ExtResource("1_o2ewt")
+region = Rect2(243, 373, 10, 11)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o2ewt"]
+size = Vector2(35, 45)
+
+[node name="ShopItem" type="Area2D"]
+script = ExtResource("1_bt0ps")
+metadata/_custom_type_script = "uid://bpisq5x7a2457"
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -6)
+texture = SubResource("AtlasTexture_bt0ps")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+text = "5¢"
+horizontal_alignment = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_o2ewt")
