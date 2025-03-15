@@ -19,7 +19,7 @@ enum ItemType {
 	
 func _ready() -> void:
 	if random_item and type == ItemType.ITEM:
-		itemID = randi_range(1, 5)
+		itemID = randi_range(1, 13)
 	rich_text_label.text = "%d¢" % price
 
 func interact(player: Player) -> void:
@@ -27,14 +27,14 @@ func interact(player: Player) -> void:
 		Game.player_stats.p_points -= price
 		effect(player)
 		if random_item and type == ItemType.ITEM:
-			itemID = randi_range(1, 5)
+			itemID = randi_range(1, 13)
 		
 func effect(player: Player) -> void:
 	match type:
 		ItemType.EFFECT:
 			Game.player_stats.health += healing
 		ItemType.ITEM:
-			var item = preload("res://items/item.tscn").instantiate() as Item
+			var item = Item.new()
 			var script_path = ScriptPath + "itemID%d.gd" % itemID
 			var script = load(script_path)
 			item.set_script(script)

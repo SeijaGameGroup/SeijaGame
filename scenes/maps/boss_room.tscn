@@ -1427,9 +1427,3 @@ tile_set = SubResource("TileSet_4oshn")
 
 [node name="Player" parent="." instance=ExtResource("4_s6s4s")]
 position = Vector2(12, 1536)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-metadata/_edit_lock_ = true

@@ -1432,11 +1432,6 @@ tile_set = SubResource("TileSet_6g1qo")
 [node name="Player" parent="." instance=ExtResource("4_mf58k")]
 position = Vector2(474, 565)
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-
 [node name="TeleporterRegular" type="Area2D" parent="."]
 position = Vector2(289, 799)
 script = ExtResource("5_c7ce6")

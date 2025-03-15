@@ -594,6 +594,11 @@ offset_right = -66.0
 offset_bottom = 90.0
 grow_horizontal = 0
 
+[node name="SubViewport" parent="CanvasLayer/Map&ItemsBar/MapBase/SubViewportContainer" index="0" node_paths=PackedStringArray("player")]
+handle_input_locally = false
+render_target_update_mode = 4
+player = NodePath("../../../../..")
+
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
 position = Vector2(0.2, -11.6)
 scale = Vector2(0.3, 0.3)
@@ -604,7 +609,7 @@ autoplay = "keyboard"
 [node name="EnemyLockSprite" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.333333, 0.333333)
 sprite_frames = SubResource("SpriteFrames_myrg7")
-animation = &"locking"
+animation = &"arrow"
 autoplay = "locking"
 
 [node name="VisibleDetection" type="Node2D" parent="."]
@@ -623,6 +628,13 @@ collide_with_areas = true
 target_position = Vector2(50, 10)
 collide_with_areas = true
 
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+
 [connection signal="timeout" from="ShootingTimer" to="." method="_on_shooting_timer_timeout"]
 [connection signal="timeout" from="SubShootingTimer" to="." method="_on_sub_shooting_timer_timeout"]
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
+
+[editable path="CanvasLayer/Map&ItemsBar"]

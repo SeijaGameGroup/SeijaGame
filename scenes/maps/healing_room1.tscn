@@ -1425,7 +1425,7 @@ size = Vector2(30, 33)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_olxuo"]
 size = Vector2(54, 63)
 
-[node name="HealingRoom" type="Node2D"]
+[node name="HealingRoom1" type="Node2D"]
 metadata/_edit_vertical_guides_ = [202.0, 1465.0, 1978.0]
 metadata/_edit_horizontal_guides_ = [252.0, 803.0, 260.0]
 
@@ -1437,11 +1437,6 @@ tile_set = SubResource("TileSet_mky7u")
 
 [node name="Player" parent="." instance=ExtResource("4_y841t")]
 position = Vector2(474, 565)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
 
 [node name="HealingMachine" type="Area2D" parent="."]
 position = Vector2(656.714, 606.93)

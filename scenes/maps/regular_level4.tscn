@@ -1430,7 +1430,7 @@ sources/2 = SubResource("TileSetAtlasSource_muvuw")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_15h1g"]
 size = Vector2(64, 68)
 
-[node name="RegularLevel" type="Node2D"]
+[node name="RegularLevel4" type="Node2D"]
 metadata/_edit_horizontal_guides_ = [-794.0, 916.0]
 metadata/_edit_vertical_guides_ = [2802.0]
 
@@ -1442,12 +1442,6 @@ tile_set = SubResource("TileSet_jray3")
 
 [node name="Player" parent="." instance=ExtResource("4_e6ieo")]
 position = Vector2(129, 424)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-position_smoothing_speed = 10.0
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
 
 [node name="butterfly" parent="." instance=ExtResource("5_t6km1")]
 position = Vector2(661, -241)
