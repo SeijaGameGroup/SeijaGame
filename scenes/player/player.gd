@@ -259,24 +259,23 @@ func shoot_sub() -> void:
 
 
 func enemy_tracking() -> void:
+	var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
+
 	for enemy in get_tree().get_nodes_in_group("Monsters"):
 		if enemy:
-			if is_in_sight(enemy) and not enemies_in_sight.has(enemy):
+			if is_in_sight(enemy,camera) and not enemies_in_sight.has(enemy):
 				enemies_in_sight.append(enemy)
-			elif not is_in_sight(enemy) and enemies_in_sight.has(enemy):
+			elif not is_in_sight(enemy,camera) and enemies_in_sight.has(enemy):
 				enemies_in_sight.erase(enemy)
-		else:
-			enemies_in_sight.erase(null)
+	enemies_in_sight.erase(null)
 
-	var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
 	for enemy in enemies_in_sight:
 		if enemy:
 			if is_in_camera(enemy,camera) and not enemies_in_camera.has(enemy):
 				enemies_in_camera.append(enemy)
 			elif not is_in_camera(enemy,camera) and enemies_in_camera.has(enemy):
 				enemies_in_camera.erase(enemy)
-		else:
-			enemies_in_camera.erase(null)
+	enemies_in_camera.erase(null)
 
 	# return the nearest visible enemy node
 	if enemies_in_sight.is_empty():
@@ -346,7 +345,7 @@ func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:fl
 
 func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
 	var viewport_size = get_viewport_rect().size
-	var camera_rect = Rect2(camera.global_position - viewport_size*0.5 / camera.zoom, viewport_size / camera.zoom)
+	var camera_rect = Rect2(camera.get_screen_center_position() - viewport_size*0.5 / camera.zoom, viewport_size / camera.zoom)
 	if node is BaseMonster:
 		var monster_hurtbox = node.get_node("HurtBox") as HurtBox
 		if HurtBox:
@@ -363,9 +362,10 @@ func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
 func add_item(itemID: int):
 	map_items_bar.add_item(itemID)
 
-func is_in_sight(node: Node2D) -> bool:
-	var sight_rect = Rect2(self.global_position - viewsize * 0.5, viewsize)
+func is_in_sight(node: Node2D, camera: Camera2D) -> bool:
+	var sight_rect = Rect2(camera.get_screen_center_position() - viewsize * 0.5, viewsize)
 	return sight_rect.has_point(node.global_position)
+
 
 
 func sort_by_distance_to_player(a,b) -> bool:

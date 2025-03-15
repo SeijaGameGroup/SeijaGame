@@ -23,8 +23,9 @@ size = Vector2(6.5, 16.6)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6gk5o"]
 size = Vector2(5.2, 8.4)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_irvdk"]
-radius = 3.4
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_myrg7"]
+radius = 3.33333
+height = 16.0
 
 [sub_resource type="Animation" id="Animation_d2wvv"]
 resource_name = "Falling"
@@ -536,17 +537,19 @@ collision_layer = 4
 collision_mask = 0
 script = ExtResource("8_ms0pe")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+[node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("RectangleShape2D_6gk5o")
+debug_color = Color(0.965108, 0, 0.488705, 0.42)
 
 [node name="DetectedArea" type="Area2D" parent="."]
 collision_layer = 16
 collision_mask = 0
 script = ExtResource("9_hjkth")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectedArea"]
+[node name="DetectedAreaShape2D" type="CollisionShape2D" parent="DetectedArea"]
 position = Vector2(0, 7.10543e-15)
-shape = SubResource("CircleShape2D_irvdk")
+shape = SubResource("CapsuleShape2D_myrg7")
+debug_color = Color(0.662745, 0.513726, 0, 0.0784314)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
