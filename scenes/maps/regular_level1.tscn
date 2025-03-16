@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=4 uid="uid://dbs41hxmx2nt6"]
+[gd_scene load_steps=14 format=4 uid="uid://dbs41hxmx2nt6"]
 
 [ext_resource type="Texture2D" uid="uid://crcu60v7mpvo3" path="res://assets/pictures/Tiles.png" id="1_3mjpt"]
 [ext_resource type="Texture2D" uid="uid://dp37u14ujaj8s" path="res://assets/pictures/Tree-Assets.png" id="2_vp2cr"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player/player.tscn" id="4_qn3qy"]
 [ext_resource type="PackedScene" uid="uid://bp2klddudgkav" path="res://scenes/moster/butterfly.tscn" id="5_5q86u"]
 [ext_resource type="Script" uid="uid://cf2os0iwnvytu" path="res://scripts/teleporter.gd" id="6_mrboa"]
+[ext_resource type="PackedScene" uid="uid://b4ae056cppomg" path="res://scenes/moster/ordinary_green_spirit.tscn" id="6_vp2cr"]
+[ext_resource type="PackedScene" uid="uid://dl3xtcjk3ec2h" path="res://scenes/moster/ordinary_red_spirit.tscn" id="7_gsdfv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hyjl5"]
 texture = ExtResource("1_3mjpt")
@@ -1463,6 +1465,12 @@ position = Vector2(3603, -869)
 
 [node name="butterfly5" parent="." instance=ExtResource("5_5q86u")]
 position = Vector2(5414, -1609)
+
+[node name="OrdinaryGreenSpirit" parent="." instance=ExtResource("6_vp2cr")]
+position = Vector2(1072, -35)
+
+[node name="OrdinaryRedSpirit" parent="." instance=ExtResource("7_gsdfv")]
+position = Vector2(1435, 149)
 
 [node name="TeleporterRegular" type="Area2D" parent="."]
 position = Vector2(2452.2, 396.039)

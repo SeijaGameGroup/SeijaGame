@@ -1,29 +1,27 @@
 extends BaseMonster
 
-@onready var stats 				:= $Stats
-@onready var hitbox				:= $HitBox
-@onready var hurtbox 			:= $HurtBox
-@onready var animation_player 	:= $AnimationPlayer
-@onready var animation_tree 	:= $AnimationTree
-@onready var graphics			:= $Graphics
-@onready var state_machine 		: AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
+@onready var graphics			: Node2D = $Graphics
+@onready var detecting_area		: DetectingArea = $DetectingArea
+@onready var hurtbox			: HurtBox = $HurtBox
+@onready var hitbox			: HitBox = $HitBox
+@onready var animation_tree		: AnimationTree = $AnimationTree
+@onready var animation_player	: AnimationPlayer = $AnimationPlayer
+@onready var stats				: Stats = $Stats
 @onready var visible_detection	: Node2D = $VisibleDetection
-@onready var collision_detection: Area2D = $CollisionDetection
+@onready var state_machine 		: AnimationNodeStateMachinePlayback = animation_tree["parameters/playback"]
 @onready var floor_detection_ray: RayCast2D = $FloorDetectionRay
-@onready var path_finding_ray	: RayCast2D = $PathFindingRay
 @onready var wandering_timer	: Timer = $WanderingTimer
-@onready var detecting_timer	: Timer = $DetectingTimer
+@onready var shooting_timer		: Timer = $ShootingTimer
+@onready var shooting_point		: Node2D = $Graphics/ShootingPoint
 
-@export var knockback_acc 	: float = 50
-@export var chasing_acc		: float = 10
-@export var WANDERING_SPEED : float = 40
-@export var CHASING_SPEED 	: float = 200
-@export var damage 			: float = 15.0 :
-	set(value):
-		damage = value
-		hitbox.damage = value
-@export var detecting_time	:= 0.3
-@export var flying_height	:= 100
+@export var shoot_cooldown		: float = 2.0
+@export var shoot_damage		: int = 8
+@export var shoot_num			: int = 4
+@export var bullet_speed		: float = 200
+
+@export var knockback_acc 		: float = 50
+@export var acc					: float = 10
+@export var WANDERING_SPEED		: float = 20
 
 @export var detected_enemies	: Array = []
 @export var visible_enemies 	: Array = []
@@ -31,25 +29,21 @@ extends BaseMonster
 @export var current_state		: State = State.Wandering
 @export var next_state 			: State
 @export var velocity_target		: Vector2
-@export var end_chasing			: bool = false
+
 
 enum State{
 	Idle,
 	Wandering,
-	Detecting,
-	Chasing,
-	Adjusting,
+	Shooting,
 }
-
 
 func _ready() -> void:
 	super()
-	current_state = State.Wandering
-	stats.max_health = 60.0
-	stats.health = 60.0
+	stats.max_health = 40.0
+	stats.health = 40.0
 
 
-func _physics_process(_delta):
+func _physics_process(delta: float) -> void:
 	# Handle Searching Enemy
 	get_enemy()
 	var direction_to_enemy:Vector2
@@ -62,7 +56,7 @@ func _physics_process(_delta):
 			velocity = Vector2.ZERO
 			next_state = State.Idle
 		State.Wandering:
-			velocity = velocity.move_toward(velocity_target, chasing_acc)
+			velocity = velocity.move_toward(velocity_target, acc)
 			if wandering_timer.is_stopped():
 				wandering_timer.start()
 				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
@@ -70,36 +64,18 @@ func _physics_process(_delta):
 				if velocity.y > 0:
 					velocity_target.y = - velocity_target.y
 			if not enemy == null:
-				next_state = State.Detecting
+				next_state = State.Shooting
 			else:
 				next_state = State.Wandering
-		State.Detecting:
-			velocity.move_toward(Vector2.ZERO,chasing_acc)
-			if enemy == null:
-				next_state = State.Wandering
-			elif detecting_timer.is_stopped():
-				next_state = State.Chasing
-			else:
-				next_state = State.Detecting
-		State.Chasing:
+		State.Shooting:
+			velocity = velocity.move_toward(Vector2.ZERO, acc)
 			if enemy == null:
 				next_state = State.Wandering
 			else:
-				velocity = velocity.move_toward(direction_to_enemy * CHASING_SPEED, chasing_acc)
-				next_state = State.Chasing
-		State.Adjusting:
-			if enemy == null:
-				next_state = State.Wandering
-			else:
-				velocity = velocity.move_toward(- direction_to_enemy * CHASING_SPEED, chasing_acc)
-				var distance_to_enemy = self.global_position.distance_to(enemy.global_position)
-				if distance_to_enemy > 300:
-					next_state = State.Chasing
-				else:
-					next_state = State.Adjusting
-	if end_chasing:
-		next_state = State.Adjusting
-		end_chasing = false
+				if shooting_timer.is_stopped():
+					shoot_angular(direction_to_enemy, shoot_num, bullet_speed, shoot_damage)
+					shooting_timer.start(shoot_cooldown)
+				next_state = State.Shooting
 
 	# Handle Transition Behavior
 	if not current_state == next_state:
@@ -109,11 +85,7 @@ func _physics_process(_delta):
 				pass
 			State.Wandering:
 				wandering_timer.stop()
-			State.Detecting:
-				detecting_timer.stop()
-			State.Chasing:
-				pass
-			State.Adjusting:
+			State.Shooting:
 				pass
 		# Handle Entering Behavior
 		match next_state:
@@ -123,13 +95,8 @@ func _physics_process(_delta):
 				wandering_timer.start()
 				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
 				state_machine.travel("wandering")
-			State.Detecting:
-				detecting_timer.start()
-				state_machine.travel("detecting")
-			State.Chasing:
-				state_machine.travel("chasing")
-			State.Adjusting:
-				state_machine.travel("adjusting")
+			State.Shooting:
+				state_machine.travel("shooting")
 
 		current_state = next_state
 
@@ -138,6 +105,20 @@ func _physics_process(_delta):
 	elif not is_zero_approx(velocity.x):
 		graphics.scale.x = -1 if velocity.x > 0 else 1
 	move_and_slide()
+
+
+func shoot_angular(direction:Vector2, num:int, speed:float, damage:float) -> void:
+	if enemy == null:
+		return
+	else:
+		var fire_angle:float = PI*2/3
+		var angle_offset = fire_angle/2
+		for i:int in range(0,num):
+			var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
+			normal_bullet.set_bullet(shooting_point.global_position ,\
+			direction.rotated(angle_offset), speed, 10, enemy, self, damage)
+			get_tree().current_scene.add_child(normal_bullet)
+			angle_offset -= fire_angle/(num-1)
 
 
 func get_enemy() -> void:
@@ -171,20 +152,8 @@ func enemy_lost(detected_area: DetectedArea):
 		visible_enemies.erase(detected_area.owner)
 
 
-func hit(hurtbox: HurtBox):
-	var acc = hurtbox.global_position.direction_to(hitbox.global_position) * knockback_acc
-	velocity += acc
-	if current_state == State.Chasing:
-		end_chasing = true
-		next_state = State.Adjusting
-
-
-func on_collision_detection(body: Node2D):
-	pass
-
-
 func die() -> void:
-	var n_points = randi_range(5, 8)
+	var n_points = randi_range(8, 12)
 	for i in range(n_points):
 		var p_point = preload("res://scenes/utilities/p_point.tscn").instantiate()
 		p_point.global_position = global_position
