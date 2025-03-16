@@ -14,9 +14,10 @@ extends BaseMonster
 @onready var wandering_timer	: Timer = $WanderingTimer
 @onready var detecting_timer	: Timer = $DetectingTimer
 
-@export var knockback_acc 	:= 20
+@export var knockback_acc 	:= 200
+@export var chasing_acc		:= 10
 @export var WANDERING_SPEED := 20
-@export var CHASING_SPEED 	:= 100
+@export var CHASING_SPEED 	:= 200
 @export var damage 			:= 15.0 :
 	set(value):
 		damage = value
@@ -30,13 +31,14 @@ extends BaseMonster
 @export var current_state		: State = State.Wandering
 @export var next_state 			: State
 @export var end_chasing			: bool = false
+@export var velocity_target		: Vector2
 
 enum State{
 	Idle,
 	Wandering,
 	Detecting,
 	Chasing,
-	Locking,
+	Adjusting,
 }
 
 
@@ -51,35 +53,39 @@ func _ready() -> void:
 func _physics_process(_delta):
 	# Handle Searching Enemy
 	for enemy in detected_enemies:
-		if visible_detection.visible_detect(enemy, 30):
+		if visible_detection.visible_detect(enemy, 15):
 			if not visible_enemies.has(enemy):
 				visible_enemies.append(enemy)
 		elif visible_enemies.has(enemy):
 			visible_enemies.erase(enemy)
-
 	visible_enemies.erase(null)
 	if not visible_enemies.is_empty():
 		enemy = visible_enemies.front()
 	else:
 		enemy = null
+	var direction_to_enemy:Vector2
+	if enemy and enemy is Node2D:
+		direction_to_enemy = self.global_position.direction_to(enemy.global_position)
+
 	# Handle State Behavior and Transition
 	match current_state:
 		State.Idle:
 			velocity = Vector2.ZERO
 			next_state = State.Idle
 		State.Wandering:
+			velocity = velocity.move_toward(velocity_target, chasing_acc)
 			if wandering_timer.is_stopped():
 				wandering_timer.start()
-				velocity = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
+				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
 			if floor_detection_ray.is_colliding():
 				if velocity.y > 0:
-					velocity.y = -2 * WANDERING_SPEED
+					velocity_target.y = - velocity_target.y
 			if not enemy == null:
 				next_state = State.Detecting
 			else:
 				next_state = State.Wandering
 		State.Detecting:
-			velocity = Vector2.ZERO
+			velocity.move_toward(Vector2.ZERO,chasing_acc)
 			if enemy == null:
 				next_state = State.Wandering
 			elif detecting_timer.is_stopped():
@@ -90,22 +96,20 @@ func _physics_process(_delta):
 			if enemy == null or not enemy is Node2D:
 				next_state = State.Wandering
 			else:
-				var direction_to_enemy = self.global_position.direction_to(enemy.global_position)
-				velocity = direction_to_enemy * CHASING_SPEED
+				velocity = velocity.move_toward(direction_to_enemy * CHASING_SPEED, chasing_acc)
 				next_state = State.Chasing
-		State.Locking:
+		State.Adjusting:
 			if enemy == null:
 				next_state = State.Wandering
 			else:
-				var direction_to_enemy = self.global_position.direction_to(enemy.global_position)
-				velocity = - direction_to_enemy * CHASING_SPEED
+				velocity = velocity.move_toward(- direction_to_enemy * CHASING_SPEED, chasing_acc)
 				var distance_to_enemy = self.global_position.distance_to(enemy.global_position)
 				if distance_to_enemy > 300:
 					next_state = State.Chasing
 				else:
-					next_state = State.Locking
+					next_state = State.Adjusting
 	if end_chasing:
-		next_state = State.Locking
+		next_state = State.Adjusting
 		end_chasing = false
 	# Handle Transition Behavior
 	if not current_state == next_state:
@@ -119,7 +123,7 @@ func _physics_process(_delta):
 				detecting_timer.stop()
 			State.Chasing:
 				pass
-			State.Locking:
+			State.Adjusting:
 				pass
 		# Handle Entering Behavior
 		match next_state:
@@ -127,19 +131,21 @@ func _physics_process(_delta):
 				pass
 			State.Wandering:
 				wandering_timer.start()
-				velocity = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
+				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
 				state_machine.travel("wandering")
 			State.Detecting:
 				detecting_timer.start()
-				velocity = Vector2.ZERO
 				state_machine.travel("detecting")
 			State.Chasing:
-					state_machine.travel("chasing")
-			State.Locking:
-				state_machine.travel("locking")
+				state_machine.travel("chasing")
+			State.Adjusting:
+				state_machine.travel("adjusting")
 
 		current_state = next_state
-	if not is_zero_approx(velocity.x):
+
+	if enemy:
+		graphics.scale.x = -1 if direction_to_enemy.x > 0 else 1
+	elif not is_zero_approx(velocity.x):
 		graphics.scale.x = -1 if velocity.x > 0 else 1
 	move_and_slide()
 
@@ -162,14 +168,15 @@ func enemy_lost(detected_area: DetectedArea):
 
 
 func hit(hurtbox: HurtBox):
+	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
+	velocity += acc
 	if current_state == State.Chasing:
 		end_chasing = true
-		next_state = State.Locking
+		next_state = State.Adjusting
 
 
 func on_collision_detection(body: Node2D):
 	pass
-
 
 
 func die() -> void:

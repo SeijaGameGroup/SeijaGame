@@ -20,14 +20,14 @@ radius = 40.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8va8a"]
 size = Vector2(38, 30)
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_x6jfy"]
+animation = &"adjusting"
+
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ilh7v"]
 animation = &"chasing"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hrfhg"]
 animation = &"detecting"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_x6jfy"]
-animation = &"locking"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7x6cr"]
 animation = &"wandering"
@@ -43,24 +43,24 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5pnw7"]
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qxlmn"]
+
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_76ipo"]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_c5sf1"]
 
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_x6jfy"]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qxlmn"]
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_cq37o"]
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_drv5a"]
+states/adjusting/node = SubResource("AnimationNodeAnimation_x6jfy")
+states/adjusting/position = Vector2(527, 28)
 states/chasing/node = SubResource("AnimationNodeAnimation_ilh7v")
 states/chasing/position = Vector2(676, 100)
 states/detecting/node = SubResource("AnimationNodeAnimation_hrfhg")
 states/detecting/position = Vector2(527, 195)
-states/locking/node = SubResource("AnimationNodeAnimation_x6jfy")
-states/locking/position = Vector2(528, 21)
 states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
 states/wandering/position = Vector2(355, 100)
-transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7"), "chasing", "locking", SubResource("AnimationNodeStateMachineTransition_76ipo"), "locking", "wandering", SubResource("AnimationNodeStateMachineTransition_c5sf1"), "locking", "chasing", SubResource("AnimationNodeStateMachineTransition_x6jfy"), "detecting", "wandering", SubResource("AnimationNodeStateMachineTransition_qxlmn")]
+transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7"), "detecting", "wandering", SubResource("AnimationNodeStateMachineTransition_qxlmn"), "adjusting", "wandering", SubResource("AnimationNodeStateMachineTransition_76ipo"), "chasing", "adjusting", SubResource("AnimationNodeStateMachineTransition_c5sf1"), "adjusting", "chasing", SubResource("AnimationNodeStateMachineTransition_cq37o")]
 graph_offset = Vector2(25, -25)
 
 [sub_resource type="Animation" id="Animation_0byte"]
@@ -130,7 +130,7 @@ tracks/0/keys = {
 }
 
 [sub_resource type="Animation" id="Animation_x6jfy"]
-resource_name = "locking"
+resource_name = "adjusting"
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -148,9 +148,9 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_a3ugo"]
 _data = {
 &"RESET": SubResource("Animation_0byte"),
+&"adjusting": SubResource("Animation_x6jfy"),
 &"chasing": SubResource("Animation_ly8a1"),
 &"detecting": SubResource("Animation_svyxp"),
-&"locking": SubResource("Animation_x6jfy"),
 &"wandering": SubResource("Animation_dohlk")
 }
 
