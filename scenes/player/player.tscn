@@ -1,11 +1,7 @@
-[gd_scene load_steps=69 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=65 format=3 uid="uid://dqauwk5l6600p"]
 
 [ext_resource type="Script" uid="uid://doy788hc8gr5h" path="res://scenes/player/player.gd" id="1_jmtl0"]
 [ext_resource type="Texture2D" uid="uid://bixsaagyeojt5" path="res://assets/pictures/tempSprite.png" id="2_ur7pv"]
-[ext_resource type="Script" uid="uid://bjo3en6vjihqs" path="res://scenes/player/dodge.gd" id="4_25f81"]
-[ext_resource type="Script" uid="uid://13srbjh567rb" path="res://scenes/player/skill1.gd" id="5_bsawl"]
-[ext_resource type="Script" uid="uid://cuwvmuc3rfsy1" path="res://scenes/player/skill2.gd" id="6_f3au0"]
-[ext_resource type="Script" uid="uid://clefr0k3indke" path="res://scenes/player/skill3.gd" id="7_ypujm"]
 [ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="8_ms0pe"]
 [ext_resource type="Script" uid="uid://cmpnd44nwscvv" path="res://scripts/detected_area.gd" id="9_hjkth"]
 [ext_resource type="PackedScene" uid="uid://dkff0o0q4plm" path="res://ui/status_bar.tscn" id="9_ur7pv"]
@@ -493,35 +489,6 @@ scale = Vector2(0.2, 0.2)
 position = Vector2(0, 0.9)
 shape = SubResource("RectangleShape2D_1xecy")
 
-[node name="Skills" type="Node" parent="."]
-
-[node name="Dodge" type="Node" parent="Skills" node_paths=PackedStringArray("player")]
-script = ExtResource("4_25f81")
-cooldown = 5
-duration = 1
-player = NodePath("../..")
-metadata/_custom_type_script = "uid://fialhvcedhaj"
-
-[node name="Skill1" type="Node" parent="Skills" node_paths=PackedStringArray("player")]
-script = ExtResource("5_bsawl")
-cooldown = 10
-player = NodePath("../..")
-metadata/_custom_type_script = "uid://fialhvcedhaj"
-
-[node name="Skill2" type="Node" parent="Skills" node_paths=PackedStringArray("player")]
-script = ExtResource("6_f3au0")
-cooldown = 12
-duration = 6
-player = NodePath("../..")
-metadata/_custom_type_script = "uid://fialhvcedhaj"
-
-[node name="Skill3" type="Node" parent="Skills" node_paths=PackedStringArray("player")]
-script = ExtResource("7_ypujm")
-cooldown = 60
-duration = 10
-player = NodePath("../..")
-metadata/_custom_type_script = "uid://fialhvcedhaj"
-
 [node name="ShootingTimer" type="Timer" parent="."]
 one_shot = true
 
@@ -595,8 +562,6 @@ offset_bottom = 90.0
 grow_horizontal = 0
 
 [node name="SubViewport" parent="CanvasLayer/Map&ItemsBar/MapBase/SubViewportContainer" index="0" node_paths=PackedStringArray("player")]
-handle_input_locally = false
-render_target_update_mode = 4
 player = NodePath("../../../../..")
 
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]

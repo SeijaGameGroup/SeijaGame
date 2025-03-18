@@ -1,12 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://csxx6ylytbhlh"]
+[gd_scene load_steps=6 format=3 uid="uid://csxx6ylytbhlh"]
 
+[ext_resource type="Script" uid="uid://nwemf74o1h5w" path="res://ui/config_bar.gd" id="1_0rtca"]
 [ext_resource type="Texture2D" uid="uid://dri3oii7cm5me" path="res://assets/pictures/circle.png" id="1_jvsd2"]
 [ext_resource type="Texture2D" uid="uid://bc5x57vhh4jnb" path="res://assets/pictures/energy_groove.png" id="1_l8aa2"]
 [ext_resource type="Texture2D" uid="uid://dvidxucotxbu6" path="res://assets/pictures/energy.png" id="2_jvsd2"]
+[ext_resource type="PackedScene" uid="uid://cuubsp8m6lrk" path="res://ui/skill_icon.tscn" id="4_ciq2k"]
 
 [node name="ConfigBar" type="HBoxContainer"]
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_0rtca")
 
 [node name="ShootingConfig" type="TextureRect" parent="."]
 layout_mode = 2
@@ -30,22 +33,16 @@ vertical_alignment = 1
 layout_mode = 2
 max_value = 1.0
 step = 0.0
-value = 0.015
+value = 0.4
 fill_mode = 3
 texture_under = ExtResource("1_l8aa2")
 texture_progress = ExtResource("2_jvsd2")
 
-[node name="Skill1" type="TextureRect" parent="."]
+[node name="SkillIcon1" parent="." instance=ExtResource("4_ciq2k")]
 layout_mode = 2
-texture = ExtResource("1_jvsd2")
-expand_mode = 2
 
-[node name="Skill2" type="TextureRect" parent="."]
+[node name="SkillIcon2" parent="." instance=ExtResource("4_ciq2k")]
 layout_mode = 2
-texture = ExtResource("1_jvsd2")
-expand_mode = 2
 
-[node name="Skill3" type="TextureRect" parent="."]
+[node name="SkillIcon3" parent="." instance=ExtResource("4_ciq2k")]
 layout_mode = 2
-texture = ExtResource("1_jvsd2")
-expand_mode = 2

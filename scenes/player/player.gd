@@ -5,7 +5,7 @@ extends CharacterBody2D
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @export var damage 			:= 6.0
-@export var shoot_damage	:= 6.0
+@export var shoot_damage		:= 6.0
 @export var firedelay 		:= 0.3
 @export var shooting_range	:= 10.0
 @export var sub_shoot_cd 	:= 10.0
@@ -14,25 +14,24 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @export var jump_velocity 	:= -700.0
 @export var ground_friction := 2000.0
 @export var air_friction 	:= 300.0
-#@export var acc := 1500
 
-@export var damage_reduction_rate 	:= 0.0
-@export var speed_multiplier 		:= 1.0
-@export var gravity_multiplier 		:= 1.0
-@export var jump_velocity_multipler := 1.0
-@export var range_multipler			:= 1.0
+@export var damage_reduction_rate_skill 		:= 0.0
+@export var speed_multiplier_skill 			:= 1.0
+@export var gravity_multiplier_skill 		:= 1.0
+@export var jump_velocity_multipler_skill 	:= 1.0
+@export var range_multipler_skill			:= 1.0
 
 var SPEED : float :
 	get:
-		return speed * 50 * speed_multiplier * playerstats.speed_multiplier_item
+		return speed * 50 * speed_multiplier_skill * playerstats.speed_multiplier_item
 
 var GRAVITY : float :
 	get:
-		return gravity * gravity_multiplier * playerstats.gravity_multiplier_item * (-1 if upside_down else 1)
+		return gravity * gravity_multiplier_skill * playerstats.gravity_multiplier_item * (-1 if upside_down else 1)
 
 var JUMP_VELOCITY : float :
 	get:
-		return jump_velocity * jump_velocity_multipler * playerstats.jump_velocity_multipler_item * (-1 if upside_down else 1)
+		return jump_velocity * jump_velocity_multipler_skill * playerstats.jump_velocity_multipler_item * (-1 if upside_down else 1)
 
 var CAN_JUMP : bool :
 	get:
@@ -103,6 +102,7 @@ enum DistributionType
 }
 
 func _ready() -> void:
+	Game.player_stats.player = self
 	for item in Game.player_stats.passive_items:
 		add_item(item.ID)
 
@@ -147,12 +147,23 @@ func _physics_process(delta) -> void:
 			sub_shooting_timer.start(sub_shoot_cd)
 
 		# Handle Interact
-		if Input.is_action_just_pressed("Interact") and not interacting_with.is_empty():
+		if Input.is_action_just_pressed("interact") and not interacting_with.is_empty():
 			interacting_with.back().interact(self)
 		# Test
 		if Input.is_action_just_pressed("TestButton"):
 			get_tree().call_group("Bullets", &"duplicate_bullet")
 
+		# Handle Skills
+		if Input.is_action_just_pressed("skill1") and Game.player_stats.current_set.skill_slot1.available:
+			Game.player_stats.current_set.skill_slot1.skill_pressed()
+		
+		if Input.is_action_just_pressed("skill2"):
+			if Game.player_stats.current_set.skill_slot2.available:
+				Game.player_stats.current_set.skill_slot2.skill_pressed()
+		
+		if Input.is_action_just_pressed("skill3") and Game.player_stats.current_set.skill_slot3.available:
+			Game.player_stats.current_set.skill_slot3.skill_pressed()
+		
 	if movable:
 		# Add the gravity.
 		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):

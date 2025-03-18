@@ -4,6 +4,10 @@ extends Stats
 
 signal p_points_changed(p_points: int)
 
+const SKILL_PATH = "res://scenes/player/skills/"
+
+@export var player : Player
+
 @export var damage_item	:= 0.0
 
 @export var range_multipler_item			:= 1.0
@@ -22,9 +26,31 @@ signal p_points_changed(p_points: int)
 @export var passive_items	: Array[Item]
 @export var is_locking		: bool
 
-var player_global_position : Vector2
+@export var skills : Array[Skill]
 
+class Set:
+	var bullet_type : Player.BulletType
+	var skill_slot1 : Skill
+	var skill_slot2 : Skill
+	var skill_slot3 : Skill
+	
+var set1 : Set
+var set2 : Set
+var current_set : Set
+var player_global_position : Vector2
 
 func _init() -> void:
 	max_health = 150.0
 	health = 150.0
+	for i in range(0, 3):
+		var skill = Skill.new()
+		var script = load(SKILL_PATH + "skillID%d.gd" % (i+1))
+		skill.set_script(script)
+		skills.append(skill)
+	set1 = Set.new()
+	set1.bullet_type = Player.BulletType.NormalBullet
+	set1.skill_slot1 = skills[0]
+	set1.skill_slot2 = skills[1]
+	set1.skill_slot3 = skills[2]
+	current_set = set1
+		

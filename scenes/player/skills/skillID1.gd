@@ -1,5 +1,11 @@
 extends Skill
 
+func _init() -> void:
+	super()
+	id = 1
+	duration = 5.0
+	cooldown = 8.0
+	Name = ""
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
