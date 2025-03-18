@@ -3,7 +3,6 @@ extends BaseMonster
 @onready var graphics			: Node2D = $Graphics
 @onready var detecting_area		: DetectingArea = $DetectingArea
 @onready var hurtbox			: HurtBox = $HurtBox
-@onready var hitbox			: HitBox = $HitBox
 @onready var animation_tree		: AnimationTree = $AnimationTree
 @onready var animation_player	: AnimationPlayer = $AnimationPlayer
 @onready var stats				: Stats = $Stats
@@ -19,8 +18,8 @@ extends BaseMonster
 @export var shoot_num			: int = 4
 @export var bullet_speed		: float = 200
 
-@export var knockback_acc 		: float = 50
-@export var acc					: float = 10
+@export var knockback_impulse 	: float = 50
+@export var acc					: float = 600
 @export var WANDERING_SPEED		: float = 20
 
 @export var detected_enemies	: Array = []
@@ -57,7 +56,7 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector2.ZERO
 			next_state = State.Idle
 		State.Wandering:
-			velocity = velocity.move_toward(velocity_target, acc)
+			velocity = velocity.move_toward(velocity_target, acc * delta)
 			if wandering_timer.is_stopped():
 				wandering_timer.start()
 				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
@@ -69,7 +68,7 @@ func _physics_process(delta: float) -> void:
 			else:
 				next_state = State.Wandering
 		State.Shooting:
-			velocity = velocity.move_toward(Vector2.ZERO, acc)
+			velocity = velocity.move_toward(Vector2.ZERO, acc * delta)
 			if enemy == null:
 				next_state = State.Wandering
 			else:
@@ -137,7 +136,7 @@ func get_enemy() -> void:
 
 
 func hurt(hitbox: HitBox):
-	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
+	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_impulse
 	velocity += acc
 	stats.health -= hitbox.damage
 

@@ -8,8 +8,8 @@
 [ext_resource type="Script" uid="uid://62xtjwiuudp2" path="res://scripts/stats.gd" id="6_x6jfy"]
 [ext_resource type="Script" uid="uid://dkauh5vw1lfeu" path="res://scenes/moster/visible_detection.gd" id="7_x6jfy"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_82vyn"]
-size = Vector2(38, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_x6jfy"]
+radius = 30.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vbe1y"]
 radius = 400.0
@@ -17,8 +17,8 @@ radius = 400.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_xnl4x"]
 radius = 40.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8va8a"]
-size = Vector2(38, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_c5sf1"]
+radius = 20.0
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_x6jfy"]
 animation = &"adjusting"
@@ -161,11 +161,6 @@ radius = 60.0
 collision_layer = 2
 collision_mask = 32
 script = ExtResource("1_wgdg4")
-visible_radius = 30.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(11, 5)
-shape = SubResource("RectangleShape2D_82vyn")
 
 [node name="Graphics" type="Node2D" parent="."]
 
@@ -173,6 +168,9 @@ shape = SubResource("RectangleShape2D_82vyn")
 texture = ExtResource("3_wsltf")
 hframes = 2
 frame = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_x6jfy")
 
 [node name="DetectingArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -190,7 +188,7 @@ script = ExtResource("4_0cgc5")
 
 [node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("CircleShape2D_xnl4x")
-debug_color = Color(0.965108, 0, 0.488705, 0.42)
+debug_color = Color(0.964706, 0, 0.490196, 0.121569)
 
 [node name="HitBox" type="Area2D" parent="."]
 collision_layer = 0
@@ -199,8 +197,8 @@ script = ExtResource("5_kju7k")
 damage = 15.0
 
 [node name="HitBoxShape2D" type="CollisionShape2D" parent="HitBox"]
-position = Vector2(11, 5)
-shape = SubResource("RectangleShape2D_8va8a")
+shape = SubResource("CircleShape2D_c5sf1")
+debug_color = Color(0, 0.6, 0.164706, 0.0627451)
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_drv5a")

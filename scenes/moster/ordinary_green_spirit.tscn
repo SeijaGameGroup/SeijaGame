@@ -36,22 +36,6 @@ states/wandering/node = SubResource("AnimationNodeAnimation_jyuh6")
 states/wandering/position = Vector2(428, 100)
 transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_nqh8b"), "wandering", "shooting", SubResource("AnimationNodeStateMachineTransition_8ggm1"), "shooting", "wandering", SubResource("AnimationNodeStateMachineTransition_jk71y")]
 
-[sub_resource type="Animation" id="Animation_gh4w3"]
-resource_name = "wandering"
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-
 [sub_resource type="Animation" id="Animation_jyuh6"]
 length = 0.001
 tracks/0/type = "value"
@@ -82,6 +66,22 @@ tracks/0/keys = {
 "values": [0]
 }
 
+[sub_resource type="Animation" id="Animation_gh4w3"]
+resource_name = "wandering"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_8ggm1"]
 _data = {
 &"RESET": SubResource("Animation_jyuh6"),
@@ -94,9 +94,6 @@ collision_layer = 2
 collision_mask = 32
 script = ExtResource("1_gh4w3")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_a3sxf")
-
 [node name="Graphics" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
@@ -104,6 +101,9 @@ texture = ExtResource("1_a3sxf")
 offset = Vector2(10, -3)
 
 [node name="ShootingPoint" type="Node2D" parent="Graphics"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_a3sxf")
 
 [node name="DetectingArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -121,7 +121,7 @@ script = ExtResource("4_nqh8b")
 
 [node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("RectangleShape2D_8xoo6")
-debug_color = Color(0.965108, 0, 0.488705, 0.42)
+debug_color = Color(0.964706, 0, 0.490196, 0.121569)
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_ccla3")

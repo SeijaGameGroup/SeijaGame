@@ -1,20 +1,28 @@
-[gd_scene load_steps=20 format=3 uid="uid://dl3xtcjk3ec2h"]
+[gd_scene load_steps=21 format=3 uid="uid://b87cjfj0bvqgl"]
 
-[ext_resource type="Script" uid="uid://7lstpdc5co50" path="res://scenes/moster/ordinary_red_spirit.gd" id="1_cn2wh"]
-[ext_resource type="Texture2D" uid="uid://hqqn5s6xkc5h" path="res://assets/pictures/spirit2.png" id="2_cn2wh"]
-[ext_resource type="Script" uid="uid://bhv07ig7mc223" path="res://scripts/detecting_area.gd" id="3_c21b8"]
-[ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="4_5lcse"]
-[ext_resource type="Script" uid="uid://62xtjwiuudp2" path="res://scripts/stats.gd" id="6_wljsg"]
-[ext_resource type="Script" uid="uid://dkauh5vw1lfeu" path="res://scenes/moster/visible_detection.gd" id="7_72cko"]
+[ext_resource type="Script" uid="uid://d1galjnmap10l" path="res://scenes/moster/kendama.gd" id="1_xkfqj"]
+[ext_resource type="Texture2D" uid="uid://b5f1ca26o6x1g" path="res://assets/pictures/kendama.png" id="2_pji0j"]
+[ext_resource type="Script" uid="uid://bhv07ig7mc223" path="res://scripts/detecting_area.gd" id="3_uxxsm"]
+[ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="4_57ykf"]
+[ext_resource type="Script" uid="uid://62xtjwiuudp2" path="res://scripts/stats.gd" id="5_7vf6j"]
+[ext_resource type="Script" uid="uid://cfsmsiujxat5m" path="res://scripts/hitbox.gd" id="5_xkfqj"]
+[ext_resource type="Script" uid="uid://dkauh5vw1lfeu" path="res://scenes/moster/visible_detection.gd" id="6_3k8y0"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_a3sxf"]
-size = Vector2(25, 60)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6j8eq"]
+size = Vector2(30, 34)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ddrg2"]
-size = Vector2(800, 500)
+size = Vector2(450, 300)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8xoo6"]
-size = Vector2(40, 60)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u4ux4"]
+size = Vector2(12, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xkfqj"]
+size = Vector2(40, 36)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_pji0j"]
+radius = 18.0
+height = 50.0
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gh4w3"]
 animation = &"shooting"
@@ -51,77 +59,65 @@ tracks/0/keys = {
 "values": [0]
 }
 
-[sub_resource type="Animation" id="Animation_nqh8b"]
-resource_name = "shooting"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-
-[sub_resource type="Animation" id="Animation_gh4w3"]
-resource_name = "wandering"
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Graphics/Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_8ggm1"]
 _data = {
-&"RESET": SubResource("Animation_jyuh6"),
-&"shooting": SubResource("Animation_nqh8b"),
-&"wandering": SubResource("Animation_gh4w3")
+&"RESET": SubResource("Animation_jyuh6")
 }
 
-[node name="OrdinaryRedSpirit" type="CharacterBody2D"]
+[node name="Kendama" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 32
-script = ExtResource("1_cn2wh")
+script = ExtResource("1_xkfqj")
 
 [node name="Graphics" type="Node2D" parent="."]
 
 [node name="Sprite2D" type="Sprite2D" parent="Graphics"]
-texture = ExtResource("2_cn2wh")
-offset = Vector2(10, -3)
-
-[node name="ShootingPoint" type="Node2D" parent="Graphics"]
+texture = ExtResource("2_pji0j")
+offset = Vector2(6, -12)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_a3sxf")
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_6j8eq")
 
 [node name="DetectingArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 16
-script = ExtResource("3_c21b8")
+script = ExtResource("3_uxxsm")
 
 [node name="DetectingAreaShape2D" type="CollisionShape2D" parent="DetectingArea"]
 shape = SubResource("RectangleShape2D_ddrg2")
 debug_color = Color(0.662745, 0.513726, 0, 0.0784314)
 
+[node name="FrontHurtBox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_57ykf")
+
+[node name="FrontHurtBoxShape2D" type="CollisionShape2D" parent="FrontHurtBox"]
+position = Vector2(-19, 0)
+shape = SubResource("RectangleShape2D_u4ux4")
+debug_color = Color(0.964706, 0, 0.490196, 0.121569)
+
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 8
 collision_mask = 0
-script = ExtResource("4_5lcse")
+script = ExtResource("4_57ykf")
 
 [node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
-shape = SubResource("RectangleShape2D_8xoo6")
+position = Vector2(7, 0)
+shape = SubResource("RectangleShape2D_xkfqj")
 debug_color = Color(0.964706, 0, 0.490196, 0.121569)
+
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("5_xkfqj")
+damage = 8.0
+
+[node name="HitBoxShape2D" type="CollisionShape2D" parent="HitBox"]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_pji0j")
+debug_color = Color(0, 0.6, 0.164706, 0.0627451)
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_ccla3")
@@ -133,11 +129,11 @@ libraries = {
 }
 
 [node name="Stats" type="Node" parent="."]
-script = ExtResource("6_wljsg")
+script = ExtResource("5_7vf6j")
 metadata/_custom_type_script = "uid://62xtjwiuudp2"
 
 [node name="VisibleDetection" type="Node2D" parent="."]
-script = ExtResource("7_72cko")
+script = ExtResource("6_3k8y0")
 visible_collision_mask = 48
 
 [node name="DetectionRayUp" type="RayCast2D" parent="VisibleDetection"]
@@ -155,19 +151,24 @@ target_position = Vector2(50, 10)
 collision_mask = 48
 collide_with_areas = true
 
-[node name="FloorDetectionRay" type="RayCast2D" parent="."]
-target_position = Vector2(0, 200)
-collision_mask = 32
-
-[node name="WanderingTimer" type="Timer" parent="."]
+[node name="WalkingTimer" type="Timer" parent="."]
 wait_time = 3.0
 one_shot = true
 
-[node name="ShootingTimer" type="Timer" parent="."]
-wait_time = 2.0
+[node name="ChargingTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="HoveringTimer" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="CoolDownTimer" type="Timer" parent="."]
 one_shot = true
 
 [connection signal="target_entered" from="DetectingArea" to="." method="enemy_detected"]
 [connection signal="target_lost" from="DetectingArea" to="." method="enemy_lost"]
+[connection signal="hurt" from="FrontHurtBox" to="." method="hurt_front"]
 [connection signal="hurt" from="HurtBox" to="." method="hurt"]
+[connection signal="hit" from="HitBox" to="." method="hit"]
 [connection signal="die" from="Stats" to="." method="die"]

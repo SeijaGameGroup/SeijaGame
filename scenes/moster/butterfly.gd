@@ -14,11 +14,11 @@ extends BaseMonster
 @onready var wandering_timer	: Timer = $WanderingTimer
 @onready var detecting_timer	: Timer = $DetectingTimer
 
-@export var knockback_acc 	: float = 50
-@export var chasing_acc		: float = 10
-@export var WANDERING_SPEED : float = 40
-@export var CHASING_SPEED 	: float = 200
-@export var damage 			: float = 15.0 :
+@export var knockback_impulse 	: float = 50
+@export var chasing_acc			: float = 600
+@export var WANDERING_SPEED 	: float = 40
+@export var CHASING_SPEED 		: float = 200
+@export var damage 				: float = 15.0 :
 	set(value):
 		damage = value
 		hitbox.damage = value
@@ -62,7 +62,7 @@ func _physics_process(_delta):
 			velocity = Vector2.ZERO
 			next_state = State.Idle
 		State.Wandering:
-			velocity = velocity.move_toward(velocity_target, chasing_acc)
+			velocity = velocity.move_toward(velocity_target, chasing_acc * _delta)
 			if wandering_timer.is_stopped():
 				wandering_timer.start()
 				velocity_target = Vector2(WANDERING_SPEED,0).rotated(randf_range(0,TAU))
@@ -74,7 +74,7 @@ func _physics_process(_delta):
 			else:
 				next_state = State.Wandering
 		State.Detecting:
-			velocity.move_toward(Vector2.ZERO,chasing_acc)
+			velocity = velocity.move_toward(Vector2.ZERO,chasing_acc * _delta)
 			if enemy == null:
 				next_state = State.Wandering
 			elif detecting_timer.is_stopped():
@@ -85,13 +85,13 @@ func _physics_process(_delta):
 			if enemy == null:
 				next_state = State.Wandering
 			else:
-				velocity = velocity.move_toward(direction_to_enemy * CHASING_SPEED, chasing_acc)
+				velocity = velocity.move_toward(direction_to_enemy * CHASING_SPEED, chasing_acc * _delta)
 				next_state = State.Chasing
 		State.Adjusting:
 			if enemy == null:
 				next_state = State.Wandering
 			else:
-				velocity = velocity.move_toward(- direction_to_enemy * CHASING_SPEED, chasing_acc)
+				velocity = velocity.move_toward(- direction_to_enemy * CHASING_SPEED, chasing_acc * _delta)
 				var distance_to_enemy = self.global_position.distance_to(enemy.global_position)
 				if distance_to_enemy > 300:
 					next_state = State.Chasing
@@ -155,7 +155,7 @@ func get_enemy() -> void:
 
 
 func hurt(hitbox: HitBox):
-	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_acc
+	var acc = hitbox.global_position.direction_to(hurtbox.global_position) * knockback_impulse
 	velocity += acc
 	stats.health -= hitbox.damage
 
@@ -172,7 +172,7 @@ func enemy_lost(detected_area: DetectedArea):
 
 
 func hit(hurtbox: HurtBox):
-	var acc = hurtbox.global_position.direction_to(hitbox.global_position) * knockback_acc
+	var acc = hurtbox.global_position.direction_to(hitbox.global_position) * knockback_impulse
 	velocity += acc
 	if current_state == State.Chasing:
 		end_chasing = true
