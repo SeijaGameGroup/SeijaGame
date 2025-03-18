@@ -54,6 +54,11 @@ var IN_AIR : bool :
 	set(value):
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
+		if upside_down:
+			var viewport_size = get_viewport_rect().size
+			camera_2d.limit_top = (camera_2d.get_screen_center_position() - viewport_size*0.5 / camera_2d.zoom).y
+		else:
+			camera_2d.limit_top = -10000000
 
 @export var facing_direction : float = 1
 
@@ -75,6 +80,7 @@ var IN_AIR : bool :
 @onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
 @onready var visible_detection		:= $VisibleDetection
+@onready var camera_2d				:= $Camera2D
 
 @export var interacting_with 		: Array[Interactable]
 @export var viewsize				: Vector2
@@ -101,8 +107,10 @@ enum DistributionType
 	Vertical,
 }
 
-func _ready() -> void:
+func _init() -> void:
 	Game.player_stats.player = self
+
+func _ready() -> void:
 	for item in Game.player_stats.passive_items:
 		add_item(item.ID)
 
@@ -154,14 +162,13 @@ func _physics_process(delta) -> void:
 			get_tree().call_group("Bullets", &"duplicate_bullet")
 
 		# Handle Skills
-		if Input.is_action_just_pressed("skill1") and Game.player_stats.current_set.skill_slot1.available:
+		if Input.is_action_just_pressed("skill1"):
 			Game.player_stats.current_set.skill_slot1.skill_pressed()
 		
 		if Input.is_action_just_pressed("skill2"):
-			if Game.player_stats.current_set.skill_slot2.available:
-				Game.player_stats.current_set.skill_slot2.skill_pressed()
+			Game.player_stats.current_set.skill_slot2.skill_pressed()
 		
-		if Input.is_action_just_pressed("skill3") and Game.player_stats.current_set.skill_slot3.available:
+		if Input.is_action_just_pressed("skill3"):
 			Game.player_stats.current_set.skill_slot3.skill_pressed()
 		
 	if movable:

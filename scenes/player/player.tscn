@@ -381,7 +381,7 @@ states/Running/node = SubResource("AnimationNodeAnimation_a38lo")
 states/Running/position = Vector2(294, -32)
 states/Start/position = Vector2(-82, 100)
 transitions = ["Start", "RESET", SubResource("AnimationNodeStateMachineTransition_4ni07"), "RESET", "Idle", SubResource("AnimationNodeStateMachineTransition_l71n6"), "RESET", "Running", SubResource("AnimationNodeStateMachineTransition_ke2ow"), "RESET", "Rising", SubResource("AnimationNodeStateMachineTransition_ujl30"), "RESET", "Falling", SubResource("AnimationNodeStateMachineTransition_31cv2"), "Idle", "Running", SubResource("AnimationNodeStateMachineTransition_pf23h"), "Running", "Idle", SubResource("AnimationNodeStateMachineTransition_dt7fs"), "Idle", "Jump", SubResource("AnimationNodeStateMachineTransition_wqfne"), "Running", "Jump", SubResource("AnimationNodeStateMachineTransition_wnwbv"), "Jump", "Rising", SubResource("AnimationNodeStateMachineTransition_gl8cc"), "Rising", "Falling", SubResource("AnimationNodeStateMachineTransition_487ah"), "Land", "Idle", SubResource("AnimationNodeStateMachineTransition_cs1tg"), "Land", "Running", SubResource("AnimationNodeStateMachineTransition_2dvfe"), "Land", "Jump", SubResource("AnimationNodeStateMachineTransition_giy8y"), "Falling", "Land", SubResource("AnimationNodeStateMachineTransition_ur7pv"), "Falling", "Rising", SubResource("AnimationNodeStateMachineTransition_oprun"), "Running", "Falling", SubResource("AnimationNodeStateMachineTransition_a8ls1"), "Idle", "Falling", SubResource("AnimationNodeStateMachineTransition_qfm1y")]
-graph_offset = Vector2(-381, -57)
+graph_offset = Vector2(-333, -140)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ur7pv"]
 animation = &"Still"
@@ -411,7 +411,7 @@ states/Start/position = Vector2(-23, 157)
 states/Still/node = SubResource("AnimationNodeAnimation_ur7pv")
 states/Still/position = Vector2(290, -5)
 transitions = ["Normal", "Still", SubResource("AnimationNodeStateMachineTransition_y4r1p"), "Still", "Normal", SubResource("AnimationNodeStateMachineTransition_d2wvv"), "Start", "Normal", SubResource("AnimationNodeStateMachineTransition_3v2ag"), "Normal", "Hurt", SubResource("AnimationNodeStateMachineTransition_jej6c"), "Hurt", "Normal", SubResource("AnimationNodeStateMachineTransition_f1ej7")]
-graph_offset = Vector2(-244, -42)
+graph_offset = Vector2(-381, -133)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fm80t"]
 atlas = ExtResource("10_je7p5")
@@ -560,9 +560,6 @@ offset_top = 64.0
 offset_right = -66.0
 offset_bottom = 90.0
 grow_horizontal = 0
-
-[node name="SubViewport" parent="CanvasLayer/Map&ItemsBar/MapBase/SubViewportContainer" index="0" node_paths=PackedStringArray("player")]
-player = NodePath("../../../../..")
 
 [node name="InteractionIcon" type="AnimatedSprite2D" parent="."]
 position = Vector2(0.2, -11.6)

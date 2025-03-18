@@ -35,7 +35,7 @@ func _init(player : Player = null) -> void:
 	
 	duration_timer.timeout.connect(deffect)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not cooldown_timer.is_stopped():
 		var current_cooldown = int(cooldown_timer.time_left)
 		if current_cooldown != previous_cooldown:
@@ -43,13 +43,12 @@ func _process(delta: float) -> void:
 			previous_cooldown = current_cooldown
 
 func skill_pressed() -> void:
-	print(cancelable)
-	print(duration_timer.is_stopped())
 	if cancelable and not duration_timer.is_stopped():
 		cancel()
-	cooldown_timer.start(cooldown)
-	duration_timer.start(duration)
-	effect()
+	elif available:
+		cooldown_timer.start(cooldown)
+		duration_timer.start(duration)
+		effect()
 	
 func effect() -> void:
 	pass

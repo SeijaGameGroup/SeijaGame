@@ -3,8 +3,8 @@ extends Skill
 func _init() -> void:
 	super()
 	id = 2
-	cooldown = 3.0
-	duration = 2.0
+	cooldown = 6.0
+	duration = 3.0
 	Name = "逆符「天地有用」"
 	cancelable = true
 

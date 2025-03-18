@@ -1,16 +1,13 @@
 [gd_scene load_steps=3 format=3 uid="uid://bmo8jgx7ncr8n"]
 
 [ext_resource type="Script" uid="uid://oqwfrpboybno" path="res://scenes/game.gd" id="1_uwrxv"]
-[ext_resource type="Script" uid="uid://cljc20g42jra0" path="res://scenes/player/player_stats.gd" id="2_yqjtg"]
+[ext_resource type="PackedScene" uid="uid://bha7m77h65igm" path="res://scenes/player/player_stats.tscn" id="2_yqjtg"]
 
 [node name="Game" type="CanvasLayer"]
 layer = 99
 script = ExtResource("1_uwrxv")
 
-[node name="PlayerStats" type="Node" parent="."]
-script = ExtResource("2_yqjtg")
-p_points = 150
-metadata/_custom_type_script = "uid://cljc20g42jra0"
+[node name="PlayerStats" parent="." instance=ExtResource("2_yqjtg")]
 
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15

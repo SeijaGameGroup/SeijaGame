@@ -1,6 +1,6 @@
 extends SubViewport
 
-@export var player : Player
+var player : Player = Game.player_stats.player
 @onready var camera_2d: Camera2D = $Camera2D
 
 func _ready() -> void:
