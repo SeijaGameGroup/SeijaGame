@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=3 uid="uid://bha7m77h65igm"]
+
+[ext_resource type="Script" uid="uid://cljc20g42jra0" path="res://scenes/player/player_stats.gd" id="1_q2wpc"]
+[ext_resource type="Script" uid="uid://13srbjh567rb" path="res://scenes/player/skills/skillID1.gd" id="2_6ctj3"]
+[ext_resource type="Script" uid="uid://cuwvmuc3rfsy1" path="res://scenes/player/skills/skillID2.gd" id="3_f5yus"]
+[ext_resource type="Script" uid="uid://clefr0k3indke" path="res://scenes/player/skills/skillID3.gd" id="4_ylwqh"]
+[ext_resource type="Script" uid="uid://diqmq6cnpjeqe" path="res://scenes/player/config_set.gd" id="5_ylwqh"]
+
+[node name="PlayerStats" type="Node" node_paths=PackedStringArray("current_set", "available_skills")]
+script = ExtResource("1_q2wpc")
+current_set = NodePath("ConfigSets/Set1")
+available_skills = [NodePath("Skills/SkillID1"), NodePath("Skills/SkillID2"), NodePath("Skills/skillID3")]
+max_health = 150.0
+health = 150.0
+metadata/_custom_type_script = "uid://cljc20g42jra0"
+
+[node name="Skills" type="Node" parent="."]
+
+[node name="SkillID1" type="Node" parent="Skills"]
+script = ExtResource("2_6ctj3")
+metadata/_custom_type_script = "uid://fialhvcedhaj"
+
+[node name="SkillID2" type="Node" parent="Skills"]
+script = ExtResource("3_f5yus")
+metadata/_custom_type_script = "uid://fialhvcedhaj"
+
+[node name="skillID3" type="Node" parent="Skills"]
+script = ExtResource("4_ylwqh")
+metadata/_custom_type_script = "uid://fialhvcedhaj"
+
+[node name="ConfigSets" type="Node" parent="."]
+
+[node name="Set1" type="Node" parent="ConfigSets" node_paths=PackedStringArray("skill_slot1", "skill_slot2", "skill_slot3")]
+script = ExtResource("5_ylwqh")
+skill_slot1 = NodePath("../../Skills/SkillID1")
+skill_slot2 = NodePath("../../Skills/SkillID2")
+skill_slot3 = NodePath("../../Skills/skillID3")
+metadata/_custom_type_script = "uid://diqmq6cnpjeqe"
+
+[node name="Set2" type="Node" parent="ConfigSets" node_paths=PackedStringArray("skill_slot1", "skill_slot2", "skill_slot3")]
+script = ExtResource("5_ylwqh")
+bullet_type = 1
+skill_slot1 = NodePath("../../Skills/SkillID1")
+skill_slot2 = NodePath("../../Skills/SkillID2")
+skill_slot3 = NodePath("../../Skills/skillID3")
+metadata/_custom_type_script = "uid://diqmq6cnpjeqe"

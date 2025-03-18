@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://cuubsp8m6lrk"]
+
+[ext_resource type="Texture2D" uid="uid://dri3oii7cm5me" path="res://assets/pictures/circle.png" id="1_j33v4"]
+[ext_resource type="Script" uid="uid://dm250f74fb6dn" path="res://ui/skill_icon.gd" id="2_1kire"]
+
+[node name="SkillIcon" type="TextureRect"]
+custom_minimum_size = Vector2(160, 160)
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("1_j33v4")
+script = ExtResource("2_1kire")
+
+[node name="Skill" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CoolDown" type="RichTextLabel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 50
+horizontal_alignment = 1
+vertical_alignment = 1

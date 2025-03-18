@@ -1422,7 +1422,7 @@ sources/2 = SubResource("TileSetAtlasSource_11lnh")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2w0gi"]
 size = Vector2(60.075, 61.5409)
 
-[node name="HealingRoom2" type="Node2D"]
+[node name="Shop1" type="Node2D"]
 metadata/_edit_vertical_guides_ = [202.0, 1465.0, 1995.0]
 metadata/_edit_horizontal_guides_ = [252.0, 803.0]
 
@@ -1450,11 +1450,6 @@ itemID = 5
 
 [node name="Player" parent="." instance=ExtResource("4_11lnh")]
 position = Vector2(474, 565)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
 
 [node name="Teleporter" type="Area2D" parent="."]
 position = Vector2(1343.4, 590.66)

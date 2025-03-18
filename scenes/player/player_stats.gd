@@ -4,6 +4,12 @@ extends Stats
 
 signal p_points_changed(p_points: int)
 
+const SKILL_PATH = "res://scenes/player/skills/"
+
+var player : Player
+
+@onready var skills: Node = $Skills
+
 @export var damage_item	:= 0.0
 
 @export var range_multipler_item			:= 1.0
@@ -22,9 +28,9 @@ signal p_points_changed(p_points: int)
 @export var passive_items	: Array[Item]
 @export var is_locking		: bool
 
+@export var current_set : ConfigSet
+@export var available_skills : Array[Skill]
 var player_global_position : Vector2
 
-
 func _init() -> void:
-	max_health = 150.0
-	health = 150.0
+	pass

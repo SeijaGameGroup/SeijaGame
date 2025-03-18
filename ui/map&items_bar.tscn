@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://d2hldw1swdjsc"]
+[gd_scene load_steps=5 format=3 uid="uid://d2hldw1swdjsc"]
 
 [ext_resource type="Texture2D" uid="uid://dotfrums17cy0" path="res://assets/pictures/Base-01.png" id="1_pnq2u"]
 [ext_resource type="Script" uid="uid://dxgu5x1iekpyx" path="res://ui/map&items_bar.gd" id="1_s5jqi"]
+[ext_resource type="Script" uid="uid://cdsp1ub5y7vqq" path="res://ui/minimap.gd" id="3_o0x7a"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_s5jqi"]
 atlas = ExtResource("1_pnq2u")
@@ -15,6 +16,30 @@ custom_minimum_size = Vector2(300, 300)
 layout_mode = 2
 size_flags_horizontal = 8
 texture = SubResource("AtlasTexture_s5jqi")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MapBase"]
+modulate = Color(1, 1, 1, 0.784314)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 23.0
+offset_right = -23.0
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MapBase/SubViewportContainer"]
+handle_input_locally = false
+canvas_item_default_texture_filter = 0
+size = Vector2i(253, 254)
+render_target_update_mode = 4
+script = ExtResource("3_o0x7a")
+
+[node name="Camera2D" type="Camera2D" parent="MapBase/SubViewportContainer/SubViewport"]
+zoom = Vector2(0.2, 0.2)
 
 [node name="Seperator" type="Control" parent="."]
 custom_minimum_size = Vector2(0, 50)
