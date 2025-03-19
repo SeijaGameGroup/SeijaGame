@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bp2klddudgkav"]
+[gd_scene load_steps=32 format=3 uid="uid://bp2klddudgkav"]
 
 [ext_resource type="Script" uid="uid://c3v3e5lt7b4l3" path="res://scenes/moster/butterfly.gd" id="1_wgdg4"]
 [ext_resource type="Script" uid="uid://bhv07ig7mc223" path="res://scripts/detecting_area.gd" id="3_21p2d"]
@@ -8,14 +8,20 @@
 [ext_resource type="Script" uid="uid://62xtjwiuudp2" path="res://scripts/stats.gd" id="6_x6jfy"]
 [ext_resource type="Script" uid="uid://dkauh5vw1lfeu" path="res://scenes/moster/visible_detection.gd" id="7_x6jfy"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_vbe1y"]
-radius = 200.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_x6jfy"]
+radius = 30.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_82vyn"]
-size = Vector2(38, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_vbe1y"]
+radius = 400.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_xnl4x"]
-radius = 48.0521
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_c5sf1"]
+radius = 20.0
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_x6jfy"]
+animation = &"adjusting"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ilh7v"]
 animation = &"chasing"
@@ -37,18 +43,44 @@ advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_5pnw7"]
 
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_qxlmn"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_76ipo"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_c5sf1"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_cq37o"]
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_drv5a"]
+states/adjusting/node = SubResource("AnimationNodeAnimation_x6jfy")
+states/adjusting/position = Vector2(527, 28)
 states/chasing/node = SubResource("AnimationNodeAnimation_ilh7v")
 states/chasing/position = Vector2(676, 100)
 states/detecting/node = SubResource("AnimationNodeAnimation_hrfhg")
 states/detecting/position = Vector2(527, 195)
 states/wandering/node = SubResource("AnimationNodeAnimation_7x6cr")
 states/wandering/position = Vector2(355, 100)
-transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7")]
-graph_offset = Vector2(-146, 12)
+transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_oh352"), "wandering", "detecting", SubResource("AnimationNodeStateMachineTransition_or53c"), "detecting", "chasing", SubResource("AnimationNodeStateMachineTransition_xk01p"), "chasing", "wandering", SubResource("AnimationNodeStateMachineTransition_5pnw7"), "detecting", "wandering", SubResource("AnimationNodeStateMachineTransition_qxlmn"), "adjusting", "wandering", SubResource("AnimationNodeStateMachineTransition_76ipo"), "chasing", "adjusting", SubResource("AnimationNodeStateMachineTransition_c5sf1"), "adjusting", "chasing", SubResource("AnimationNodeStateMachineTransition_cq37o")]
+graph_offset = Vector2(25, -25)
 
 [sub_resource type="Animation" id="Animation_0byte"]
 length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+
+[sub_resource type="Animation" id="Animation_x6jfy"]
+resource_name = "adjusting"
+loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -90,10 +122,10 @@ tracks/0/path = NodePath("Graphics/Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [0, 1]
+"values": [0, 1, 0]
 }
 
 [sub_resource type="Animation" id="Animation_dohlk"]
@@ -116,19 +148,19 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_a3ugo"]
 _data = {
 &"RESET": SubResource("Animation_0byte"),
+&"adjusting": SubResource("Animation_x6jfy"),
 &"chasing": SubResource("Animation_ly8a1"),
 &"detecting": SubResource("Animation_svyxp"),
 &"wandering": SubResource("Animation_dohlk")
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_8va8a"]
-size = Vector2(38, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_76ipo"]
+radius = 60.0
 
 [node name="Butterfly" type="CharacterBody2D"]
 collision_layer = 2
 collision_mask = 32
 script = ExtResource("1_wgdg4")
-visible_radius = 30.0
 
 [node name="Graphics" type="Node2D" parent="."]
 
@@ -137,29 +169,36 @@ texture = ExtResource("3_wsltf")
 hframes = 2
 frame = 1
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_x6jfy")
+
 [node name="DetectingArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 16
 script = ExtResource("3_21p2d")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectingArea"]
+[node name="DetectingAreaShape2D" type="CollisionShape2D" parent="DetectingArea"]
 shape = SubResource("CircleShape2D_vbe1y")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(11, 5)
-shape = SubResource("RectangleShape2D_82vyn")
+debug_color = Color(0.662745, 0.513726, 0, 0.0784314)
 
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 8
 collision_mask = 0
 script = ExtResource("4_0cgc5")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+[node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
 shape = SubResource("CircleShape2D_xnl4x")
+debug_color = Color(0.964706, 0, 0.490196, 0.121569)
 
-[node name="DetectingTimer" type="Timer" parent="."]
-wait_time = 2.0
-autostart = true
+[node name="HitBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("5_kju7k")
+damage = 15.0
+
+[node name="HitBoxShape2D" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("CircleShape2D_c5sf1")
+debug_color = Color(0, 0.6, 0.164706, 0.0627451)
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_drv5a")
@@ -169,16 +208,6 @@ anim_player = NodePath("../AnimationPlayer")
 libraries = {
 &"": SubResource("AnimationLibrary_a3ugo")
 }
-
-[node name="HitBox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 4
-script = ExtResource("5_kju7k")
-damage = 15.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox"]
-position = Vector2(11, 5)
-shape = SubResource("RectangleShape2D_8va8a")
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource("6_x6jfy")
@@ -190,20 +219,46 @@ visible_collision_mask = 48
 
 [node name="DetectionRayUp" type="RayCast2D" parent="VisibleDetection"]
 target_position = Vector2(50, -10)
-collision_mask = 51
+collision_mask = 48
 collide_with_areas = true
 
 [node name="DetectionRayMid" type="RayCast2D" parent="VisibleDetection"]
 target_position = Vector2(50, 0)
-collision_mask = 51
+collision_mask = 48
 collide_with_areas = true
 
 [node name="DetectionRayDown" type="RayCast2D" parent="VisibleDetection"]
 target_position = Vector2(50, 10)
-collision_mask = 51
+collision_mask = 48
 collide_with_areas = true
+
+[node name="CollisionDetection" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 32
+
+[node name="CollisionDetectionShape2D" type="CollisionShape2D" parent="CollisionDetection"]
+shape = SubResource("CircleShape2D_76ipo")
+debug_color = Color(0, 0.6, 0.701961, 0.0627451)
+
+[node name="FloorDetectionRay" type="RayCast2D" parent="."]
+target_position = Vector2(0, 200)
+collision_mask = 32
+
+[node name="PathFindingRay" type="RayCast2D" parent="."]
+target_position = Vector2(0, 100)
+collision_mask = 32
+
+[node name="WanderingTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="DetectingTimer" type="Timer" parent="."]
+wait_time = 0.3
+one_shot = true
 
 [connection signal="target_entered" from="DetectingArea" to="." method="enemy_detected"]
 [connection signal="target_lost" from="DetectingArea" to="." method="enemy_lost"]
 [connection signal="hurt" from="HurtBox" to="." method="hurt"]
-[connection signal="timeout" from="DetectingTimer" to="." method="adjust"]
+[connection signal="hit" from="HitBox" to="." method="hit"]
+[connection signal="die" from="Stats" to="." method="die"]
+[connection signal="body_entered" from="CollisionDetection" to="." method="on_collision_detection"]

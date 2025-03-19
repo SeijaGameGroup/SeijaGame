@@ -1,0 +1,173 @@
+[gd_scene load_steps=20 format=3 uid="uid://dl3xtcjk3ec2h"]
+
+[ext_resource type="Script" uid="uid://7lstpdc5co50" path="res://scenes/moster/ordinary_red_spirit.gd" id="1_cn2wh"]
+[ext_resource type="Texture2D" uid="uid://hqqn5s6xkc5h" path="res://assets/pictures/spirit2.png" id="2_cn2wh"]
+[ext_resource type="Script" uid="uid://bhv07ig7mc223" path="res://scripts/detecting_area.gd" id="3_c21b8"]
+[ext_resource type="Script" uid="uid://ugpmfntl4pms" path="res://scripts/hurtbox.gd" id="4_5lcse"]
+[ext_resource type="Script" uid="uid://62xtjwiuudp2" path="res://scripts/stats.gd" id="6_wljsg"]
+[ext_resource type="Script" uid="uid://dkauh5vw1lfeu" path="res://scenes/moster/visible_detection.gd" id="7_72cko"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a3sxf"]
+size = Vector2(25, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ddrg2"]
+size = Vector2(800, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8xoo6"]
+size = Vector2(40, 60)
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gh4w3"]
+animation = &"shooting"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_jyuh6"]
+animation = &"wandering"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_nqh8b"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_8ggm1"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jk71y"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ccla3"]
+states/End/position = Vector2(618, 100)
+states/shooting/node = SubResource("AnimationNodeAnimation_gh4w3")
+states/shooting/position = Vector2(428, 212)
+states/wandering/node = SubResource("AnimationNodeAnimation_jyuh6")
+states/wandering/position = Vector2(428, 100)
+transitions = ["Start", "wandering", SubResource("AnimationNodeStateMachineTransition_nqh8b"), "wandering", "shooting", SubResource("AnimationNodeStateMachineTransition_8ggm1"), "shooting", "wandering", SubResource("AnimationNodeStateMachineTransition_jk71y")]
+
+[sub_resource type="Animation" id="Animation_jyuh6"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_nqh8b"]
+resource_name = "shooting"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_gh4w3"]
+resource_name = "wandering"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Graphics/Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8ggm1"]
+_data = {
+&"RESET": SubResource("Animation_jyuh6"),
+&"shooting": SubResource("Animation_nqh8b"),
+&"wandering": SubResource("Animation_gh4w3")
+}
+
+[node name="OrdinaryRedSpirit" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 32
+script = ExtResource("1_cn2wh")
+
+[node name="Graphics" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics"]
+texture = ExtResource("2_cn2wh")
+offset = Vector2(10, -3)
+
+[node name="ShootingPoint" type="Node2D" parent="Graphics"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_a3sxf")
+
+[node name="DetectingArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("3_c21b8")
+
+[node name="DetectingAreaShape2D" type="CollisionShape2D" parent="DetectingArea"]
+shape = SubResource("RectangleShape2D_ddrg2")
+debug_color = Color(0.662745, 0.513726, 0, 0.0784314)
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("4_5lcse")
+
+[node name="HurtBoxShape2D" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("RectangleShape2D_8xoo6")
+debug_color = Color(0.964706, 0, 0.490196, 0.121569)
+
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeStateMachine_ccla3")
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_8ggm1")
+}
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource("6_wljsg")
+metadata/_custom_type_script = "uid://62xtjwiuudp2"
+
+[node name="VisibleDetection" type="Node2D" parent="."]
+script = ExtResource("7_72cko")
+visible_collision_mask = 48
+
+[node name="DetectionRayUp" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, -10)
+collision_mask = 48
+collide_with_areas = true
+
+[node name="DetectionRayMid" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, 0)
+collision_mask = 48
+collide_with_areas = true
+
+[node name="DetectionRayDown" type="RayCast2D" parent="VisibleDetection"]
+target_position = Vector2(50, 10)
+collision_mask = 48
+collide_with_areas = true
+
+[node name="FloorDetectionRay" type="RayCast2D" parent="."]
+target_position = Vector2(0, 200)
+collision_mask = 32
+
+[node name="WanderingTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[node name="ShootingTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="target_entered" from="DetectingArea" to="." method="enemy_detected"]
+[connection signal="target_lost" from="DetectingArea" to="." method="enemy_lost"]
+[connection signal="hurt" from="HurtBox" to="." method="hurt"]
+[connection signal="die" from="Stats" to="." method="die"]
