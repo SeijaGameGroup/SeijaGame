@@ -1446,12 +1446,6 @@ tile_set = SubResource("TileSet_jray3")
 [node name="Player" parent="." instance=ExtResource("4_qn3qy")]
 position = Vector2(129, 424)
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-position_smoothing_speed = 10.0
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-
 [node name="butterfly" parent="." instance=ExtResource("5_5q86u")]
 position = Vector2(661, -241)
 

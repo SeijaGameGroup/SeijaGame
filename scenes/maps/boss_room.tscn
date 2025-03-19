@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://xt3vbf5vj0j0" path="res://assets/pictures/Buildings.png" id="3_1u45f"]
 [ext_resource type="PackedScene" uid="uid://dqauwk5l6600p" path="res://scenes/player/player.tscn" id="4_s6s4s"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ojb2f"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e7e82"]
 texture = ExtResource("1_e7e82")
 6:0/0 = 0
 7:0/0 = 0
@@ -568,7 +568,7 @@ texture = ExtResource("1_e7e82")
 0:0/0/terrain = 0
 0:0/0/terrains_peering_bit/bottom_right_corner = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_syglu"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qxrm5"]
 texture = ExtResource("2_qxrm5")
 5:0/0 = 0
 5:0/0/terrain_set = 0
@@ -1013,7 +1013,7 @@ texture = ExtResource("2_qxrm5")
 4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 4:0/0/terrains_peering_bit/bottom_left_corner = 1
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wqxwv"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1u45f"]
 texture = ExtResource("3_1u45f")
 0:0/0 = 0
 1:0/0 = 0
@@ -1413,9 +1413,9 @@ terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
 terrain_set_0/terrain_1/name = "Terrain 1"
 terrain_set_0/terrain_1/color = Color(0.5, 0.4375, 0.25, 1)
-sources/0 = SubResource("TileSetAtlasSource_ojb2f")
-sources/1 = SubResource("TileSetAtlasSource_syglu")
-sources/2 = SubResource("TileSetAtlasSource_wqxwv")
+sources/0 = SubResource("TileSetAtlasSource_e7e82")
+sources/1 = SubResource("TileSetAtlasSource_qxrm5")
+sources/2 = SubResource("TileSetAtlasSource_1u45f")
 
 [node name="BossRoom" type="Node2D"]
 
@@ -1427,9 +1427,3 @@ tile_set = SubResource("TileSet_4oshn")
 
 [node name="Player" parent="." instance=ExtResource("4_s6s4s")]
 position = Vector2(12, 1536)
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(2, 2)
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-metadata/_edit_lock_ = true
