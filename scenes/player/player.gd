@@ -54,11 +54,11 @@ var IN_AIR : bool :
 	set(value):
 		upside_down = value
 		graphics.scale.y = -1 if value else 1
-		if upside_down:
-			var viewport_size = get_viewport_rect().size
-			camera_2d.limit_top = (camera_2d.get_screen_center_position() - viewport_size*0.5 / camera_2d.zoom).y
-		else:
-			camera_2d.limit_top = -10000000
+		#if upside_down:
+			#var viewport_size = get_viewport_rect().size
+			#camera_2d.limit_top = (camera_2d.get_screen_center_position() - viewport_size*0.5 / camera_2d.zoom).y
+		#else:
+			#camera_2d.limit_top = -10000000
 
 @export var facing_direction : float = 1
 

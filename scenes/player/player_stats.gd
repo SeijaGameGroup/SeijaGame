@@ -4,8 +4,6 @@ extends Stats
 
 signal p_points_changed(p_points: int)
 
-const SKILL_PATH = "res://scenes/player/skills/"
-
 var player : Player
 
 @onready var skills: Node = $Skills
@@ -29,8 +27,17 @@ var player : Player
 @export var is_locking		: bool
 
 @export var current_set : ConfigSet
+@export var current_set_index : int = 0:
+	set(value):
+		value = posmod(value, available_sets.size())
+		current_set_index = value
+		current_set = available_sets[value]
+@export var available_sets : Array[ConfigSet]
 @export var available_skills : Array[Skill]
 var player_global_position : Vector2
+
+func switch_config():
+	current_set_index += 1
 
 func _init() -> void:
 	pass

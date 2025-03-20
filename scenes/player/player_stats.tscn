@@ -6,9 +6,10 @@
 [ext_resource type="Script" uid="uid://clefr0k3indke" path="res://scenes/player/skills/skillID3.gd" id="4_ylwqh"]
 [ext_resource type="Script" uid="uid://diqmq6cnpjeqe" path="res://scenes/player/config_set.gd" id="5_ylwqh"]
 
-[node name="PlayerStats" type="Node" node_paths=PackedStringArray("current_set", "available_skills")]
+[node name="PlayerStats" type="Node" node_paths=PackedStringArray("current_set", "available_sets", "available_skills")]
 script = ExtResource("1_q2wpc")
 current_set = NodePath("ConfigSets/Set1")
+available_sets = [NodePath("ConfigSets/Set1"), NodePath("ConfigSets/Set2")]
 available_skills = [NodePath("Skills/SkillID1"), NodePath("Skills/SkillID2"), NodePath("Skills/skillID3")]
 max_health = 150.0
 health = 150.0

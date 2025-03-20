@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://cf2os0iwnvytu" path="res://scripts/teleporter.gd" id="6_mrboa"]
 [ext_resource type="PackedScene" uid="uid://b4ae056cppomg" path="res://scenes/moster/ordinary_green_spirit.tscn" id="6_vp2cr"]
 [ext_resource type="PackedScene" uid="uid://dl3xtcjk3ec2h" path="res://scenes/moster/ordinary_red_spirit.tscn" id="7_gsdfv"]
-[ext_resource type="PackedScene" uid="uid://b87cjfj0bvqgl" path="res://scenes/moster/kendama.tscn" id="8_qn3qy"]
+[ext_resource type="PackedScene" uid="uid://b87cjfj0bvqgl" path="res://scenes/moster/kedama.tscn" id="8_qn3qy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_hyjl5"]
 texture = ExtResource("1_3mjpt")
