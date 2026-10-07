@@ -1,0 +1,142 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/generated/forest_v2/tree_clean.png" id="1"]
+
+[node name="ForestDecor" type="Node2D"]
+texture_filter = 1
+
+[node name="DistantTree1" type="Sprite2D" parent="."]
+position = Vector2(40, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="DistantTree2" type="Sprite2D" parent="."]
+position = Vector2(480, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="DistantTree3" type="Sprite2D" parent="."]
+position = Vector2(920, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="DistantTree4" type="Sprite2D" parent="."]
+position = Vector2(1360, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="DistantTree5" type="Sprite2D" parent="."]
+position = Vector2(1800, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="DistantTree6" type="Sprite2D" parent="."]
+position = Vector2(2240, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="DistantTree7" type="Sprite2D" parent="."]
+position = Vector2(2680, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="DistantTree8" type="Sprite2D" parent="."]
+position = Vector2(3120, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="DistantTree9" type="Sprite2D" parent="."]
+position = Vector2(3560, 620)
+scale = Vector2(0.23, 0.23)
+modulate = Color(0.30, 0.43, 0.54, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="Tree1" type="Sprite2D" parent="."]
+position = Vector2(210, 622)
+scale = Vector2(0.32, 0.32)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="Tree2" type="Sprite2D" parent="."]
+position = Vector2(690, 622)
+scale = Vector2(0.29, 0.29)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="Tree3" type="Sprite2D" parent="."]
+position = Vector2(1170, 622)
+scale = Vector2(0.32, 0.32)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="Tree4" type="Sprite2D" parent="."]
+position = Vector2(1650, 622)
+scale = Vector2(0.29, 0.29)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="Tree5" type="Sprite2D" parent="."]
+position = Vector2(2130, 622)
+scale = Vector2(0.32, 0.32)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="Tree6" type="Sprite2D" parent="."]
+position = Vector2(2610, 622)
+scale = Vector2(0.29, 0.29)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true
+
+[node name="Tree7" type="Sprite2D" parent="."]
+position = Vector2(3090, 622)
+scale = Vector2(0.32, 0.32)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = false
+
+[node name="Tree8" type="Sprite2D" parent="."]
+position = Vector2(3570, 622)
+scale = Vector2(0.29, 0.29)
+modulate = Color(0.64, 0.73, 0.79, 1)
+texture = ExtResource("1")
+offset = Vector2(0, -732)
+flip_h = true

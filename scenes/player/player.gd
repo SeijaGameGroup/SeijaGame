@@ -1,392 +1,231 @@
 class_name Player
 extends CharacterBody2D
 
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
-
-@export var damage 			:= 6.0
-@export var shoot_damage		:= 6.0
-@export var firedelay 		:= 0.3
-@export var shooting_range	:= 10.0
-@export var sub_shoot_cd 	:= 10.0
-@export var sub_shoot_num 	:= 6
-@export var speed 			:= 6.0
-@export var jump_velocity 	:= -700.0
-@export var ground_friction := 2000.0
-@export var air_friction 	:= 300.0
-
-@export var damage_reduction_rate_skill 		:= 0.0
-@export var speed_multiplier_skill 			:= 1.0
-@export var gravity_multiplier_skill 		:= 1.0
-@export var jump_velocity_multipler_skill 	:= 1.0
-@export var range_multipler_skill			:= 1.0
-
-var SPEED : float :
-	get:
-		return speed * 50 * speed_multiplier_skill * playerstats.speed_multiplier_item
-
-var GRAVITY : float :
-	get:
-		return gravity * gravity_multiplier_skill * playerstats.gravity_multiplier_item * (-1 if upside_down else 1)
-
-var JUMP_VELOCITY : float :
-	get:
-		return jump_velocity * jump_velocity_multipler_skill * playerstats.jump_velocity_multipler_item * (-1 if upside_down else 1)
-
-var CAN_JUMP : bool :
-	get:
-		return (not upside_down and is_on_floor()) or (upside_down and is_on_ceiling())
-
-var IN_AIR : bool :
-	get:
-		return not (is_on_floor() or is_on_ceiling())
-
-@export var movable : bool = true
-
-@export var invincible : bool = false :
-	set(value):
-		invincible = value
-		hurtbox.set_deferred("monitorable", not value)
-
-@export var operatable : bool = true
-
-@export var upside_down : bool = false :
-	set(value):
-		upside_down = value
-		graphics.scale.y = -1 if value else 1
-		#if upside_down:
-			#var viewport_size = get_viewport_rect().size
-			#camera_2d.limit_top = (camera_2d.get_screen_center_position() - viewport_size*0.5 / camera_2d.zoom).y
-		#else:
-			#camera_2d.limit_top = -10000000
-
-@export var facing_direction : float = 1
-
-@onready var playerstats			: PlayerStats = Game.player_stats
-@onready var shooting_timer 		:= $ShootingTimer
-@onready var sub_shooting_timer 	:= $SubShootingTimer
-@onready var jump_request_timer 	:= $JumpRequestTimer
-@onready var sprite_2d 				:= $Graphics/Sprite2D
-@onready var shooting_point 		:= $Graphics/ShootingPoint
-@onready var collision_shape_2d 	:= $CollisionShape2D
-@onready var graphics 				:= $Graphics
-@onready var animation_player 		:= $AnimationPlayer
-@onready var animation_tree 		:= $AnimationTree
-@onready var hurtbox 				:= $HurtBox
-@onready var detected_area			:= $DetectedArea
-@onready var interaction_icon		:= $InteractionIcon
-@onready var enemy_lock_sprite		:= $EnemyLockSprite
-@onready var map_items_bar			:= $"CanvasLayer/Map&ItemsBar"
-@onready var state_machine 			: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
-@onready var state_machine_normal 	: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/Normal/playback")
-@onready var visible_detection		:= $VisibleDetection
-@onready var camera_2d				:= $Camera2D
-
-@export var interacting_with 		: Array[Interactable]
-@export var viewsize				: Vector2
-@export var enemy_tracked			: BaseMonster
-@export var enemies_in_sight		: Array[BaseMonster]
-@export var enemies_in_camera		: Array[BaseMonster]
-
-@export var bullet_type				: BulletType = BulletType.NormalBullet
-@export var bullet_distribution		: DistributionType = DistributionType.None
-@export var bullet_num				: int = 1
-
-# Bullet types for shooting
-enum BulletType
-{
-	NormalBullet,
-	TrackingBullet,
-}
-
-enum DistributionType
-{
-	None,
-	Serial,
-	Angular,
-	Vertical,
-}
-
-func _init() -> void:
-	Game.player_stats.player = self
+# The enums retain compatibility with archived configuration resources.
+enum BulletType { NormalBullet, TrackingBullet }
+enum DistributionType { None, Serial, Angular, Vertical }
+var operatable := true
+var movable := true
+var invincible := false
+var upside_down := false
+var facing_direction := 1.0
+var enemy_tracked: Node2D
+var interacting_with: Array[Interactable] = []
+var viewsize := Vector2(1280, 720)
+var hurt_left := 0.0
+var immunity_left := 0.0
+var jump_buffer := 0.0
+var coyote := 0.0
+var fire_left := 0.0
+var drop_left := 0.0
+var camera_y := 360.0
+var camera_x := 640.0
+@export_group("Camera")
+@export_range(0.0, 320.0, 1.0) var camera_deadzone := 120.0
+@export_range(100.0, 2400.0, 50.0) var camera_follow_speed := 900.0
+@export_range(0.0, 160.0, 1.0) var camera_look_ahead := 0.0
+@export var sprite_ground_offset := -23.0
+@export var body_half_height := 22.0
+var ceiling_y := 66.0
+var last_safe := Vector2.ZERO
+var shot_count := 0
+@onready var graphics: Sprite2D = $Graphics
+@onready var camera_2d: Camera2D = $Camera2D
+@onready var playerstats: PlayerStats = Game.player_stats
+var CAN_JUMP: bool:
+	get: return is_on_floor()
+var IN_AIR: bool:
+	get: return not is_on_floor()
 
 func _ready() -> void:
-	for item in Game.player_stats.passive_items:
-		add_item(item.ID)
+	Game.player_stats.player = self
+	last_safe = global_position
+	camera_2d.top_level = true
+	camera_x = _camera_limit_x(global_position.x)
+	camera_2d.global_position = Vector2(camera_x, camera_y)
+	camera_2d.reset_smoothing()
 
-func _physics_process(delta) -> void:
-	# Track Enemy
-	enemy_tracking()
-	if Input.is_action_just_pressed("enemy_lock"):
-		playerstats.is_locking = not playerstats.is_locking
+func can_act() -> bool:
+	return operatable and hurt_left <= 0.0 and not playerstats.dead and not Game.transitioning and not Game.finishing
 
-	if playerstats.is_locking and enemy_tracked != null:
-		var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
-		if camera:
-			if is_in_camera(enemy_tracked, camera):
-				enemy_lock_sprite.visible = true
-				enemy_lock_sprite.global_position = enemy_tracked.global_position
-				enemy_lock_sprite.rotation = 0
-				enemy_lock_sprite.play("locking")
-			else:
-				enemy_lock_sprite.visible = true
-				var direction_to_enemy = self.global_position.direction_to(enemy_tracked.global_position)
-				enemy_lock_sprite.global_position = global_position + 200 * direction_to_enemy
-				enemy_lock_sprite.rotation = direction_to_enemy.angle()
-				enemy_lock_sprite.play("arrow")
-		else:
-			enemy_lock_sprite.visible = false
-	else:
-		enemy_lock_sprite.visible = false
-
-	# Handle Interactable
-	interaction_icon.visible = not interacting_with.is_empty()
-
-	if operatable:
-		# Handle Shoot
-		if Input.is_action_just_pressed("shoot") and shooting_timer.is_stopped():
-			shoot(BulletType.NormalBullet, bullet_distribution, bullet_num)
-			if bullet_distribution == DistributionType.Serial:
-				shooting_timer.start(firedelay * bullet_num)
-			else:
-				shooting_timer.start(firedelay)
-		if Input.is_action_just_pressed("shoot_sub") and sub_shooting_timer.is_stopped():
-			shoot_sub()
-			sub_shooting_timer.start(sub_shoot_cd)
-
-		# Handle Interact
-		if Input.is_action_just_pressed("interact") and not interacting_with.is_empty():
-			interacting_with.back().interact(self)
-		# Test
-		if Input.is_action_just_pressed("TestButton"):
-			get_tree().call_group("Bullets", &"duplicate_bullet")
-
-		# Handle Skills
-		if Input.is_action_just_pressed("skill1"):
-			Game.player_stats.current_set.skill_slot1.skill_pressed()
-		
-		if Input.is_action_just_pressed("skill2"):
-			Game.player_stats.current_set.skill_slot2.skill_pressed()
-		
-		if Input.is_action_just_pressed("skill3"):
-			Game.player_stats.current_set.skill_slot3.skill_pressed()
-		
-	if movable:
-		# Add the gravity.
-		# if (gravity < 0 and not is_on_floor()) or (gravity > 0 and not is_on_ceiling()):
-		velocity.y += GRAVITY * delta
-
-		if operatable:
-			var direction = Input.get_axis("move_left", "move_right")
-			if IN_AIR:
-				if direction:
-					facing_direction = direction
-					velocity.x = SPEED * direction
-				else:
-					velocity.x = move_toward(velocity.x, 0, air_friction * delta)
-
-			else:
-				# Handle Jump
-				if CAN_JUMP:
-					if Input.is_action_pressed("jump") or not jump_request_timer.is_stopped():
-						velocity.y = JUMP_VELOCITY
-						state_machine_normal.travel("Jump")
-				elif Input.is_action_pressed("jump"):
-					jump_request_timer.start(0.1)
-
-				if direction:
-					facing_direction = direction
-					velocity.x = SPEED * direction
-				else:
-					velocity.x = move_toward(velocity.x, 0, ground_friction * delta)
-			# Handle graphics
-			if not is_zero_approx(velocity.x):
-				graphics.scale.x = -1 if velocity.x < 0 else 1
-
-		else:
-			velocity.x = move_toward(velocity.x, 0, air_friction * delta)
-
-		move_and_slide()
-		Game.player_stats.player_global_position = global_position
-
-func shoot(bullet:BulletType, distribution:DistributionType = DistributionType.None, num:int = 1, par1:float = -1, par2:float = -1):
-	match bullet:
-		BulletType.NormalBullet:
-			match distribution:
-				DistributionType.None:
-					shoot_normal_bullet()
-				DistributionType.Serial:
-					shoot_normal_bullet()
-					if num > 1:
-						var fire_delay:float = firedelay if par1 == -1 else par1
-						for i:int in range(0, num-1):
-							await get_tree().create_timer(fire_delay).timeout
-							shoot_normal_bullet()
-				DistributionType.Angular:
-					if num == 1:
-						shoot_normal_bullet()
-					elif num > 1:
-						var angle_to_enemy: float
-						if enemy_tracked == null:
-							angle_to_enemy = PI/48
-						else:
-							angle_to_enemy = asin(enemy_tracked.visible_radius / (global_position.distance_to(enemy_tracked.global_position)))
-						var fire_angle:float = clamp(2*angle_to_enemy,0,PI*2/3) if par1==-1 else par1
-						var angle_offset = fire_angle/2
-						for i:int in range(0,num):
-							shoot_normal_bullet(Vector2.ZERO,angle_offset)
-							angle_offset -= fire_angle/(num-1)
-
-				DistributionType.Vertical:
-					if num == 1:
-						shoot_normal_bullet()
-					elif num > 1:
-						var v_distance:float = 50 if par1 == -1 else par1
-						var v_offset = Vector2(v_distance,0)
-						var fire_rotation:float
-						if par2 == -1:
-							if enemy_tracked == null:
-								#var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
-								fire_rotation = PI/2
-							else:
-								var direction_to_enemy = shooting_point.global_position.direction_to(enemy_tracked.global_position)
-								fire_rotation = direction_to_enemy.orthogonal().angle()
-						else:
-							fire_rotation = par2
-						v_offset = v_offset.rotated(fire_rotation)
-						var bullet_offset = v_offset/2
-						for i:int in range(0,num):
-							shoot_normal_bullet(bullet_offset,0)
-							bullet_offset -= v_offset/(num-1)
-
-
-		BulletType.TrackingBullet:
-			pass
-
-
-func shoot_sub() -> void:
-	if enemy_tracked == null:
+func set_inverted(value: bool) -> void:
+	if upside_down == value:
 		return
-	var offset: Vector2
-	for i:int in range(sub_shoot_num):
-		offset = Vector2(40*cos(PI/2-PI*i/(sub_shoot_num-1)), 40*sin(PI/2-PI*i/(sub_shoot_num-1)))
-		var tracking_bullet = preload("res://scenes/bullet/tracking_bullet.tscn").instantiate()
-		tracking_bullet.set_bullet(shooting_point.global_position + offset,\
-		Vector2.ZERO, 200, 10, enemy_tracked, self, shoot_damage)
-		get_tree().current_scene.add_child(tracking_bullet)
+	upside_down = value
+	up_direction = Vector2.DOWN if value else Vector2.UP
+	graphics.flip_v = value
+	graphics.position.y = sprite_ground_offset * (-1.0 if value else 1.0)
+	if value:
+		camera_y = camera_2d.get_screen_center_position().y
+		ceiling_y = camera_y - 360.0 + 66.0
+	velocity.y = 0.0
+	coyote = 0.0
+	jump_buffer = 0.0
 
+func _physics_process(delta: float) -> void:
+	for property in ["hurt_left", "immunity_left", "jump_buffer", "coyote", "fire_left", "drop_left"]:
+		set(property, maxf(0.0, float(get(property)) - delta))
+	set_collision_mask_value(9, drop_left <= 0.0)
+	if playerstats.dead or Game.finishing:
+		velocity = Vector2.ZERO
+		queue_redraw()
+		return
+	var gravity_sign := -1.0 if upside_down else 1.0
+	var on_upper_edge := upside_down and global_position.y <= ceiling_y + body_half_height and velocity.y <= 0
+	var grounded := is_on_floor() or on_upper_edge
+	if grounded:
+		coyote = 0.1
+	if can_act():
+		if Input.is_action_just_pressed("enemy_lock"):
+			playerstats.is_locking = not playerstats.is_locking
+		if Input.is_action_just_pressed("jump"):
+			jump_buffer = 0.1
+		if Input.is_action_just_pressed("drop") and not upside_down:
+			drop_left = 0.22
+			coyote = 0.0
+			global_position.y += 3.0
+		if Input.is_action_just_pressed("skill1"):
+			Game.guard.skill_pressed()
+		if Input.is_action_just_pressed("skill2"):
+			Game.inversion.skill_pressed()
+		if Input.is_action_just_pressed("interact"):
+			interact_nearest()
+	enemy_tracking()
+	var speed := 300.0 * playerstats.speed_multiplier_item * (1.5 if upside_down else 1.0)
+	var can_move: bool = can_act() and (Game.guard.active_left <= 0.0 or upside_down)
+	var axis := Input.get_axis("move_left", "move_right") if can_move else 0.0
+	if hurt_left <= 0.0:
+		velocity.x = move_toward(velocity.x, axis * speed, (2600.0 if grounded else 1600.0) * delta)
+	if axis != 0:
+		facing_direction = signf(axis)
+	if can_move and jump_buffer > 0 and coyote > 0:
+		velocity.y = -560.0 * gravity_sign
+		jump_buffer = 0.0
+		coyote = 0.0
+	if Input.is_action_just_released("jump") and velocity.y * gravity_sign < -220:
+		velocity.y = -220.0 * gravity_sign
+	var gravity_scale := playerstats.gravity_multiplier_item if velocity.y * gravity_sign > 0.0 else 1.0
+	velocity.y += 1500.0 * gravity_sign * gravity_scale * delta
+	velocity.y = clampf(velocity.y, -760.0, 760.0)
+	if movable:
+		move_and_slide()
+	if upside_down and global_position.y < ceiling_y + body_half_height:
+		global_position.y = ceiling_y + body_half_height
+		velocity.y = maxf(0.0, velocity.y)
+	if is_instance_valid(Game.room):
+		global_position.x = clampf(global_position.x, 24, Game.room.width - 24)
+	if not upside_down and is_on_floor():
+		last_safe = global_position
+	if global_position.y > 1000.0:
+		global_position = last_safe
+		velocity = Vector2.ZERO
+		receive_damage(15, global_position + Vector2.DOWN)
+		camera_2d.reset_smoothing()
+	if can_act() and Input.is_action_pressed("shoot") and fire_left <= 0:
+		shoot()
+		fire_left = 0.22
+	graphics.flip_h = facing_direction < 0
+	graphics.flip_v = upside_down
+	graphics.position.y = sprite_ground_offset * (-1.0 if upside_down else 1.0)
+	graphics.modulate.a = 0.35 if immunity_left > 0 and int(immunity_left * 16) % 2 == 0 else 1.0
+	var desired_y := camera_y if upside_down else 360.0
+	camera_y = lerpf(camera_y, desired_y, minf(1, delta * 6))
+	var room_width: float = Game.room.width if is_instance_valid(Game.room) else 1280
+	var center_limit := maxf(640.0, room_width - 640.0)
+	# Keep the camera still while the player changes direction near its current
+	# center. It only follows after the player leaves the horizontal deadzone,
+	# which prevents the old left/right look-ahead target from oscillating.
+	var offset := global_position.x - camera_x
+	if absf(offset) > camera_deadzone:
+		var desired_x := global_position.x - signf(offset) * camera_deadzone
+		if absf(velocity.x) > 24.0 and camera_look_ahead > 0.0:
+			desired_x += signf(velocity.x) * camera_look_ahead
+		camera_x = move_toward(camera_x, _camera_limit_x(desired_x), camera_follow_speed * delta)
+	camera_x = clampf(camera_x, 640.0, center_limit)
+	camera_2d.global_position = Vector2(camera_x, camera_y)
+	playerstats.player_global_position = global_position
+	queue_redraw()
+
+func _camera_limit_x(value: float) -> float:
+	var room_width: float = Game.room.width if is_instance_valid(Game.room) else 1280.0
+	return clampf(value, 640.0, maxf(640.0, room_width - 640.0))
 
 func enemy_tracking() -> void:
-	var camera = get_tree().current_scene.get_node("Player/Camera2D") as Camera2D
-
-	for enemy in get_tree().get_nodes_in_group("Monsters"):
-		if enemy:
-			if is_in_sight(enemy,camera) and not enemies_in_sight.has(enemy):
-				enemies_in_sight.append(enemy)
-			elif not is_in_sight(enemy,camera) and enemies_in_sight.has(enemy):
-				enemies_in_sight.erase(enemy)
-	enemies_in_sight.erase(null)
-
-	for enemy in enemies_in_sight:
-		if enemy:
-			if is_in_camera(enemy,camera) and not enemies_in_camera.has(enemy):
-				enemies_in_camera.append(enemy)
-			elif not is_in_camera(enemy,camera) and enemies_in_camera.has(enemy):
-				enemies_in_camera.erase(enemy)
-	enemies_in_camera.erase(null)
-
-	# return the nearest visible enemy node
-	if enemies_in_sight.is_empty():
-		enemy_tracked = null
+	enemy_tracked = null
+	if not playerstats.is_locking:
 		return
-	else:
-		if not enemies_in_camera.is_empty():
-			enemies_in_camera.sort_custom(sort_by_distance_to_player)
-			for enemy in enemies_in_camera:
-				if enemy:
-					if visible_detection.visible_detect(enemy, enemy.visible_radius):
-						enemy_tracked = enemy
-						return
-		else:
-			enemies_in_sight.sort_custom(sort_by_distance_to_player)
-			for enemy in enemies_in_sight:
-				if enemy:
-					if visible_detection.visible_detect(enemy, enemy.visible_radius):
-						enemy_tracked = enemy
-						return
-		enemy_tracked == null
+	var best := INF
+	for enemy in get_tree().get_nodes_in_group("combat_enemies"):
+		if not is_instance_valid(enemy) or enemy.dead or not enemy.targetable:
+			continue
+		var distance := global_position.distance_squared_to(enemy.global_position)
+		if distance < best and in_view(enemy.global_position) and clear_sight(enemy.global_position):
+			best = distance
+			enemy_tracked = enemy
 
+func in_view(point: Vector2) -> bool:
+	return Rect2(camera_2d.get_screen_center_position() - Vector2(620, 340), Vector2(1240, 680)).has_point(point)
 
+func clear_sight(point: Vector2) -> bool:
+	var query := PhysicsRayQueryParameters2D.create(global_position, point, 32)
+	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
-func _on_shooting_timer_timeout() -> void:
-	if Input.is_action_pressed("shoot"):
-		shoot(BulletType.NormalBullet, bullet_distribution, bullet_num)
-		shooting_timer.start(firedelay)
+func shoot() -> void:
+	var direction := Vector2(facing_direction, 0)
+	if is_instance_valid(enemy_tracked):
+		direction = global_position.direction_to(enemy_tracked.global_position)
+	var damage := 8.0 * playerstats.damage_multipler_item * (playerstats.inversion_damage if upside_down else 1.0)
+	spawn_shot(direction, damage)
+	if Game.run.rng.randf() < playerstats.extra_shot_chance:
+		spawn_shot(direction.rotated(0.09), damage)
+	shot_count += 1
+	Game.sound("shoot")
 
+func spawn_shot(direction: Vector2, damage: float) -> void:
+	var bullet := CombatBullet.new()
+	bullet.position = global_position + direction * 24
+	bullet.velocity = direction * 880
+	bullet.damage = damage
+	bullet.friendly = true
+	get_parent().add_child(bullet)
 
-func _on_sub_shooting_timer_timeout() -> void:
-	if Input.is_action_pressed("shoot_sub"):
-		shoot_sub()
-		sub_shooting_timer.start(sub_shoot_cd)
+func receive_damage(amount: float, source: Vector2) -> bool:
+	if playerstats.dead or immunity_left > 0 or Game.guard.active_left > 0 or invincible or Game.transitioning:
+		return false
+	immunity_left = 0.8
+	hurt_left = 0.12
+	velocity = Vector2(160.0 * (1.0 if global_position.x >= source.x else -1.0), 100.0 if upside_down else -130.0)
+	playerstats.take_damage(amount * (1.0 - playerstats.damage_reduction_rate_item))
+	Game.sound("hurt")
+	return true
 
+func interact_nearest() -> void:
+	var closest: Node2D
+	var distance := 90.0
+	for object in get_tree().get_nodes_in_group("world_interactions"):
+		var current := global_position.distance_to(object.global_position)
+		if current < distance:
+			distance = current
+			closest = object
+	if is_instance_valid(closest):
+		closest.interact(self)
 
-func _on_hurt_box_hurt(hitbox: HitBox) -> void:
-	state_machine.travel("Hurt")
-	# animation_player_extra.play("HurtEffect")
+func add_item(id: int) -> void:
+	Game.acquire_item(id)
 
-	playerstats.health -= hitbox.damage
-
-
-func shoot_normal_bullet(position_offset:Vector2 = Vector2.ZERO, angle_offset:float = 0):
-	var normal_bullet = preload("res://scenes/bullet/normal_bullet.tscn").instantiate()
-	if playerstats.is_locking and not (enemy_tracked == null):
-		var direction_to_enemy:Vector2 = shooting_point.global_position.direction_to(enemy_tracked.global_position)
-		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
-		direction_to_enemy.rotated(angle_offset), 800, 10, enemy_tracked, self, shoot_damage)
-	else:
-		#var direction_to_mouse:Vector2 = shooting_point.global_position.direction_to(get_global_mouse_position())
-		normal_bullet.set_bullet(shooting_point.global_position + position_offset ,\
-		Vector2(facing_direction,0).rotated(angle_offset), 800, 10, null, self, shoot_damage)
-	get_tree().current_scene.add_child(normal_bullet)
-
-#func reset_item_effects():
-	#damage_item				= 0.0
-
-	#dodge_time_multipler		= 1.0
-	#cooldown_multipler			= 1.0
-	#damage_multipler_item		= 1.0
-	#damage_reduction_rate 		= 0.0
-	#speed_multiplier 			= 1.0
-	#gravity_multiplier 		= 1.0
-	#jump_velocity_multipler	= 1.0
-
-
-func is_in_camera(node: Node2D, camera: Camera2D) -> bool:
-	var viewport_size = get_viewport_rect().size
-	var camera_rect = Rect2(camera.get_screen_center_position() - viewport_size*0.5 / camera.zoom, viewport_size / camera.zoom)
-	if node is BaseMonster:
-		var monster_hurtbox = node.get_node("HurtBox") as HurtBox
-		if HurtBox:
-			var monster_hurtbox_area = monster_hurtbox.get_child(0) as CollisionShape2D
-			var monster_hurtbox_rect = Rect2(
-				monster_hurtbox_area.shape.get_rect().position + monster_hurtbox.position + node.global_position,
-				monster_hurtbox_area.shape.get_rect().size
-				)
-			if monster_hurtbox_area:
-				return camera_rect.has_point(node.global_position)\
-				or camera_rect.intersects(monster_hurtbox_rect)
-	return camera_rect.has_point(node.global_position)
-
-func add_item(itemID: int):
-	map_items_bar.add_item(itemID)
-
-func is_in_sight(node: Node2D, camera: Camera2D) -> bool:
-	var sight_rect = Rect2(camera.get_screen_center_position() - viewsize * 0.5, viewsize)
-	return sight_rect.has_point(node.global_position)
-
-
-
-func sort_by_distance_to_player(a,b) -> bool:
-	if not a or not a is Node2D: return false
-	if not b or not b is Node2D: return true
-	return (self.global_position.distance_squared_to(a.global_position) < self.global_position.distance_squared_to(b.global_position))
+func _draw() -> void:
+	if Game.guard.active_left > 0:
+		draw_arc(Vector2.ZERO, 36, 0, TAU, 40, Color("#a1e8ef"), 3)
+	if is_instance_valid(enemy_tracked):
+		var point := to_local(enemy_tracked.global_position)
+		draw_arc(point, 33, 0, TAU, 24, Color(0.7, 0.95, 0.9, 0.75), 1.5)
+	if upside_down:
+		# Keep the authored support guide just above the collision edge so it
+		# does not visually cut through the inverted character's head.
+		var support_y := ceiling_y - 8.0
+		var left := to_local(Vector2(camera_2d.get_screen_center_position().x - 635, support_y))
+		var right := left + Vector2(1270, 0)
+		draw_line(left, right, Color(0.84, 0.58, 0.86, 0.7), 2)
+		for i in 32:
+			var p := left + Vector2(i * 40, 0)
+			draw_line(p, p + Vector2(9, -6), Color(0.85, 0.58, 0.86, 0.5), 1)

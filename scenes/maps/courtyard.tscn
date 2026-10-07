@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/demo_room.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/world_interaction.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/props/room_backdrop.tscn" id="3"]
+[node name="courtyard" type="Node2D"]
+script = ExtResource("1")
+room_id = "courtyard"
+[node name="RoomBackdrop" parent="." instance=ExtResource("3")]
+room_width = 1280.0
+[node name="StartGate" type="Node2D" parent="."]
+metadata/scene_authored = true
+position = Vector2(440, 577)
+script = ExtResource("2")
+kind = "start"
+title = "踏入蝶迹"
+detail = "F 开始一局新的旅程"
+[node name="QuitGate" type="Node2D" parent="."]
+metadata/scene_authored = true
+position = Vector2(1120, 577)
+script = ExtResource("2")
+kind = "quit"
+title = "离开"
+detail = "F 退出游戏"

@@ -1,28 +1,13 @@
 extends Skill
-
 func _init() -> void:
-	super()
 	id = 2
-	cooldown = 6.0
-	duration = 3.0
-	Name = "逆符「天地有用」"
+	Name = "天地有用"
+	cooldown = 12.0
+	duration = 6.0
 	cancelable = true
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta) -> void:
-	pass
-
 func effect() -> void:
-	super()
-	player.upside_down = true
-	player.speed_multiplier_skill = 1.5
-
+	player.set_inverted(true)
+	Game.sound("invert")
 func deffect() -> void:
-	super()
-	player.upside_down = false
-	player.speed_multiplier_skill = 1
+	if is_instance_valid(player):
+		player.set_inverted(false)

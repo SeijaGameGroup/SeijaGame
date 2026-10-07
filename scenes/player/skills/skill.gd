@@ -1,61 +1,48 @@
 class_name Skill
 extends Node
 
-@export var id				: int
-@export var cooldown 		: float
-@export var duration 		: float
-@export var Name				: StringName
-@export var description		: StringName
-@export var cancelable		: bool
-
-var player : Player:
-	get:
-		return Game.player_stats.player
-
-var cooldown_timer : Timer
-var duration_timer : Timer
-
-var previous_cooldown : int = 0
-signal cooldown_changed(cooldown: int)
-
-var available : bool :
-	get:
-		if not cooldown_timer:
-			await ready
-		return cooldown_timer.is_stopped()
-
-func _init(player : Player = null) -> void:
-	cooldown_timer = Timer.new()
-	cooldown_timer.one_shot = true
-	add_child(cooldown_timer)
-
-	duration_timer = Timer.new()
-	duration_timer.one_shot = true
-	add_child(duration_timer)
-	
-	duration_timer.timeout.connect(deffect)
+signal cooldown_changed(value: int)
+@export var id := 0
+@export var cooldown := 5.0
+@export var duration := 1.0
+@export var Name: StringName
+@export var description: StringName
+@export var cancelable := false
+var remaining := 0.0
+var active_left := 0.0
+var player: Player:
+	get: return Game.player_stats.player
+var available: bool:
+	get: return remaining <= 0.0
 
 func _physics_process(delta: float) -> void:
-	if not cooldown_timer.is_stopped():
-		var current_cooldown = int(cooldown_timer.time_left)
-		if current_cooldown != previous_cooldown:
-			cooldown_changed.emit(current_cooldown)
-			previous_cooldown = current_cooldown
+	var previous := ceili(remaining)
+	remaining = maxf(0.0, remaining - delta)
+	if previous != ceili(remaining):
+		cooldown_changed.emit(ceili(remaining))
+	if active_left > 0.0:
+		active_left = maxf(0.0, active_left - delta)
+		if active_left == 0.0:
+			deffect()
 
 func skill_pressed() -> void:
-	if cancelable and not duration_timer.is_stopped():
+	if not is_instance_valid(player) or not player.can_act():
+		return
+	if active_left > 0.0 and cancelable:
 		cancel()
 	elif available:
-		cooldown_timer.start(cooldown)
-		duration_timer.start(duration)
+		remaining = cooldown
+		active_left = duration * (Game.player_stats.dodge_time_multipler_item if id == 1 else 1.0)
 		effect()
-	
+
 func effect() -> void:
 	pass
-	
 func deffect() -> void:
 	pass
-
 func cancel() -> void:
-	duration_timer.stop()
+	active_left = 0.0
 	deffect()
+func reset() -> void:
+	cancel()
+	remaining = 0.0
+	cooldown_changed.emit(0)

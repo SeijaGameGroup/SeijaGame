@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TerrainSkin" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/terrain_skin.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/forest_v2/terrain.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+texture = ExtResource("2")

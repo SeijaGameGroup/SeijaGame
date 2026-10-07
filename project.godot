@@ -8,11 +8,15 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
-config/name="demo"
-run/main_scene="uid://rcl1omwlkbqk"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/name="逆旅 · 蝶迹"
+run/main_scene="res://scenes/maps/courtyard.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -21,8 +25,8 @@ Game="*res://scenes/game.tscn"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 
 [input]
@@ -141,7 +145,11 @@ TestButton={
 2d_physics/layer_6="EnvironmentCollisionArea"
 2d_physics/layer_7="BulletCollisionArea"
 2d_physics/layer_8="GravityAffectedItems"
+2d_physics/layer_9="OneWayPlatforms"
 
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.06, 0.1, 0.16, 1)

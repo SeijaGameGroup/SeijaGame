@@ -3,9 +3,11 @@ extends TextureRect
 
 var skill : Skill :
 	set(value):
+		if skill != null and skill.cooldown_changed.is_connected(print_cooldown):
+			skill.cooldown_changed.disconnect(print_cooldown)
 		skill = value
-		skill.cooldown_changed.connect(print_cooldown)
-		skill.cooldown_timer.timeout.connect(print_cooldown)
+		if skill != null:
+			skill.cooldown_changed.connect(print_cooldown)
 
 @onready var cool_down: RichTextLabel = $CoolDown
 
@@ -16,4 +18,5 @@ func _physics_process(delta: float) -> void:
 	pass
 
 func print_cooldown(cooldown: int = -1) -> void:
-	cool_down.text = "%d" % (cooldown+1) if cooldown >= 0 else ""
+	if is_instance_valid(cool_down):
+		cool_down.text = "%d" % cooldown if cooldown > 0 else ""
