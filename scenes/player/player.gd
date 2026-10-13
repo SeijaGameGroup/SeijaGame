@@ -32,6 +32,7 @@ var shot_count := 0
 @onready var graphics: Sprite2D = $Graphics
 @onready var camera_2d: Camera2D = $Camera2D
 @onready var playerstats: PlayerStats = Game.player_stats
+@onready var combat: PlayerCombat = $Combat
 var CAN_JUMP: bool:
 	get: return is_on_floor()
 var IN_AIR: bool:
@@ -88,11 +89,15 @@ func _physics_process(delta: float) -> void:
 			Game.guard.skill_pressed()
 		if Input.is_action_just_pressed("skill2"):
 			Game.inversion.skill_pressed()
+		if Input.is_action_just_pressed("skill3"):
+			Game.revolution.skill_pressed()
+		if Input.is_action_just_pressed("dodge"):
+			combat.dash()
 		if Input.is_action_just_pressed("interact"):
 			interact_nearest()
 	enemy_tracking()
 	var speed := 300.0 * playerstats.speed_multiplier_item * (1.5 if upside_down else 1.0)
-	var can_move: bool = can_act() and (Game.guard.active_left <= 0.0 or upside_down)
+	var can_move: bool = can_act()
 	var axis := Input.get_axis("move_left", "move_right") if can_move else 0.0
 	if hurt_left <= 0.0:
 		velocity.x = move_toward(velocity.x, axis * speed, (2600.0 if grounded else 1600.0) * delta)
@@ -107,6 +112,8 @@ func _physics_process(delta: float) -> void:
 	var gravity_scale := playerstats.gravity_multiplier_item if velocity.y * gravity_sign > 0.0 else 1.0
 	velocity.y += 1500.0 * gravity_sign * gravity_scale * delta
 	velocity.y = clampf(velocity.y, -760.0, 760.0)
+	if combat.dash_left > 0.0:
+		velocity = Vector2(combat.dash_direction * Game.balance.dash_speed, 0.0)
 	if movable:
 		move_and_slide()
 	if upside_down and global_position.y < ceiling_y + body_half_height:
@@ -123,7 +130,7 @@ func _physics_process(delta: float) -> void:
 		camera_2d.reset_smoothing()
 	if can_act() and Input.is_action_pressed("shoot") and fire_left <= 0:
 		shoot()
-		fire_left = 0.22
+		fire_left = combat.shot_interval()
 	graphics.flip_h = facing_direction < 0
 	graphics.flip_v = upside_down
 	graphics.position.y = sprite_ground_offset * (-1.0 if upside_down else 1.0)
@@ -171,31 +178,21 @@ func clear_sight(point: Vector2) -> bool:
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 func shoot() -> void:
-	var direction := Vector2(facing_direction, 0)
-	if is_instance_valid(enemy_tracked):
-		direction = global_position.direction_to(enemy_tracked.global_position)
-	var damage := 8.0 * playerstats.damage_multipler_item * (playerstats.inversion_damage if upside_down else 1.0)
-	spawn_shot(direction, damage)
-	if Game.run.rng.randf() < playerstats.extra_shot_chance:
-		spawn_shot(direction.rotated(0.09), damage)
-	shot_count += 1
-	Game.sound("shoot")
+	combat.shoot()
 
 func spawn_shot(direction: Vector2, damage: float) -> void:
-	var bullet := CombatBullet.new()
-	bullet.position = global_position + direction * 24
-	bullet.velocity = direction * 880
-	bullet.damage = damage
-	bullet.friendly = true
-	get_parent().add_child(bullet)
+	combat.spawn_shot(direction, damage)
 
 func receive_damage(amount: float, source: Vector2) -> bool:
-	if playerstats.dead or immunity_left > 0 or Game.guard.active_left > 0 or invincible or Game.transitioning:
+	if playerstats.dead or immunity_left > 0 or Game.guard.active_left > 0 or combat.dash_left > 0 or invincible or Game.transitioning:
 		return false
 	immunity_left = 0.8
 	hurt_left = 0.12
 	velocity = Vector2(160.0 * (1.0 if global_position.x >= source.x else -1.0), 100.0 if upside_down else -130.0)
-	playerstats.take_damage(amount * (1.0 - playerstats.damage_reduction_rate_item))
+	var damage: float = amount * Game.balance.enemy_damage_multiplier * (1.0 - playerstats.damage_reduction_rate_item)
+	Game.run.damage_taken += damage
+	Game.run.combo = 0
+	playerstats.take_damage(damage)
 	Game.sound("hurt")
 	return true
 

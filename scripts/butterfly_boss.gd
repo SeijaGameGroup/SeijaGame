@@ -10,7 +10,7 @@ var clock := 0.0
 var attack_index := 0
 var aim := Vector2.ZERO
 var origin := Vector2.ZERO
-var sprite: Sprite2D
+@onready var sprite: AnimatedSprite2D = $Graphics
 var hit_flash := 0.0
 var attack_kind := 0
 var battle_time := 0.0
@@ -19,16 +19,11 @@ func _ready() -> void:
 	add_to_group("combat_enemies")
 	collision_layer = 2
 	collision_mask = 32
-	var shape := CollisionShape2D.new()
-	var circle := CircleShape2D.new()
-	circle.radius = 49
-	shape.shape = circle
-	add_child(shape)
-	sprite = Sprite2D.new()
-	sprite.texture = load("res://assets/pictures/butterfly_sprite.png")
-	sprite.hframes = 2
-	sprite.scale = Vector2(1.65, 1.65)
-	add_child(sprite)
+	max_health = Game.balance.boss_health * (1.35 if Game.run.challenge else 1.0)
+	health = max_health
+	sprite.sprite_frames = preload("res://resources/enemies/butterfly_frames.tres")
+	sprite.scale = Vector2.ONE * (145.0 / sprite.sprite_frames.get_frame_texture(&"default", 0).get_height())
+	sprite.play()
 	origin = global_position
 
 func activate() -> void:
@@ -45,7 +40,7 @@ func _physics_process(delta: float) -> void:
 	battle_time += delta
 	clock -= delta
 	hit_flash = maxf(0, hit_flash - delta)
-	sprite.frame = int(Time.get_ticks_msec() / 130) % 2
+
 	sprite.modulate = Color("#ebafdc") if phase == 2 else Color.WHITE
 	if hit_flash > 0:
 		sprite.modulate = Color("#ffdbbd")

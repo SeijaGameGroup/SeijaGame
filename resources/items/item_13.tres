@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/progression/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/gameplay_v3/icons.png" id="2"]
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("2")
+region = Rect2(0, 940.5, 313.5, 313.5)
+[resource]
+script = ExtResource("1")
+id = 13
+title = "蝶心结"
+description = "逆势能量获取 +25%（最多 +100%）"
+category = "革命"
+price = 26
+icon = SubResource("icon")
+energy_bonus = 0.25

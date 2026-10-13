@@ -1,0 +1,17 @@
+[gd_resource type="SpriteFrames" load_steps=4 format=3]
+[ext_resource type="Texture2D" path="res://assets/generated/gameplay_v3/enemies.png" id="1"]
+[sub_resource type="AtlasTexture" id="frame0"]
+atlas = ExtResource("1")
+region = Rect2(0, 22, 566, 420)
+margin = Rect2(0, 0, 0, 0)
+[sub_resource type="AtlasTexture" id="frame1"]
+atlas = ExtResource("1")
+region = Rect2(577, 22, 288, 420)
+margin = Rect2(139, 0, 278, 0)
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("frame0")}, {"duration": 1.0, "texture": SubResource("frame1")}],
+"loop": true,
+"name": &"default",
+"speed": 6.0
+}]

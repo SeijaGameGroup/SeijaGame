@@ -15,7 +15,7 @@ var home := Vector2.ZERO
 var aim := Vector2.ZERO
 var attack_direction := Vector2.LEFT
 var hit_flash := 0.0
-var sprite: Sprite2D
+@onready var sprite: AnimatedSprite2D = $Graphics
 var tier := 1
 var contact_left := 0.0
 var visible_radius := 22.0
@@ -25,20 +25,12 @@ func _ready() -> void:
 	collision_layer = 2
 	collision_mask = 32 | 256
 	home = position
-	max_health = (72.0 if kind == Kind.KEDAMA else 48.0) + tier * 8.0
+	max_health = (Game.balance.enemy_health[kind] + tier * Game.balance.health_per_tier) * (1.35 if Game.run.challenge else 1.0)
 	health = max_health
-	var shape := CollisionShape2D.new()
-	var circle := CircleShape2D.new()
-	circle.radius = 21.0
-	shape.shape = circle
-	add_child(shape)
-	sprite = Sprite2D.new()
-	var textures := ["butterfly_sprite.png", "kendama.png", "spirit2.png", "spirit1.png"]
-	sprite.texture = load("res://assets/pictures/" + textures[kind])
-	sprite.scale = Vector2(0.64, 0.64)
-	if kind == Kind.BUTTERFLY:
-		sprite.hframes = 2
-	add_child(sprite)
+	var visuals: Array[SpriteFrames] = [preload("res://resources/enemies/butterfly_frames.tres"), preload("res://resources/enemies/kedama_frames.tres"), preload("res://resources/enemies/red_frames.tres"), preload("res://resources/enemies/green_frames.tres")]
+	sprite.sprite_frames = visuals[kind]
+	sprite.scale = Vector2.ONE * (62.0 / sprite.sprite_frames.get_frame_texture(&"default", 0).get_height())
+	sprite.play()
 	clock += fmod(position.x, 11.0) * 0.06
 
 func sees_player() -> bool:
@@ -56,8 +48,6 @@ func _physics_process(delta: float) -> void:
 	clock -= delta
 	hit_flash = maxf(0, hit_flash - delta)
 	contact_left = maxf(0, contact_left - delta)
-	if kind == Kind.BUTTERFLY:
-		sprite.frame = int(Time.get_ticks_msec() / 160) % 2
 	sprite.modulate = Color("#ffffff") if hit_flash <= 0 else Color("#ffbcb8")
 	sprite.flip_h = player.global_position.x < global_position.x
 	if kind == Kind.KEDAMA:
@@ -141,12 +131,14 @@ func receive_damage(amount: float, _source: Vector2) -> bool:
 		return false
 	health = maxf(0, health - amount)
 	hit_flash = 0.1
+	Game.register_hit(global_position, amount)
 	Game.sound("hit")
 	if health == 0:
 		dead = true
 		targetable = false
 		collision_layer = 0
 		Game.run.kills += 1
+		Game.register_kill()
 		var pickup = load("res://scripts/world_pickup.gd").new()
 		pickup.position = global_position
 		pickup.amount = Game.run.rng.randi_range(7, 11)

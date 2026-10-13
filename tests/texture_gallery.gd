@@ -1,6 +1,8 @@
 extends Node
 
 func _ready() -> void:
+	Game.profile.persistence_enabled = false
+	Game.rewards.presentation_enabled = false
 	run.call_deferred()
 
 func frames(count: int) -> void:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/progression/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/gameplay_v3/icons.png" id="2"]
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("2")
+region = Rect2(627, 627, 313.5, 313.5)
+[resource]
+script = ExtResource("1")
+id = 11
+title = "返月镜"
+description = "反弹伤害 +50%，反弹弹幕穿透 1 人"
+category = "反击"
+price = 28
+icon = SubResource("icon")
+reflection_bonus = 0.5

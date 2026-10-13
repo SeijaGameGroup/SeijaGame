@@ -1,5 +1,7 @@
 extends Node
 func _ready() -> void:
+	Game.profile.persistence_enabled = false
+	Game.rewards.presentation_enabled = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	run.call_deferred()
 func frames(count: int) -> void:
@@ -48,7 +50,7 @@ func run() -> void:
 	await frames(50)
 	Game.room.start_boss()
 	Game.player_stats.player.position = Vector2(670, 581)
-	Game.room.boss.receive_damage(2500, Vector2.ZERO)
+	Game.room.boss.receive_damage(Game.room.boss.max_health * 0.55, Vector2.ZERO)
 	await frames(220)
 	await capture("05-boss")
 	Game.room.boss.receive_damage(3000, Vector2.ZERO)

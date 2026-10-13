@@ -3,6 +3,8 @@ var failures := 0
 var checks := 0
 
 func _ready() -> void:
+	Game.profile.persistence_enabled = false
+	Game.rewards.presentation_enabled = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	run_tests.call_deferred()
 
@@ -50,12 +52,29 @@ func run_tests() -> void:
 	check(Game.run.active and not Game.transitioning, "new run enters first combat room")
 	var player := Game.player_stats.player
 	check(is_instance_valid(player) and player.can_act(), "player binds to current run")
+	# Rewards pause the run and accept both keyboard-style selection and button calls.
+	Game.rewards.presentation_enabled = true
+	Game.rewards.resume_pending()
+	await frames(3)
+	check(Game.rewards.active and Game.rewards.choices.size() == 3 and get_tree().paused, "reward offer pauses with three deterministic choices")
+	var reward_choice: int = Game.rewards.choices[0]
+	Game.rewards.choose(0)
+	await frames(2)
+	check(not Game.rewards.active and not get_tree().paused and Game.run.items.get(reward_choice, 0) == 1 and Game.run.collected.has("starter"), "reward selection applies exactly one item and resumes")
+	Game.rewards.presentation_enabled = false
 	var counts := {1: 99, 2: 99, 3: 2, 4: 2, 5: 99, 7: 99, 8: 99, 9: 2}
 	Game.player_stats.recalculate(counts)
 	check(Game.player_stats.max_health == 190 and is_equal_approx(Game.player_stats.damage_multipler_item, 1.3), "health and damage items calculate additively")
 	check(Game.player_stats.damage_reduction_rate_item <= 0.56 and Game.player_stats.extra_shot_chance <= 0.8 and Game.player_stats.gravity_multiplier_item >= 0.4, "item stacking is bounded")
 	Game.player_stats.recalculate(counts)
 	check(Game.player_stats.max_health == 190, "recalculation is idempotent")
+	Game.player_stats.recalculate({6: 1, 12: 1})
+	var bullets_before: int = get_tree().get_nodes_in_group("combat_bullets").size()
+	player.combat.shoot()
+	var spawned_bullets: Array = get_tree().get_nodes_in_group("combat_bullets").slice(bullets_before)
+	check(spawned_bullets.size() == 3 and spawned_bullets.all(func(bullet: CombatBullet) -> bool: return bullet.friendly and bullet.pierces_left == 1), "piercing and side-shot items modify spawned projectiles")
+	for bullet: Node in spawned_bullets:
+		bullet.queue_free()
 	Game.player_stats.recalculate({})
 	Game.guard.skill_pressed()
 	var before := Game.player_stats.health
@@ -68,6 +87,11 @@ func run_tests() -> void:
 	await frames(10)
 	check(player.hurt_left == 0 and player.immunity_left > 0 and player.can_act(), "control returns before immunity expires")
 	await frames(50)
+	# Dash is a short, reusable invulnerability window for recovery and repositioning.
+	player.facing_direction = 1.0
+	player.combat.dash()
+	check(player.combat.dash_left > 0.0 and not player.receive_damage(20, player.position), "dash grants brief damage immunity")
+	await frames(20)
 	Game.guard.reset()
 	Game.inversion.skill_pressed()
 	await frames(100)
@@ -79,6 +103,17 @@ func run_tests() -> void:
 	check(Game.guard.active_left > 0 and player.upside_down, "guard and inversion coexist")
 	Game.inversion.cancel()
 	check(Game.guard.active_left > 0 and not player.upside_down, "cancel inversion preserves guard")
+	Game.run.energy = 100.0
+	Game.revolution.skill_pressed()
+	check(Game.run.energy == 0.0 and Game.revolution.active_left > 0.0, "full energy activates revolution and consumes charge")
+	Game.revolution.reset()
+	var reflected := CombatBullet.new()
+	reflected.position = player.global_position
+	reflected.velocity = Vector2.LEFT * 240.0
+	get_tree().current_scene.add_child(reflected)
+	reflected.reflect(player)
+	check(reflected.friendly and reflected.reflected and reflected.damage >= 24.0, "guard reflection converts hostile bullet into friendly fire")
+	reflected.queue_free()
 	var cooldown := Game.inversion.remaining
 	await visit("shop1")
 	check(Game.inversion.active_left == 0 and Game.inversion.remaining > 0 and Game.inversion.remaining < cooldown, "transition cancels duration but preserves cooldown")
@@ -179,7 +214,7 @@ func run_tests() -> void:
 	Game.room.start_boss()
 	var boss: Node2D = Game.room.boss
 	check(boss.targetable and boss.stage != "dormant", "F core activation starts boss")
-	boss.receive_damage(2500, Vector2.ZERO)
+	boss.receive_damage(boss.max_health * 0.55, Vector2.ZERO)
 	check(boss.phase == 2 and boss.stage == "phase", "boss transitions at half health")
 	await frames(130)
 	boss.receive_damage(3000, Vector2.ZERO)
@@ -189,7 +224,8 @@ func run_tests() -> void:
 	check(Game.run.outcome == "胜利" and Game.run.room_id == "courtyard", "victory returns to scene-based courtyard")
 	Game.new_run(81)
 	await frames(45)
-	check(Game.run.items.is_empty() and Game.run.collected.is_empty() and Game.player_stats.health == 150 and Game.guard.remaining == 0 and Game.inversion.remaining == 0, "restart fully resets the run")
+	check(Game.run.items.is_empty() and Game.run.collected.is_empty() and Game.player_stats.health == 150 and Game.run.energy == 50.0 and Game.run.combo == 0 and Game.run.revives_left == 1 and Game.guard.remaining == 0 and Game.inversion.remaining == 0, "restart fully resets the run")
+	Game.run.revives_left = 0
 	Game.player_stats.take_damage(999)
 	Game.finish_run(true)
 	await frames(95)
@@ -197,5 +233,9 @@ func run_tests() -> void:
 	Game.new_run(82)
 	await frames(45)
 	check(Game.run.active and not Game.player_stats.dead, "restart after death works")
+	Game.player_stats.health = 1.0
+	Game.player_stats.player.receive_damage(999, Game.player_stats.player.position)
+	await frames(4)
+	check(Game.run.revives_left == 0 and Game.player_stats.health > 0.0 and not Game.player_stats.dead, "once-per-run revive lowers failure cost")
 	print("RESULT: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

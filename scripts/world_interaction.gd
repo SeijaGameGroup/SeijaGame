@@ -1,7 +1,7 @@
 @tool
 class_name WorldInteraction
 extends Node2D
-@export_enum("exit", "start", "quit", "shop", "item", "heal", "boss", "win") var kind: String = "exit"
+@export_enum("exit", "start", "quit", "shop", "item", "heal", "boss", "win", "reward") var kind: String = "exit"
 @export var title: String = ""
 @export_multiline var detail: String = ""
 @export var target: String = ""
@@ -58,6 +58,8 @@ func interact(_player: Player) -> void:
 			get_tree().quit()
 		"shop":
 			say(Game.purchase(key, item_id, price, healing))
+		"reward":
+			Game.rewards.offer(key, title + " · 选择一件宝物")
 		"item":
 			if Game.acquire_item(item_id):
 				Game.run.collected[key] = true

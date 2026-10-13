@@ -4,36 +4,38 @@ const ROOM_IDS := ["courtyard", "regular_level1", "regular_level2", "regular_lev
 @onready var player_stats: PlayerStats = $PlayerStats
 @onready var color_rect: ColorRect = $ColorRect
 var run := RunState.new()
-var guard: Skill
-var inversion: Skill
+@export var balance: RunBalance
+@onready var guard: Skill = $Guard
+@onready var inversion: Skill = $Inversion
+@onready var revolution: Skill = $Revolution
+@onready var rewards: RewardController = $Rewards
+@onready var profile: JourneyProfile = $Profile
+@onready var feedback: CombatFeedback = $FeedbackWorld/Feedback
+var notice: String = ""
+var notice_left: float = 0.0
 var transitioning := false
 var finishing := false
 var room: Node2D
-var music: AudioStreamPlayer
+@onready var music: AudioStreamPlayer = $Music
 var music_path := ""
 var sound_cache: Dictionary = {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	guard = load("res://scenes/player/skills/skillID1.gd").new()
-	inversion = load("res://scenes/player/skills/skillID2.gd").new()
-	for skill in [guard, inversion]:
-		add_child(skill)
-		skill.process_mode = Node.PROCESS_MODE_PAUSABLE
-	player_stats.die.connect(func(): finish_run(false))
+	guard.cooldown = balance.guard_cooldown
+	inversion.cooldown = balance.inversion_cooldown
+	inversion.duration = balance.inversion_duration
+	revolution.duration = balance.revolution_duration
+	$RewardLayer/RewardScreen.bind_rewards(rewards)
+	player_stats.die.connect(_on_player_died)
 	player_stats.reset_run()
-	music = AudioStreamPlayer.new()
-	music.volume_db = -20.0
-	add_child(music)
 	music.finished.connect(func(): music.play())
 	# Keep the existing device bindings; add only the missing keyboard actions.
 	add_key("jump", KEY_W)
 	add_key("drop", KEY_S)
-	var hud := CanvasLayer.new()
-	hud.layer = 20
-	add_child(hud)
-	hud.add_child(load("res://ui/run_hud.gd").new())
+	add_key("skill3", KEY_I)
+	add_key("dodge", KEY_K)
 
 func add_key(action: String, key: Key) -> void:
 	if not InputMap.has_action(action):
@@ -44,23 +46,32 @@ func add_key(action: String, key: Key) -> void:
 		InputMap.action_add_event(action, event)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("settings") and not event.is_echo() and not transitioning:
+	if event.is_action_pressed("settings") and not event.is_echo() and not transitioning and not rewards.active:
 		get_tree().paused = not get_tree().paused
 		get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
+	if not get_tree().paused:
+		notice_left = maxf(0.0, notice_left - delta)
 	if run.active and not transitioning and not get_tree().paused:
 		run.elapsed += delta
+		run.combo_left = maxf(0.0, run.combo_left - delta)
+		if run.combo_left == 0.0:
+			run.combo = 0
 
-func new_run(seed_value: int = -1) -> void:
+func new_run(seed_value: int = -1, challenge: bool = false) -> void:
 	if transitioning:
 		return
 	run.reset(seed_value if seed_value >= 0 else int(Time.get_unix_time_from_system() * 1000))
+	run.challenge = challenge and profile.victories > 0
+	rewards.reset()
 	guard.reset()
 	inversion.reset()
+	revolution.reset()
 	player_stats.reset_run()
 	finishing = false
 	enter_room("regular_level1")
+	rewards.offer("starter", "起行 · 选择你的打法", true)
 
 func enter_room(id: String, entry: String = "entry") -> void:
 	if transitioning or not ROOM_IDS.has(id):
@@ -69,6 +80,8 @@ func enter_room(id: String, entry: String = "entry") -> void:
 	get_tree().paused = false
 	guard.cancel()
 	inversion.cancel()
+	revolution.cancel()
+	feedback.clear()
 	if is_instance_valid(player_stats.player):
 		player_stats.player.operatable = false
 	var tween := create_tween()
@@ -92,6 +105,7 @@ func enter_room(id: String, entry: String = "entry") -> void:
 	transitioning = false
 	if is_instance_valid(player_stats.player):
 		player_stats.player.operatable = true
+	rewards.resume_pending()
 
 # Legacy scene hooks remain usable, but official exits use stable room IDs.
 func change_scene(path: String) -> void:
@@ -109,8 +123,11 @@ func _resolve_finish(won: bool) -> void:
 	# Lethal damage on the same physics tick takes precedence over a boss kill.
 	run.outcome = "胜利" if won and not player_stats.dead else "倒下"
 	run.active = false
+	rewards.reset()
+	profile.record_run(run)
 	guard.reset()
 	inversion.reset()
+	revolution.reset()
 	sound("win" if run.outcome == "胜利" else "hurt")
 	await get_tree().create_timer(0.7, false).timeout
 	enter_room("courtyard")
@@ -120,10 +137,49 @@ func acquire_item(id: int) -> bool:
 		return false
 	run.items[id] = int(run.items.get(id, 0)) + 1
 	player_stats.recalculate(run.items)
+	profile.discover(id)
 	if id == 3:
 		player_stats.health += 20
 	sound("buy")
 	return true
+
+func notify(message: String, duration: float = 2.2) -> void:
+	notice = message
+	notice_left = duration
+
+func gain_energy(amount: float) -> void:
+	if revolution.active_left <= 0.0 and run.active:
+		run.energy = clampf(run.energy + amount * player_stats.energy_multiplier, 0.0, 100.0)
+
+func register_hit(at: Vector2, damage: float) -> void:
+	feedback.hit(at, damage)
+	gain_energy(balance.energy_per_hit)
+
+func register_kill() -> void:
+	run.combo += 1
+	run.combo_left = 4.0
+	run.best_combo = maxi(run.best_combo, run.combo)
+	gain_energy(balance.energy_per_kill)
+	player_stats.health += player_stats.kill_heal
+	if run.combo % 5 == 0:
+		add_points(10)
+		notify("%d 连破！额外 +10 P" % run.combo)
+
+func _on_player_died() -> void:
+	if run.active and run.revives_left > 0 and is_instance_valid(player_stats.player):
+		run.revives_left -= 1
+		player_stats.dead = false
+		player_stats.health = player_stats.max_health * balance.revive_fraction
+		player_stats.player.immunity_left = balance.revive_immunity
+		player_stats.player.hurt_left = 0.0
+		for bullet: Node in get_tree().get_nodes_in_group("combat_bullets"):
+			if not bullet.friendly:
+				bullet.queue_free()
+		feedback.pulse(player_stats.player.global_position, 250.0, Color("96f5d2"))
+		notify("不屈 · 回复一半生命 · 短暂无敌", 3.0)
+		sound("guard")
+		return
+	finish_run(false)
 
 func purchase(key: String, id: int, price: int, healing: float = 0.0) -> String:
 	if run.collected.has(key):

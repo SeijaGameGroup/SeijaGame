@@ -1,26 +1,30 @@
 class_name ItemCatalog
 extends RefCounted
 
-const IDS: Array[int] = [1, 2, 3, 4, 5, 7, 8, 9]
-static var textures: Dictionary = {}
-const DATA := {
-	1: ["量贩型小麻薯", "额外射弹概率 +10%", "连射", 28],
-	2: ["魔女扫帚", "移动速度 +15%", "疾行", 25],
-	3: ["伊吹瓢", "生命上限 +20，回复 20", "生存", 30],
-	4: ["御币", "所有射弹伤害 +15%", "火力", 30],
-	5: ["子安贝", "受到伤害 -8%（上限 56%）", "守护", 28],
-	7: ["闪避布残片", "H 防护时间 +0.25 秒", "防护", 25],
-	8: ["轻身伞", "下落速度 -15%，不影响起跳", "浮游", 22],
-	9: ["逆鳞", "反转期间射弹伤害 +30%", "逆转", 30],
-}
+const IDS: Array[int] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+const ITEMS: Array[ItemData] = [
+	preload("res://resources/items/item_01.tres"),
+	preload("res://resources/items/item_02.tres"),
+	preload("res://resources/items/item_03.tres"),
+	preload("res://resources/items/item_04.tres"),
+	preload("res://resources/items/item_05.tres"),
+	preload("res://resources/items/item_06.tres"),
+	preload("res://resources/items/item_07.tres"),
+	preload("res://resources/items/item_08.tres"),
+	preload("res://resources/items/item_09.tres"),
+	preload("res://resources/items/item_10.tres"),
+	preload("res://resources/items/item_11.tres"),
+	preload("res://resources/items/item_12.tres"),
+	preload("res://resources/items/item_13.tres"),
+]
+static func data(id: int) -> ItemData:
+	return ITEMS[id - 1] if id >= 1 and id <= ITEMS.size() else null
 static func title(id: int) -> String:
-	return DATA[id][0]
+	var item: ItemData = data(id)
+	return item.title if item != null else "未知道具"
 static func description(id: int) -> String:
-	return DATA[id][1]
+	var item: ItemData = data(id)
+	return item.description if item != null else ""
 static func icon(id: int) -> Texture2D:
-	if not textures.has(id):
-		if id <= 5:
-			textures[id] = load("res://assets/pictures/items/itemID%d.png" % id)
-		else:
-			textures[id] = load("res://assets/pictures/" + ("energy.png" if id == 9 else "circle.png"))
-	return textures[id]
+	var item: ItemData = data(id)
+	return item.icon if item != null else null

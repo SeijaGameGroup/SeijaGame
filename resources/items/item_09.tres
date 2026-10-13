@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/progression/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/gameplay_v3/icons.png" id="2"]
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("2")
+region = Rect2(0, 627, 313.5, 313.5)
+[resource]
+script = ExtResource("1")
+id = 9
+title = "逆鳞"
+description = "倒置时射弹伤害 +30%"
+category = "逆转"
+price = 28
+icon = SubResource("icon")
+inversion_bonus = 0.3

@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://daqsxlwjxddkr"]
+[gd_scene load_steps=4 format=3 uid="uid://daqsxlwjxddkr"]
 [ext_resource type="Script" path="res://scripts/demo_room.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/encounter_marker.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/props/room_backdrop.tscn" id="3"]
 [ext_resource type="Script" path="res://scripts/world_interaction.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/props/inversion_cache.tscn" id="cache"]
+[ext_resource type="Script" path="res://scripts/combat/encounter_director.gd" id="encounters"]
 [sub_resource type="RectangleShape2D" id="PlatformA"]
 size = Vector2(240, 12)
 [sub_resource type="RectangleShape2D" id="PlatformB"]
@@ -94,3 +96,9 @@ title = "高处的匣子"
 detail = "F 获得一件道具"
 key = "regular_level3/upper"
 one_way_collision = true
+
+[node name="InversionCache" parent="." instance=ExtResource("cache")]
+position = Vector2(1800, 110)
+
+[node name="Encounters" type="Node" parent="."]
+script = ExtResource("encounters")

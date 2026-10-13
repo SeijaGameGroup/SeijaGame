@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/progression/item_data.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/generated/gameplay_v3/icons.png" id="2"]
+[sub_resource type="AtlasTexture" id="icon"]
+atlas = ExtResource("2")
+region = Rect2(940.5, 313.5, 313.5, 313.5)
+[resource]
+script = ExtResource("1")
+id = 8
+title = "轻身伞"
+description = "下落重力 -15%，不影响起跳"
+category = "浮游"
+price = 20
+icon = SubResource("icon")
+gravity_reduction = 0.15

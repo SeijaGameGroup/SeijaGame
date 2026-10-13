@@ -7,6 +7,7 @@ func _init() -> void:
 	cancelable = true
 func effect() -> void:
 	player.set_inverted(true)
+	player.combat.flip_burst()
 	Game.sound("invert")
 func deffect() -> void:
 	if is_instance_valid(player):

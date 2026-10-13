@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://dqauwk5l6600p"]
+[gd_scene load_steps=6 format=3 uid="uid://dqauwk5l6600p"]
 [ext_resource type="Script" path="res://scenes/player/player.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/generated/forest_v2/seija_sheet.png" id="2"]
 [ext_resource type="Script" path="res://scenes/player/player_sprite.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/combat/player_combat.gd" id="4"]
 [sub_resource type="RectangleShape2D" id="body"]
 size = Vector2(22, 44)
 [node name="Player" type="CharacterBody2D"]
@@ -25,6 +26,8 @@ offset = Vector2(0, -216.25)
 script = ExtResource("3")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("body")
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("4")
 [node name="Camera2D" type="Camera2D" parent="."]
 # The player script owns camera interpolation so bounds and inversion use one
 # deterministic position. Keeping Camera2D's second smoothing pass enabled

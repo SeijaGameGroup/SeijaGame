@@ -168,6 +168,12 @@ func interactable(kind: String, at: Vector2, title: String, detail: String = "",
 
 func exit_door(at: Vector2, title: String, target: String, locked: bool = false) -> void:
 	var node := interactable("exit", at, title, "靠近后按 F 前往", target)
+	if target.begins_with("shop"):
+		node.detail = "路线：消费 P 点，选购构筑道具与治疗"
+	elif target.begins_with("healing"):
+		node.detail = "路线：免费回满生命，再迎接下一幕"
+	elif target == "regular_level2":
+		node.detail = "可选战斗：更多三选一奖励，随后免费治疗"
 	node.locked = locked
 	doors.append(node)
 
@@ -189,7 +195,7 @@ func build_courtyard() -> void:
 	objective = "靠近光门 · F 开始"
 	interactable("start", Vector2(440, 577), "再启旅程" if Game.run.outcome != "" else "踏入蝶迹", "F 开始一局新的旅程")
 	interactable("quit", Vector2(1120, 577), "离开", "F 退出游戏")
-	signpost(135, "A/D 移动 · W 跳跃", "J 射击 · H 防护 · U 反转", 400)
+	signpost(135, "A/D 移动 · W 跳跃", "J 射击 · K 冲刺 · H 弹反 · U 倒置", 400)
 	if Game.run.outcome != "":
 		signpost(650, Game.run.outcome, "%02d:%02d · 击败 %d · %d P" % [int(Game.run.elapsed) / 60, int(Game.run.elapsed) % 60, Game.run.kills, Game.run.total_points], 400)
 	else:
@@ -203,9 +209,9 @@ func build_combat() -> void:
 	# Platforms are authored in each regular_level*.tscn. The room script only places
 	# encounters and exits, so designers can tune jumps without editing code.
 	if tier == 1:
-		signpost(170, "A/D 移动 · W 跳跃", "J 射击 · H 防护 · U 反转")
-		signpost(760, "H 防护", "短暂免伤", 220)
-		signpost(1530, "U 反转", "沿上沿走", 205)
+		signpost(170, "K 冲刺 · 无敌穿行", "J 持续射击 · 每场战斗后选择宝物")
+		signpost(760, "H 弹反", "将敌方射弹变成自己的火力", 220)
+		signpost(1530, "U 倒置爆发", "切换时消弹 + 2 秒增伤 · 上沿有奖励", 205)
 	stages = _scene_stages()
 	if stages.is_empty():
 		stages = [[590.0, [0, 0]], [1420.0, [0, 1, 2]], [2280.0, [0, 1, 2, 3]]]
@@ -232,7 +238,7 @@ func build_combat() -> void:
 	reward.detail = ItemCatalog.description(reward.item_id)
 
 func build_rest() -> void:
-	var next := "boss_room" if room_id.ends_with("2") else "crack1"
+	var next := "crack2" if room_id.ends_with("2") else "crack1"
 	if room_id.begins_with("shop"):
 		objective = "靠近货架 · F 购买"
 		var stock := Game.run.stock(room_id)
@@ -241,7 +247,7 @@ func build_rest() -> void:
 			var node := interactable("shop", Vector2(340 + i * 205, 577), ItemCatalog.title(id), ItemCatalog.description(id))
 			node.item_id = id
 			node.icon_texture = ItemCatalog.icon(id)
-			node.price = ItemCatalog.DATA[id][3]
+			node.price = ItemCatalog.data(id).price
 			node.key = room_id + "/goods/" + str(i)
 		var heal := interactable("shop", Vector2(955, 577), "疗愈露", "回复 55 生命")
 		heal.healing = 55
@@ -255,7 +261,10 @@ func build_rest() -> void:
 		signpost(300, "月光疗愈", "F 恢复生命", 350)
 	else:
 		objective = "裂隙 · F 穿越"
-		signpost(290, "裂隙", "F 穿越", 350)
+		signpost(170, "蝶翼的另一面" if room_id == "crack1" else "黎明前的选择", "不是逃离弹幕，而是把弹幕还给它。\nI 革命：满逆势后反转弹幕，获得爆发火力。", 330)
+		var blessing := interactable("reward", Vector2(620, 577), "裂隙赠礼", "三选一，为下一幕补上构筑")
+		blessing.key = room_id + "/blessing"
+		blessing.icon_texture = ItemCatalog.icon(13)
 		next = "regular_level3" if room_id == "crack1" else "boss_room"
 	exit_door(Vector2(1150, 577), "前往蝶魁" if next == "boss_room" else "继续前行", next)
 
@@ -263,7 +272,7 @@ func build_boss() -> void:
 	objective = "异化核心 · F 挑战"
 	add_solid(Rect2(270, 465, 180, 12), true)
 	add_solid(Rect2(970, 465, 180, 12), true)
-	boss = load("res://scripts/butterfly_boss.gd").new()
+	boss = preload("res://scenes/moster/butterfly_boss.tscn").instantiate()
 	boss.position = Vector2(930, 270)
 	add_child(boss)
 	boss.defeated.connect(boss_defeated)
@@ -279,6 +288,7 @@ func start_boss() -> void:
 	boss.activate()
 
 func boss_defeated() -> void:
+	queue_redraw()
 	done = true
 	objective = "异化之源已被击破。穿过出口，完成这次旅程。"
 	for door in doors:
@@ -288,98 +298,6 @@ func boss_defeated() -> void:
 		door.locked = false
 	signpost(610, "蝶群散去，万宝槌依旧沉默。", "这只是异变的先声。\n正邪抬起头，望向更远的夜空。", 390)
 
-func make_gate(x: float) -> void:
-	gate_x = x
-	gate = StaticBody2D.new()
-	gate.position = Vector2(x, 290)
-	gate.collision_layer = 32
-	gate.collision_mask = 0
-	var collider := CollisionShape2D.new()
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(12, 1000)
-	collider.shape = shape
-	gate.add_child(collider)
-	add_child(gate)
-
-func spawn_encounter() -> void:
-	encounter_active = true
-	var stage: Array = stages[stage_index]
-	var start: float = stage[0]
-	make_gate(start + 660)
-	wave_index = 0
-	wave_count = 3 if int(room_id.right(1)) >= 3 else 2
-	if stages[stage_index].size() > 2 and is_instance_valid(stages[stage_index][2]):
-		var marker = stages[stage_index][2]
-		if marker.wave_count_override > 0:
-			wave_count = marker.wave_count_override
-	if room_id == "regular_level1" and stage_index == 0:
-		wave_count = 1
-	spawn_wave()
-
-func spawn_wave() -> void:
-	wave_delay = 0.0
-	var stage: Array = stages[stage_index]
-	var start: float = stage[0]
-	var lineup: Array = stage[1].duplicate()
-	if wave_index % 2 == 1:
-		lineup.reverse()
-		objective = "蝶障 %d/%d · 波次 %d/%d" % [stage_index + 1, stages.size(), wave_index + 1, wave_count]
-	enemies_left = lineup.size()
-	for i in lineup.size():
-		var enemy := CombatEnemy.new()
-		enemy.kind = lineup[i]
-		enemy.tier = int(room_id.right(1))
-		enemy.position = Vector2(start + 150 + (i % 3) * 145, 581 if enemy.kind == CombatEnemy.Kind.KEDAMA else (365 + (i % 2) * 110))
-		if enemy.position.distance_to(player.position) < 150:
-			enemy.position.x = clampf(player.position.x + (190 if player.position.x < start + 350 else -190), start + 40, start + 600)
-		enemy.defeated.connect(enemy_defeated)
-		add_child(enemy)
-
-func enemy_defeated(_enemy: CombatEnemy) -> void:
-	enemies_left -= 1
-	if enemies_left > 0:
-		return
-	wave_index += 1
-	var recovery = load("res://scripts/world_pickup.gd").new()
-	recovery.position = _enemy.position
-	recovery.amount = 0
-	recovery.healing = 22.0
-	add_child(recovery)
-	if wave_index < wave_count:
-		wave_delay = 1.8
-		objective = "蝶障尚未消散 · 月光碎片恢复生命 · 下一波即将到来"
-		return
-	encounter_active = false
-	if is_instance_valid(gate):
-		gate.queue_free()
-	gate_x = 0
-	stage_index += 1
-	if stage_index >= stages.size():
-		done = true
-		Game.run.rooms[room_id] = true
-		for door in doors:
-			door.locked = false
-		var reward := interactable("item", Vector2(width - 610, 577), "清场的馈赠", "F 领取一件道具")
-		reward.key = room_id + "/clear"
-		reward.item_id = ItemCatalog.IDS[Game.run.rng.randi_range(0, ItemCatalog.IDS.size() - 1)]
-		reward.icon_texture = ItemCatalog.icon(reward.item_id)
-		reward.detail = ItemCatalog.description(reward.item_id)
-		objective = "道路已开启 · 领取道具并选择出口"
-
-func _physics_process(delta: float) -> void:
-	if wave_delay > 0.0 and not Game.finishing:
-		wave_delay = maxf(0.0, wave_delay - delta)
-		if wave_delay == 0.0:
-			spawn_wave()
-	if not done and not stages.is_empty() and not encounter_active and is_instance_valid(player):
-		var trigger_distance := 370.0
-		if stages[stage_index].size() > 2 and is_instance_valid(stages[stage_index][2]):
-			trigger_distance = float(stages[stage_index][2].trigger_radius)
-		trigger_distance = maxf(trigger_distance, 350.0)
-		if player.position.x >= float(stages[stage_index][0]) - trigger_distance:
-			spawn_encounter()
-	queue_redraw()
-
 func text(at: Vector2, content: String, size: int, color: Color) -> void:
 	for line in content.split("\n"):
 		draw_string(font, at, line, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
@@ -387,6 +305,8 @@ func text(at: Vector2, content: String, size: int, color: Color) -> void:
 
 func _draw() -> void:
 	for sign in signs:
+		if room_id == "courtyard":
+			continue
 		text(sign[0], sign[1], 22, Color("#e8ddc8"))
 		text(sign[0] + Vector2(0, 32), sign[2], 16, Color("#99b2b8"))
 	if gate_x > 0:

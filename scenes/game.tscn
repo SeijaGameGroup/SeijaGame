@@ -1,14 +1,51 @@
-[gd_scene load_steps=3 format=3 uid="uid://bmo8jgx7ncr8n"]
-
-[ext_resource type="Script" uid="uid://oqwfrpboybno" path="res://scenes/game.gd" id="1_uwrxv"]
-[ext_resource type="PackedScene" uid="uid://bha7m77h65igm" path="res://scenes/player/player_stats.tscn" id="2_yqjtg"]
+[gd_scene load_steps=13 format=3 uid="uid://bmo8jgx7ncr8n"]
+[ext_resource type="Script" path="res://scenes/game.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player/player_stats.tscn" id="2"]
+[ext_resource type="Script" path="res://scenes/player/skills/skillID1.gd" id="3"]
+[ext_resource type="Script" path="res://scenes/player/skills/skillID2.gd" id="4"]
+[ext_resource type="Script" path="res://scenes/player/skills/skillID3.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/progression/reward_controller.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/progression/journey_profile.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/combat/combat_feedback.gd" id="8"]
+[ext_resource type="PackedScene" path="res://ui/rewards/reward_screen.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://ui/journey_panel.tscn" id="10"]
+[ext_resource type="Script" path="res://ui/run_hud.gd" id="11"]
+[ext_resource type="Resource" path="res://resources/balance/爽快模式.tres" id="12"]
 
 [node name="Game" type="CanvasLayer"]
 layer = 99
-script = ExtResource("1_uwrxv")
-
-[node name="PlayerStats" parent="." instance=ExtResource("2_yqjtg")]
-
+script = ExtResource("1")
+balance = ExtResource("12")
+[node name="PlayerStats" parent="." instance=ExtResource("2")]
+[node name="Guard" type="Node" parent="."]
+process_mode = 1
+script = ExtResource("3")
+[node name="Inversion" type="Node" parent="."]
+process_mode = 1
+script = ExtResource("4")
+[node name="Revolution" type="Node" parent="."]
+process_mode = 1
+script = ExtResource("5")
+[node name="Rewards" type="Node" parent="."]
+script = ExtResource("6")
+[node name="Profile" type="Node" parent="."]
+script = ExtResource("7")
+[node name="Music" type="AudioStreamPlayer" parent="."]
+volume_db = -20.0
+[node name="FeedbackWorld" type="CanvasLayer" parent="."]
+process_mode = 1
+layer = 5
+follow_viewport_enabled = true
+[node name="Feedback" type="Node2D" parent="FeedbackWorld"]
+script = ExtResource("8")
+[node name="HUDLayer" type="CanvasLayer" parent="."]
+layer = 20
+[node name="HUD" type="Control" parent="HUDLayer"]
+script = ExtResource("11")
+[node name="JourneyPanel" parent="HUDLayer" instance=ExtResource("10")]
+[node name="RewardLayer" type="CanvasLayer" parent="."]
+layer = 30
+[node name="RewardScreen" parent="RewardLayer" instance=ExtResource("9")]
 [node name="ColorRect" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0

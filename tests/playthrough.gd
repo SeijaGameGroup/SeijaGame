@@ -13,6 +13,8 @@ var boss_direction := 1.0
 var result_written := false
 
 func _ready() -> void:
+	Game.profile.persistence_enabled = false
+	Game.rewards.auto_choose = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	battle_route = OS.get_cmdline_user_args().has("--battle-route")
 	boss_only = OS.get_cmdline_user_args().has("--boss-only")
@@ -35,7 +37,7 @@ func _physics_process(delta: float) -> void:
 		return
 	tick += 1
 	elapsed += delta
-	for action in ["jump", "interact", "skill1", "skill2", "drop"]:
+	for action in ["jump", "interact", "skill1", "skill2", "skill3", "drop"]:
 		Input.action_release(action)
 	if Game.run.outcome != "":
 		if not result_written:
@@ -57,6 +59,8 @@ func _physics_process(delta: float) -> void:
 		room_started = elapsed
 		stationary = 0.0
 	Input.action_press("shoot")
+	if Game.run.energy >= 100.0 and (room.encounter_active or room.room_id == "boss_room"):
+		tap("skill3")
 	var desired_x: float = room.width - 150
 	var target: Node2D
 	if room.room_id == "boss_room" and is_instance_valid(room.boss) and room.boss.targetable:
@@ -80,7 +84,7 @@ func _physics_process(delta: float) -> void:
 			if object.is_used() or object.locked:
 				continue
 			var eligible := false
-			if object.kind == "item" and absf(object.position.y - 577) < 60:
+			if object.kind in ["item", "reward"] and absf(object.position.y - 577) < 60:
 				eligible = true
 			elif object.kind == "shop":
 				eligible = Game.player_stats.p_points >= object.price and (object.healing <= 0 or Game.player_stats.health < Game.player_stats.max_health - 15)
